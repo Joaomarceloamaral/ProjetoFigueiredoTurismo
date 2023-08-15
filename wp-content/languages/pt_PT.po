@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 6.3.x - Development package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-09 00:06:29+0000\n"
+"PO-Revision-Date: 2023-08-15 13:02:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -577,9 +577,29 @@ msgstr "Mostrado quando um visitante realiza uma pesquisa no seu site."
 msgid "Displays when a visitor views the dedicated page that exists for any media attachment."
 msgstr "Mostrado quando um visitante visualiza a página dedicada que existe para qualquer anexo multimédia."
 
+#: wp-includes/block-template-utils.php:162
+msgid "Displays a post tag archive. This template will serve as a fallback when a more specific template (e.g. Tag: Pizza) cannot be found."
+msgstr "Mostra um arquivo de etiqueta de artigo. Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo, Etiqueta: Pizza)."
+
 #: wp-includes/block-template-utils.php:158
 msgid "Displays a post archive when a specific date is visited (e.g., example.com/2023/)."
 msgstr "Mostra o arquivo de artigos quando é visitada uma data específica (exemplo: example.com/2023)."
+
+#: wp-includes/block-template-utils.php:154
+msgid "Displays a custom taxonomy archive. Like categories and tags, taxonomies have terms which you use to classify things. For example: a taxonomy named \"Art\" can have multiple terms, such as \"Modern\" and \"18th Century.\" This template will serve as a fallback when a more specific template (e.g. Taxonomy: Art) cannot be found."
+msgstr "Mostra um arquivo de taxonomia personalizada. Tal como as categorias e as etiquetas, as taxonomias têm termos que são utilizados para classificar coisas. Por exemplo: uma taxonomia chamada \"Arte\" pode ter vários termos, tais como \"Moderna\" e \"Século XVIII\". Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo, Taxonomia: Arte)."
+
+#: wp-includes/block-template-utils.php:150
+msgid "Displays a post category archive. This template will serve as a fallback when a more specific template (e.g. Category: Recipes) cannot be found."
+msgstr "Mostra um arquivo de categoria de artigo. Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo, Categoria: Receitas)."
+
+#: wp-includes/block-template-utils.php:146
+msgid "Displays a single author's post archive. This template will serve as a fallback when a more specific template (e.g. Author: Admin) cannot be found."
+msgstr "Mostra um arquivo de autor de artigos. Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo, Autor: Administrador)."
+
+#: wp-includes/block-template-utils.php:142
+msgid "Displays any archive, including posts by a single author, category, tag, taxonomy, custom post type, and date. This template will serve as a fallback when more specific templates (e.g. Category or Tag) cannot be found."
+msgstr "Mostra qualquer arquivo, incluindo artigos de um único autor, categoria, etiqueta, taxonomia, tipo de conteúdo personalizado e data. Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo: Categoria ou Etiqueta)."
 
 #: wp-includes/block-template-utils.php:138
 msgid "Display all static pages unless a custom template has been applied or a dedicated template exists."
@@ -588,6 +608,10 @@ msgstr "Mostra todas as páginas estáticas, a menos que tenha sido aplicado um 
 #: wp-includes/block-template-utils.php:134
 msgid "Displays single posts on your website unless a custom template has been applied to that post or a dedicated template exists."
 msgstr "Mostra artigos no seu site, a menos que tenha sido aplicado um modelo personalizado a um artigo ou exista um modelo dedicado."
+
+#: wp-includes/block-template-utils.php:130
+msgid "Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found."
+msgstr "Mostra qualquer tipo de conteúdo, como um artigo ou página. Este modelo servirá como alternativa quando não for possível encontrar um modelo mais específico (por exemplo: artigo, página ou anexo)."
 
 #: wp-includes/block-template-utils.php:126
 msgid "Displays your site's homepage, whether it is set to display latest posts or a static page. The Front Page template takes precedence over all templates."
