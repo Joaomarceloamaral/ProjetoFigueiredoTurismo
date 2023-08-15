@@ -1,4 +1,10 @@
 <?php
+//Begin Really Simple SSL session cookie settings
+@ini_set('session.cookie_httponly', true);
+@ini_set('session.cookie_secure', true);
+@ini_set('session.use_only_cookies', true);
+//END Really Simple SSL cookie settings
+
 /**
  * The base configuration for WordPress
  *
@@ -20,6 +26,8 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
+define('WP_CACHE', true);
+define( 'WPCACHEHOME', 'C:\xampp\htdocs\figueiredo_turismo\wp-content\plugins\wp-super-cache/' );
 define( 'DB_NAME', 'figueiredoturismo' );
 
 /** Database username */

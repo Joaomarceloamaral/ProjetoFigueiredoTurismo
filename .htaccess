@@ -1,3 +1,6 @@
+#BEGIN Really Simple SSL LETS ENCRYPT
+RewriteRule ^.well-known/(.*)$ - [L]
+#END Really Simple SSL LETS ENCRYPT
 
 # BEGIN WordPress
 # As directivas (linhas) entre "BEGIN WordPress" e "END WordPress" são geradas
@@ -12,5 +15,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /figueiredo_turismo/index.php [L]
 </IfModule>
-
 # END WordPress
