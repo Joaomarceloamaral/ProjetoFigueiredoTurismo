@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 6.3.x - Development package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-15 13:02:37+0000\n"
+"PO-Revision-Date: 2023-08-17 11:10:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -408,21 +408,82 @@ msgstr "Editar estilos"
 msgid "Footnotes"
 msgstr "Notas de rodapé"
 
+#. translators: %s: The user email address.
+#: wp-signup.php:708 wp-signup.php:866
+msgid "Check your inbox at %s and click on the given link."
+msgstr "Verifique a caixa de entrada de %s e clique na ligação enviada."
+
+#: wp-includes/update.php:1129
+msgid "Unable to locate WordPress content directory (wp-content)."
+msgstr "Não é possível localizar o directório de conteúdos do WordPress (wp-content)."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php:502
+msgid "Whether the theme is a block-based theme."
+msgstr "Se o tema é um tema baseado em blocos."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-templates-controller.php:948
+msgid "The date the template was last modified, in the site's timezone."
+msgstr "A data da última modificação do tema, no fuso horário do site."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-navigation-fallback-controller.php:134
+msgid "The unique identifier for the Navigation Menu."
+msgstr "O identificador único do menu de navegação."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-navigation-fallback-controller.php:108
+msgid "No fallback menu found."
+msgstr "Nenhum menu alternativo encontrado."
+
 #: wp-includes/rest-api/endpoints/class-wp-rest-navigation-fallback-controller.php:88
 msgid "Sorry, you are not allowed to edit Navigation Menus as this user."
 msgstr "Desculpe, este utilizador não tem permissão para editar menus de navegação."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-navigation-fallback-controller.php:80
+msgid "Sorry, you are not allowed to create Navigation Menus as this user."
+msgstr "Não tem permissão para criar menus de navegação com o actual utilizador."
 
 #: wp-includes/rest-api/endpoints/class-wp-rest-global-styles-revisions-controller.php:435
 msgid "Sorry, you are not allowed to view revisions for this global style."
 msgstr "Não tem permissão para ver revisões deste estilo global."
 
+#: wp-includes/rest-api/endpoints/class-wp-rest-global-styles-revisions-controller.php:114
+msgid "Cannot find user global styles revisions."
+msgstr "Não é possível encontrar revisões de estilos globais do utilizador."
+
+#: wp-includes/rest-api/endpoints/class-wp-rest-block-types-controller.php:525
+msgid "Custom CSS selectors."
+msgstr "Selectores CSS personalizados."
+
 #: wp-includes/post.php:304
 msgid "Pattern updated."
 msgstr "Padrão actualizado."
 
+#: wp-includes/post.php:303
+msgid "Pattern scheduled."
+msgstr "Padrão agendado."
+
+#: wp-includes/post.php:302
+msgid "Pattern reverted to draft."
+msgstr "Padrão revertido para rascunho."
+
 #: wp-includes/post.php:301
 msgid "Pattern published privately."
 msgstr "Padrão publicado em privado."
+
+#: wp-includes/post.php:300
+msgid "Pattern published."
+msgstr "Padrão publicado."
+
+#: wp-includes/post.php:298
+msgid "Patterns list navigation"
+msgstr "Lista de navegação de padrões"
+
+#: wp-includes/post.php:297
+msgid "Filter patterns list"
+msgstr "Filtrar lista de padrões"
+
+#: wp-includes/post.php:295 wp-includes/js/dist/edit-site.js:22581
+msgid "No patterns found."
+msgstr "Nenhum padrão encontrado."
 
 #: wp-includes/post.php:294
 msgid "Search Patterns"
@@ -439,6 +500,10 @@ msgstr "Ver padrões"
 #: wp-includes/post.php:291
 msgid "View Pattern"
 msgstr "Ver padrão"
+
+#: wp-includes/post.php:290
+msgid "Edit Block Pattern"
+msgstr "Editar padrão de blocos"
 
 #: wp-includes/post.php:289
 msgid "New Pattern"
@@ -463,6 +528,29 @@ msgctxt "post type general name"
 msgid "Patterns"
 msgstr "Padrões"
 
+#: wp-includes/media.php:2013 wp-includes/media.php:5664
+msgid "An image should not be lazy-loaded and marked as high priority at the same time."
+msgstr "Uma imagem não deve ser carregada em diferido e, ao mesmo tempo, assinalada como de alta prioridade."
+
+#: wp-includes/media-template.php:378
+msgid "The Edit Media screen is deprecated as of WordPress 6.3. Please use the Media Library instead."
+msgstr "O ecrã Editar multimédia está obsoleto a partir da versão 6.3 do WordPress. Em vez disso, utilize a Biblioteca multimédia."
+
+#. translators: %s: The type of the given object ID.
+#: wp-includes/functions.php:7088
+msgid "Object ID must be an integer, %s given."
+msgstr "ID do objecto deve ser um número inteiro, %s fornecido."
+
+#. translators: 1: $strategy, 2: $handle
+#: wp-includes/class-wp-scripts.php:844
+msgid "Cannot supply a strategy `%1$s` for script `%2$s` because it is an alias (it lacks a `src` value)."
+msgstr "Não é possível fornecer uma estratégia `%1$s` para o script `%2$s` porque se trata de um alias (falta-lhe um valor `src`)."
+
+#. translators: 1: $strategy, 2: $handle
+#: wp-includes/class-wp-scripts.php:832
+msgid "Invalid strategy `%1$s` defined for `%2$s` during script registration."
+msgstr "Estratégia inválida `%1$s` definida para `%2$s` durante o registo do script."
+
 #: wp-includes/class-wp-post-type.php:860
 msgid "Page trashed."
 msgstr "Página movida para o lixo."
@@ -476,10 +564,37 @@ msgctxt "Title of a Navigation menu"
 msgid "Navigation"
 msgstr "Navegação"
 
+#: wp-includes/class-wp-navigation-fallback.php:109
+msgid "Unable to convert Classic Menu to blocks."
+msgstr "Não é possível converter menu clássico em blocos."
+
+#: wp-includes/class-wp-navigation-fallback.php:102
+msgid "No Classic Menus found."
+msgstr "Nenhum menu clássico encontrado."
+
+#. translators: %s: duotone filter ID
+#: wp-includes/class-wp-duotone.php:904
+msgid "The duotone id \"%s\" is not registered in theme.json settings"
+msgstr "ID do duotone \"%s\" não está registada nas configurações theme.json"
+
 #. translators: %s: duotone colors
 #: wp-includes/class-wp-duotone.php:677
 msgid "\"%s\" in theme.json settings.color.duotone is not a hex or rgb string."
 msgstr "A string \"%s\" em settings.color.duotone do theme.json não é um valor hexadecimal nem rgb."
+
+#: wp-includes/class-wp-classic-to-block-menu-converter.php:30
+msgid "The menu provided is not a valid menu."
+msgstr "O menu fornecido não é válido."
+
+#: wp-includes/blocks/search.php:142
+msgid "Expand search field"
+msgstr "Expandir campo de pesquisa"
+
+#. translators: %1$s is a URL to a post, excerpt truncation character, default
+#. …
+#: wp-includes/blocks/latest-posts.php:54
+msgid " … <a href=\"%1$s\" rel=\"noopener noreferrer\">Read more</a>"
+msgstr " … <a href=\"%1$s\" rel=\"noopener noreferrer\">Ler mais</a>"
 
 #: wp-includes/block-template-utils.php:177
 msgctxt "Template name"
@@ -505,6 +620,11 @@ msgctxt "Template name"
 msgid "Date Archives"
 msgstr "Arquivo por datas"
 
+#: wp-includes/block-template-utils.php:149
+msgctxt "Template name"
+msgid "Category Archives"
+msgstr "Arquivos de categorias"
+
 #: wp-includes/block-template-utils.php:145
 msgctxt "Template name"
 msgid "Author Archives"
@@ -514,6 +634,11 @@ msgstr "Arquivo por autores"
 msgctxt "Template name"
 msgid "All Archives"
 msgstr "Todos os arquivos"
+
+#: wp-includes/block-template-utils.php:129
+msgctxt "Template name"
+msgid "Single Entries"
+msgstr "Conteúdo"
 
 #: wp-includes/block-template-utils.php:121
 msgctxt "Template name"
