@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 6.3.x - Development - Administration package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-17 11:14:54+0000\n"
+"PO-Revision-Date: 2023-08-23 18:28:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -151,6 +151,26 @@ msgstr "Tabela ordenada por email."
 msgid "Table ordered by Username."
 msgstr "Tabela ordenada por nome de utilizador."
 
+#. translators: %s: The plugin or theme slug.
+#: wp-admin/includes/class-wp-upgrader.php:216
+msgid "Could not delete the temporary backup directory for %s."
+msgstr "Não foi possível eliminar o directório temporário da cópia de segurança para %s."
+
+#. translators: %s: The plugin or theme slug.
+#: wp-admin/includes/class-wp-upgrader.php:214
+msgid "Could not restore the original version of %s."
+msgstr "Não foi possível recuperar a versão original de %s."
+
+#. translators: %s: upgrade-temp-backup
+#: wp-admin/includes/class-wp-upgrader.php:212
+msgid "Could not move the old version to the %s directory."
+msgstr "Não foi possível mover a versão antiga para o directório %s."
+
+#. translators: %s: upgrade-temp-backup
+#: wp-admin/includes/class-wp-upgrader.php:210
+msgid "Could not create the %s directory."
+msgstr "Não foi possível criar o directório %s."
+
 #: wp-admin/includes/class-wp-terms-list-table.php:224
 msgid "Table ordered by Links."
 msgstr "Tabela ordenada por ligações."
@@ -171,9 +191,103 @@ msgstr "Tabela ordenada por descrição."
 msgid "Table ordered hierarchically."
 msgstr "Tabela ordenada hierarquicamente."
 
-#: wp-admin/includes/class-wp-site-health.php:2798
+#: wp-admin/includes/class-wp-site-health.php:2790
 msgid "Available disk space"
 msgstr "Espaço disponível no disco"
+
+#: wp-admin/includes/class-wp-site-health.php:2786
+msgid "Plugin and theme temporary backup directory access"
+msgstr "Acesso ao directório de cópias de segurança temporárias de plugins e temas"
+
+#. translators: 1: wp-content/upgrade, 2: wp-content.
+#: wp-admin/includes/class-wp-site-health.php:2103
+msgid "The %1$s directory does not exist, and the server does not have write permissions in %2$s to create it. This directory is used for plugin and theme updates. Please make sure the server has write permissions in %2$s."
+msgstr "O directório %1$s não existe e o servidor não tem permissões de escrita em %2$s para o criar. Este directório é utilizado para actualizações de plugins e temas. Certifique-se de que o servidor tem permissões de escrita em %2$s."
+
+#: wp-admin/includes/class-wp-site-health.php:2100
+msgid "The upgrade directory cannot be created"
+msgstr "Não é possível criar o directório de actualização"
+
+#. translators: %s: wp-content/upgrade
+#: wp-admin/includes/class-wp-site-health.php:2092
+msgid "The %s directory exists but is not writable. This directory is used for plugin and theme updates. Please make sure the server has write permissions to this directory."
+msgstr "O directório %s existe mas não tem permissão de escrita. Este directório é utilizado para actualizações de plugins e temas. Certifique-se de que o servidor tem permissões de escrita neste directório."
+
+#: wp-admin/includes/class-wp-site-health.php:2089
+msgid "The upgrade directory exists but is not writable"
+msgstr "O directório de actualização existe mas não tem permissão de escrita"
+
+#. translators: %s: wp-content/upgrade-temp-backup
+#: wp-admin/includes/class-wp-site-health.php:2081
+msgid "The %s directory exists but is not writable. This directory is used to improve the stability of plugin and theme updates. Please make sure the server has write permissions to this directory."
+msgstr "O directório %s existe mas não tem permissão de escrita. Este directório é utilizado para melhorar a estabilidade das actualizações de plugins e temas. Certifique-se de que o servidor tem permissões de escrita neste diretório."
+
+#: wp-admin/includes/class-wp-site-health.php:2078
+msgid "The temporary backup directory exists but is not writable"
+msgstr "O diretório temporário de cópia de segurança existe mas não tem permissão de escrita"
+
+#. translators: %s: wp-content/upgrade-temp-backup/themes
+#: wp-admin/includes/class-wp-site-health.php:2070
+msgid "The %s directory exists but is not writable. This directory is used to improve the stability of theme updates. Please make sure the server has write permissions to this directory."
+msgstr "O directório %s existe mas não tem permissão de escrita. Este directório é utilizado para actualizações de temas. Certifique-se de que o servidor tem permissões de escrita neste directório."
+
+#: wp-admin/includes/class-wp-site-health.php:2067
+msgid "Theme temporary backup directory exists but is not writable"
+msgstr "O directório temporário de cópia de segurança de temas existe mas não tem permissão de escrita"
+
+#. translators: %s: wp-content/upgrade-temp-backup/plugins
+#: wp-admin/includes/class-wp-site-health.php:2059
+msgid "The %s directory exists but is not writable. This directory is used to improve the stability of plugin updates. Please make sure the server has write permissions to this directory."
+msgstr "O directório %s existe mas não pode ser escrito. Este directório é utilizado para melhorar a estabilidade das actualizações de plugins. Certifique-se de que o servidor tem permissões de escrita neste directório."
+
+#: wp-admin/includes/class-wp-site-health.php:2056
+msgid "Plugin temporary backup directory exists but is not writable"
+msgstr "O directório temporário de cópia de segurança de plugins existe mas não tem permissão de escrita"
+
+#. translators: 1: wp-content/upgrade-temp-backup/plugins, 2:
+#. wp-content/upgrade-temp-backup/themes.
+#: wp-admin/includes/class-wp-site-health.php:2047
+msgid "The %1$s and %2$s directories exist but are not writable. These directories are used to improve the stability of plugin updates. Please make sure the server has write permissions to these directories."
+msgstr "Os directórios %1$s e %2$s existem mas não têm permissão de escrita. Estes directórios são utilizados para actualizações de plugins. Certifique-se de que o servidor tem permissões de escrita nestes directórios."
+
+#: wp-admin/includes/class-wp-site-health.php:2044
+msgid "Plugin and theme temporary backup directories exist but are not writable"
+msgstr "Os directórios temporários de cópia de segurança de plugins e temas existem mas não têm permissão de escrita"
+
+#. translators: %s: wp-content
+#: wp-admin/includes/class-wp-site-health.php:2026
+msgid "The %s directory cannot be located."
+msgstr "Não é possível localizar o directório %s."
+
+#. translators: %s: wp-content/upgrade-temp-backup
+#: wp-admin/includes/class-wp-site-health.php:1997
+msgid "The %s directory used to improve the stability of plugin and theme updates is writable."
+msgstr "O directório %s utilizado para melhorar a estabilidade das actualizações de plugins e temas tem permissão de escrita."
+
+#: wp-admin/includes/class-wp-site-health.php:1989
+msgid "Plugin and theme temporary backup directory is writable"
+msgstr "O directório de cópia de segurança temporária de plugins e temas tem permissão de escrita"
+
+#: wp-admin/includes/class-wp-site-health.php:1963
+msgid "Could not determine available disk space for updates."
+msgstr "Não foi possível determinar o espaço disponível em disco para as actualizações."
+
+#: wp-admin/includes/class-wp-site-health.php:1966
+msgid "Available disk space is critically low, less than 20 MB available. Proceed with caution, updates may fail."
+msgstr "O espaço disponível em disco é muito reduzido, menos de 20 MB disponíveis. Prossiga com cuidado, as actualizações poderão falhar."
+
+#: wp-admin/includes/class-wp-site-health.php:1969
+msgid "Available disk space is low, less than 100 MB available."
+msgstr "O espaço disponível em disco é reduzido, menos de 100 MB disponíveis."
+
+#. translators: %s: Available disk space in MB or GB.
+#: wp-admin/includes/class-wp-site-health.php:1955
+msgid "%s available disk space was detected, update routines can be performed safely."
+msgstr "Foi detectado %s de espaço disponível em disco, as rotinas de actualização podem ser executadas em segurança."
+
+#: wp-admin/includes/class-wp-site-health.php:1947
+msgid "Disk space available to safely perform updates"
+msgstr "Espaço disponível em disco para efectuar actualizações em segurança"
 
 #: wp-admin/includes/class-wp-posts-list-table.php:767
 msgid "Table ordered by Hierarchical Menu Order and Title."
@@ -250,9 +364,18 @@ msgstr "Tabela ordenada por nome."
 msgid "Current Server time"
 msgstr "Hora actual do servidor"
 
+#: wp-admin/includes/class-wp-debug-data.php:854
+msgid "Current UTC time"
+msgstr "Hora UTC actual"
+
 #: wp-admin/includes/class-wp-debug-data.php:850
 msgid "Current time"
 msgstr "Hora actual"
+
+#. translators: Hidden accessibility text.
+#: wp-admin/includes/class-wp-comments-list-table.php:588
+msgid "Ordered by Comment Date, descending."
+msgstr "Ordenado por data de comentário, de forma decrescente."
 
 #: wp-admin/includes/class-wp-comments-list-table.php:544
 msgid "Table ordered by Post Replied To."
@@ -262,6 +385,10 @@ msgstr "Tabela ordenada por artigo da resposta."
 msgid "Table ordered by Comment Author."
 msgstr "Tabela ordenada por autor do comentário."
 
+#: wp-admin/includes/class-core-upgrader.php:37
+msgid "Attempting to restore the previous version."
+msgstr "A tentar recuperar a versão anterior."
+
 #: wp-admin/includes/class-bulk-upgrader-skin.php:157
 msgid "More details."
 msgstr "Mais detalhes."
@@ -269,6 +396,26 @@ msgstr "Mais detalhes."
 #: wp-admin/contribute.php:103
 msgid "Find your team &rarr;"
 msgstr "Descubra a sua equipa &rarr;"
+
+#: wp-admin/contribute.php:102
+msgid "Finding the area that aligns with your skills and interests is the first step toward meaningful contribution. With more than 20 Make WordPress teams working on different parts of the open source WordPress project, there&#8217;s a place for everyone, no matter what your skill set is."
+msgstr "Encontrar a área que se adequa às as suas competências e interesses é o primeiro passo para uma contribuição significativa. Com mais de 20 equipas Make WordPress a trabalhar em diferentes partes do projecto WordPress de código aberto, existe um lugar para todos, independentemente das suas competências."
+
+#: wp-admin/contribute.php:101
+msgid "Shape the future of the web with WordPress"
+msgstr "Molde o futuro da web com o WordPress"
+
+#: wp-admin/contribute.php:94
+msgid "WordPress app: Kotlin, Java, Swift, Objective-C, Vue, Python, and TypeScript"
+msgstr "Aplicação WordPress: Kotlin, Java, Swift, Objective-C, Vue, Python e TypeScript"
+
+#: wp-admin/contribute.php:93
+msgid "Core and Block Editor: HTML, CSS, PHP, SQL, JavaScript, and React"
+msgstr "Core e editor de blocos: HTML, CSS, PHP, SQL, JavaScript e React"
+
+#: wp-admin/contribute.php:91
+msgid "WordPress embraces new technologies, while being committed to backward compatibility. The WordPress project uses the following languages and libraries:"
+msgstr "O WordPress adopta novas tecnologias, ao mesmo tempo em que se compromete com a compatibilidade com versões anteriores. O projecto WordPress utiliza as seguintes linguagens e bibliotecas:"
 
 #: wp-admin/contribute.php:89
 msgid "<strong>Contribute</strong> to the code, improve the UX, and test the WordPress app."
@@ -285,6 +432,10 @@ msgstr "<strong>Teste</strong> novas versões e funcionalidades propostas para o
 #: wp-admin/contribute.php:86
 msgid "<strong>Find</strong> and report bugs in the WordPress core software."
 msgstr "<strong>Descubra</strong> e reporte erros no core do WordPress."
+
+#: wp-admin/contribute.php:84
+msgid "If you do code, or want to learn how, you can contribute technically in numerous ways:"
+msgstr "Se souber programar ou quiser aprender, pode contribuir tecnicamente de várias formas:"
 
 #: wp-admin/contribute.php:83
 msgid "Code-based contribution"
@@ -330,49 +481,150 @@ msgstr "<strong>Escreva</strong> ou melhore a documentação do WordPress."
 msgid "<strong>Share</strong> your knowledge in the WordPress support forums."
 msgstr "<strong>Partilhe</strong> os seus conhecimentos no fórum de suporte do WordPress."
 
+#: wp-admin/contribute.php:60
+msgid "WordPress may thrive on technical contributions, but you don&#8217;t have to code to contribute. Here are some of the ways you can make an impact without writing a single line of code:"
+msgstr "O WordPress pode prosperar com contribuições técnicas, mas não precisa de escrever código para contribuir. Estas são algumas das formas como pode causar impacto sem escrever uma única linha de código:"
+
 #: wp-admin/contribute.php:59
 msgid "No-code contribution"
 msgstr "Contribuição sem código"
+
+#: wp-admin/contribute.php:52
+msgid "Grow your network and make friends."
+msgstr "Aumente a sua rede e faça amigos."
+
+#: wp-admin/contribute.php:51
+msgid "Apply your skills or learn new ones."
+msgstr "Aplique as suas competências ou aprenda novas competências."
+
+#: wp-admin/contribute.php:50
+msgid "Be part of a global open source community."
+msgstr "Faça parte de uma comunidade global de código aberto."
+
+#: wp-admin/contribute.php:47
+msgid "Join the WordPress contributor community and connect with others who are passionate about maintaining a free and open web."
+msgstr "Junte-se à comunidade de contribuidores do WordPress e ligue-se a outras pessoas que são apaixonadas por manter uma web livre e aberta."
+
+#: wp-admin/contribute.php:46
+msgid "Do you use WordPress for work, for personal projects, or even just for fun? You can help shape the long-term success of the open source project that powers millions of websites around the world."
+msgstr "Utiliza o WordPress no trabalho, em projectos pessoais ou apenas por diversão? Pode ajudar a moldar o sucesso a longo prazo do projecto de código aberto que alimenta milhões de sites em todo o mundo."
 
 #: wp-admin/contribute.php:29
 msgid "Be the future of WordPress"
 msgstr "Seja o futuro do WordPress"
 
+#. translators: 1: Learn WordPress link, 2: Workshops link.
+#: wp-admin/about.php:252
+msgid "<a href=\"%1$s\">Learn WordPress</a> is a free resource for new and experienced WordPress users. Learn is stocked with how-to videos on using various features in WordPress, <a href=\"%2$s\">interactive events</a> for exploring topics in-depth, and lesson plans for diving deep into specific areas of WordPress."
+msgstr "<a href=\"%1$s\">Learn WordPress</a> é um recurso gratuito para utilizadores novos e experientes em WordPress. A plataforma Learn inclui muitos vídeos com tutoriais sobre a utilização de várias funcionalidades do WordPress, <a href=\"%2$s\">eventos interactivos</a> para explorar tópicos, e planos de lições para aprofundar o seu conhecimento em áreas específicas do WordPress."
+
+#: wp-admin/about.php:228
+msgid "Create unique patterns to jumpstart template creation with a new modal enabling access to pattern selection."
+msgstr "Crie padrões únicos para facilitar a criação de modelos com uma nova janela que permite o acesso à selecção de padrões."
+
 #: wp-admin/about.php:227
 msgid "Build templates with Patterns"
 msgstr "Crie modelos com padrões"
+
+#: wp-admin/about.php:217
+msgid "Drag and drop to every content layer and delete any block you would like in the updated List View."
+msgstr "Arraste e largue em qualquer parte do conteúdo ou elimine qualquer bloco com as melhorias na Vista de lista."
 
 #: wp-admin/about.php:216
 msgid "List View improvements"
 msgstr "Melhorias na vista de lista"
 
+#: wp-admin/about.php:205
+msgid "A revamped top toolbar offers parent selectors for nested blocks, options when selecting multiple blocks, and a new interface embedded into the title bar with new functionality in mind."
+msgstr "Uma barra de ferramentas renovada oferece selectores superiores para blocos internos, opções para seleccionar vários blocos e uma nova interface incorporada na barra de título a pensar novas funcionalidades."
+
 #: wp-admin/about.php:204
 msgid "Rediscover the Top Toolbar"
 msgstr "Redescubra a barra de ferramentas superior"
+
+#: wp-admin/about.php:191
+msgid "Distraction-free designing is now available in the Site Editor."
+msgstr "O design sem distracções está agora disponível no editor do site."
 
 #: wp-admin/about.php:190
 msgid "Build your site distraction-free"
 msgstr "Crie o seu site sem distracções"
 
+#: wp-admin/about.php:181
+msgid "Specify your aspect ratios and ensure design integrity, especially when using images in patterns."
+msgstr "Especifique os seus rácios largura:altura e garanta a integridade do design, especialmente ao utilizar imagens em padrões."
+
 #: wp-admin/about.php:180
 msgid "Set aspect ratio on images"
 msgstr "Defina a proporção das imagens"
+
+#: wp-admin/about.php:171
+msgid "Experience block themes before you switch and preview the Site Editor, with options to customize directly before committing to a new theme."
+msgstr "Experimente temas de blocos antes de os utilizar e pré-visualize o editor do site, incluindo as opções de personalização, antes de se comprometer com um novo tema."
 
 #: wp-admin/about.php:170
 msgid "Preview block themes"
 msgstr "Pré-visualize temas de blocos"
 
+#: wp-admin/about.php:156
+msgid "Incorporating more than 50 accessibility improvements across the platform, WordPress 6.3 is more accessible than ever. Improved labeling, optimized tab and arrow-key navigation, revised heading hierarchy, and new controls in the admin image editor allow those using assistive technologies to navigate more easily."
+msgstr "Com mais de 50 melhorias de acessibilidade em toda a plataforma, o WordPress 6.3 está mais acessível do que nunca. A legendagem melhorada, a optimização da navegação por tabulador e teclas de seta, a revisão da hierarquia de cabeçalhos e os novos controlos no editor de imagens do administrador permitem que os utilizadores de tecnologias assistivas naveguem mais facilmente."
+
 #: wp-admin/about.php:155
 msgid "Accessibility remains a core focus"
 msgstr "A acessibilidade continua a ser uma prioridade"
+
+#: wp-admin/about.php:146
+msgid "WordPress 6.3 has 170+ performance updates, including defer and async support for the Scripts API and fetchpriority support for images. These improvements can improve your website&#8217;s load time as perceived by visitors, along with block template resolution, image lazy-loading, and the emoji loader."
+msgstr "O WordPress 6.3 tem mais de 170 melhorias de desempenho, incluindo suporte para deferimento e assincronia na Scripts API e suporte para fetchPriority das imagens. Estas melhorias podem diminuir o tempo percepcionado de carregamento do seu site pelos seus visitantes, juntamente com a resolução de modelos de blocos, o carregamento em diferido de imagens e o carregador de emojis."
 
 #: wp-admin/about.php:145
 msgid "Performance gets a boost"
 msgstr "Desempenho melhorado"
 
+#: wp-admin/about.php:131
+msgid "Use the block to avoid spoiling a surprise, create an interactive Q&A section, or hide a long paragraph under a heading."
+msgstr "Utilize o bloco para evitar estragar uma surpresa, criar uma secção interactiva de perguntas e respostas ou esconda um parágrafo longo sob um título."
+
+#: wp-admin/about.php:130
+msgid "Show or hide content with the Details block"
+msgstr "Mostre ou esconda conteúdos com o bloco Detalhes"
+
+#: wp-admin/about.php:124
+msgid "Footnotes add convenient annotations throughout your content. Now you can add and link footnotes for any paragraph."
+msgstr "O bloco Notas de rodapé permite-lhe adicionar anotações ao seu conteúdo de forma prática. Agora pode adicionar e ligar notas de rodapé em qualquer parágrafo."
+
+#: wp-admin/about.php:123
+msgid "Annotate with the Footnotes block"
+msgstr "Faça anotações com o bloco de Notas de rodapé"
+
+#: wp-admin/about.php:117
+msgid "You can now see how your site looked at a specific time. Visualize these revisions in a timeline and access a one-click option to restore prior styles."
+msgstr "Agora pode ver o aspecto do seu site num determinado momento. Visualize estas revisões numa cronologia e aceda a uma opção para recuperar estilos anteriores como apenas um clique."
+
+#: wp-admin/about.php:116
+msgid "Track design changes with Style Revisions"
+msgstr "Acompanhe as alterações de design com as Revisões de estilos"
+
+#: wp-admin/about.php:102
+msgid "New design controls bring more versatility for fine-tuning designs, starting with the ability to customize your caption&#8217;s styles from the Styles Interface without coding. You can manage your duotone filters in Styles for supported blocks and pick from the options provided by your theme or disable them entirely. The Cover block gets added settings for text color, layout controls, and border options, making this powerful block even more handy."
+msgstr "Os novos controlos de design permitem-lhe afinar os designs com maior versatilidade, começando pela capacidade de personalizar os estilos das legendas a partir da interface de estilos sem código. Pode gerir os seus filtros bicolores em Estilos para os blocos suportados e escolher entre as opções fornecidas pelo seu tema, ou desactivá-las totalmente. O bloco Capa recebe opções adicionais para a cor do texto, controlos de layout e opções da borda, tornando este poderoso bloco ainda mais prático."
+
+#: wp-admin/about.php:101
+msgid "Sharpen your designs with new tools"
+msgstr "Aperfeiçoe os seus designs com novas ferramentas"
+
+#: wp-admin/about.php:95
+msgid "Switch to a specific template or open your editor preferences with a new tool that helps you quickly navigate expanded functionality. With simple keyboard shortcuts (⌘+k on Mac or Ctrl+k on Windows), clicking the sidebar search icon in Site View, or clicking the Title Bar, get where you need to go and do what you need to do in seconds."
+msgstr "Mude para um modelo específico ou abra as preferências do seu editor com uma nova ferramenta que ajuda a navegar rapidamente pela funcionalidade expandida. Com simples atalhos de teclado (⌘+k no Mac ou Ctrl+k no Windows), clicando no ícone de pesquisa da barra lateral na Vista do site ou clicando na barra de título, vá onde quiser e faça o que precisa em segundos."
+
 #: wp-admin/about.php:94
 msgid "Work faster with the Command Palette"
 msgstr "Trabalhe mais rapidamente com a paleta de comandos"
+
+#: wp-admin/about.php:78
+msgid "Arrange blocks in unlimited ways and save them as Patterns for use throughout your site. You can even specify whether to sync your patterns (previously referred to as “reusable blocks”) so that one change applies to all parts of your site. Or, utilize patterns as a starting point with the ability to customize each instance."
+msgstr "Organize os blocos de formas ilimitadas e guarde-os como Padrões para utilização em todo o seu site. Pode até especificar se pretende sincronizar os seus padrões (anteriormente designados por \"blocos reutilizáveis\") para que uma alteração se aplique a todas as partes do seu site. Ou utilize os padrões como ponto de partida, com a possibilidade de personalizar cada instância."
 
 #: wp-admin/about.php:77
 msgid "Create and sync patterns"
@@ -660,151 +912,151 @@ msgstr "O seu site está a usar uma versão desactualizada do PHP (%s), que em b
 msgid "Your site is running on an outdated version of PHP (%s), which does not receive security updates and soon will not be supported by WordPress. Ensure that PHP is updated on your server as soon as possible. Otherwise you will not be able to upgrade WordPress."
 msgstr "O seu site está a usar uma versão desactualizada do PHP (%s), que não recebe actualizações de segurança e em breve não será suportada pelo WordPress. Certifique-se de que o PHP é actualizado no seu servidor o mais breve possível. Caso contrário, não será possível actualizar o WordPress."
 
-#: wp-admin/includes/class-wp-site-health.php:2851
+#: wp-admin/includes/class-wp-site-health.php:2843
 msgid "Persistent object cache"
 msgstr "Cache de objectos persistente"
 
-#: wp-admin/includes/class-wp-site-health.php:2844
+#: wp-admin/includes/class-wp-site-health.php:2836
 msgid "Page cache"
 msgstr "Cache de páginas"
 
-#: wp-admin/includes/class-wp-site-health.php:2696
+#: wp-admin/includes/class-wp-site-health.php:2688
 msgid "You should use a persistent object cache"
 msgstr "Deve usar uma cache de objectos persistente"
 
 #. translators: Available object caching services.
-#: wp-admin/includes/class-wp-site-health.php:2675
+#: wp-admin/includes/class-wp-site-health.php:2667
 msgid "Your host appears to support the following object caching services: %s."
 msgstr "O seu alojamento parece suportar os seguintes serviços de cache de objectos: %s."
 
-#: wp-admin/includes/class-wp-site-health.php:2670
+#: wp-admin/includes/class-wp-site-health.php:2662
 msgid "Your hosting provider can tell you if a persistent object cache can be enabled on your site."
 msgstr "O seu serviço de alojamento pode dizer-lhe se pode activar uma cache de objectos persistente no seu site."
 
-#: wp-admin/includes/class-wp-site-health.php:2663
+#: wp-admin/includes/class-wp-site-health.php:2655
 msgid "A persistent object cache is not required"
 msgstr "Não é necessária uma cache de objectos persistente"
 
-#: wp-admin/includes/class-wp-site-health.php:2652
+#: wp-admin/includes/class-wp-site-health.php:2644
 msgid "Learn more about persistent object caching."
 msgstr "Saiba mais sobre a cache de objectos persistente."
 
-#: wp-admin/includes/class-wp-site-health.php:2647
+#: wp-admin/includes/class-wp-site-health.php:2639
 msgid "A persistent object cache makes your site&#8217;s database more efficient, resulting in faster load times because WordPress can retrieve your site&#8217;s content and settings much more quickly."
 msgstr "Uma cache de objectos persistente torna a base de dados do seu site mais eficiente, resultando em tempos de carregamento mais rápidos, porque o WordPress pode obter o conteúdo e as opções do seu site muito mais rapidamente."
 
-#: wp-admin/includes/class-wp-site-health.php:2644
+#: wp-admin/includes/class-wp-site-health.php:2636
 msgid "A persistent object cache is being used"
 msgstr "Está a ser usada uma cache de objectos persistente"
 
 #. translators: Localized Support reference.
-#: wp-admin/includes/class-wp-site-health.php:2634
+#: wp-admin/includes/class-wp-site-health.php:2626
 msgid "https://wordpress.org/documentation/article/optimization/#persistent-object-cache"
 msgstr "https://wordpress.org/documentation/article/optimization/#persistent-object-cache"
 
-#: wp-admin/includes/class-wp-site-health.php:2609
+#: wp-admin/includes/class-wp-site-health.php:2601
 msgid "A page cache plugin was not detected."
 msgstr "Não foi detectado nenhum plugin de cache de páginas."
 
-#: wp-admin/includes/class-wp-site-health.php:2606
+#: wp-admin/includes/class-wp-site-health.php:2598
 msgid "A page cache plugin was detected."
 msgstr "Foi detectado um plugin de cache de páginas."
 
 #. translators: %d: Number of caching headers.
-#: wp-admin/includes/class-wp-site-health.php:2593
+#: wp-admin/includes/class-wp-site-health.php:2585
 msgid "There was %d client caching response header detected:"
 msgid_plural "There were %d client caching response headers detected:"
 msgstr[0] "Foi detectado %d cabeçalho de resposta de cache do cliente:"
 msgstr[1] "Foram detectados %d cabeçalhos de resposta de cache do cliente:"
 
-#: wp-admin/includes/class-wp-site-health.php:2588
+#: wp-admin/includes/class-wp-site-health.php:2580
 msgid "No client caching response headers were detected."
 msgstr "Não foram detectados cabeçalhos de resposta de cache do cliente."
 
 #. translators: 1: The response time in milliseconds, 2: The recommended
 #. threshold in milliseconds.
-#: wp-admin/includes/class-wp-site-health.php:2581
+#: wp-admin/includes/class-wp-site-health.php:2573
 msgid "Median server response time was %1$s milliseconds. It should be less than the recommended %2$s milliseconds threshold."
 msgstr "O tempo médio de resposta do servidor foi de %1$s milissegundos. Deveria ser inferior ao limite recomendado de %2$s milissegundos."
 
 #. translators: 1: The response time in milliseconds, 2: The recommended
 #. threshold in milliseconds.
-#: wp-admin/includes/class-wp-site-health.php:2574
+#: wp-admin/includes/class-wp-site-health.php:2566
 msgid "Median server response time was %1$s milliseconds. This is less than the recommended %2$s milliseconds threshold."
 msgstr "O tempo médio de resposta do servidor foi de %1$s milissegundos. Isto é inferior ao limite recomendado de %2$s milissegundos."
 
-#: wp-admin/includes/class-wp-site-health.php:2567
+#: wp-admin/includes/class-wp-site-health.php:2559
 msgid "Server response time could not be determined. Verify that loopback requests are working."
 msgstr "Não foi possível determinar o tempo de resposta do servidor. Verifique se os pedidos de loopback estão a funcionar."
 
-#: wp-admin/includes/class-wp-site-health.php:2560
+#: wp-admin/includes/class-wp-site-health.php:2552
 msgid "Page cache is detected but the server response time is still slow"
 msgstr "Foi detectada cache de páginas mas o tempo de resposta do servidor ainda é lento"
 
-#: wp-admin/includes/class-wp-site-health.php:2558
+#: wp-admin/includes/class-wp-site-health.php:2550
 msgid "Page cache is not detected and the server response time is slow"
 msgstr "Não foi detectada cache de páginas e o tempo de resposta do servidor é lento"
 
-#: wp-admin/includes/class-wp-site-health.php:2554
+#: wp-admin/includes/class-wp-site-health.php:2546
 msgid "Page cache is detected and the server response time is good"
 msgstr "Foi detectada cache de páginas e o tempo de resposta do servidor é bom"
 
-#: wp-admin/includes/class-wp-site-health.php:2551
+#: wp-admin/includes/class-wp-site-health.php:2543
 msgid "Page cache is not detected but the server response time is OK"
 msgstr "Não foi detectada cache de páginas mas o tempo de resposta do servidor é razoável"
 
 #. translators: 1: Error message, 2: Error code.
-#: wp-admin/includes/class-wp-site-health.php:2539
+#: wp-admin/includes/class-wp-site-health.php:2531
 msgid "Unable to detect page cache due to possible loopback request problem. Please verify that the loopback request test is passing. Error: %1$s (Code: %2$s)"
 msgstr "Não é possível detectar a cache da página devido a um possível problema de pedido de loopback. Por favor, verifique se o teste de pedido de loopback está a passar. Erro: %1$s (Código: %2$s)"
 
-#: wp-admin/includes/class-wp-site-health.php:2535
+#: wp-admin/includes/class-wp-site-health.php:2527
 msgid "Unable to detect the presence of page cache"
 msgstr "Não é possível detectar a presença de cache da página"
 
-#: wp-admin/includes/class-wp-site-health.php:2526
+#: wp-admin/includes/class-wp-site-health.php:2518
 msgid "Learn more about page cache"
 msgstr "Saiba mais sobre a cache de páginas"
 
-#: wp-admin/includes/class-wp-site-health.php:2525
+#: wp-admin/includes/class-wp-site-health.php:2517
 msgid "https://wordpress.org/documentation/article/optimization/#Caching"
 msgstr "https://wordpress.org/documentation/article/optimization/#Caching"
 
-#: wp-admin/includes/class-wp-site-health.php:2511
+#: wp-admin/includes/class-wp-site-health.php:2503
 msgid "Page cache is detected by looking for an active page cache plugin as well as making three requests to the homepage and looking for one or more of the following HTTP client caching response headers:"
 msgstr "A cache da página é detectada procurando por um plugin de cache de páginas activo, bem como ao fazer três pedidos à página inicial e procurando por um ou mais dos seguintes cabeçalhos de resposta de cache do cliente HTTP:"
 
-#: wp-admin/includes/class-wp-site-health.php:2510
+#: wp-admin/includes/class-wp-site-health.php:2502
 msgid "Page cache enhances the speed and performance of your site by saving and serving static pages instead of calling for a page every time a user visits."
 msgstr "A cache de páginas melhora a velocidade e o desempenho do seu site ao guardar e servir páginas estáticas em vez de obter uma página cada vez que um utilizador a visita."
 
-#: wp-admin/includes/class-wp-site-health.php:2476
+#: wp-admin/includes/class-wp-site-health.php:2468
 msgid "If you are still seeing this warning after having tried the actions below, you may need to contact your hosting provider for further assistance."
 msgstr "Se ainda estiver a ver este aviso depois de ter tentado as acções abaixo, poderá ter de pedir assistência ao seu serviço de alojamento."
 
-#: wp-admin/includes/class-wp-site-health.php:2459
+#: wp-admin/includes/class-wp-site-health.php:2451
 msgid "The Authorization header is used by third-party applications you have approved for this site. Without this header, those apps cannot connect to your site."
 msgstr "O cabeçalho da autorização é usado por terceiros que aprovou para este site. Sem este cabeçalho, as aplicações não poderão ligar-se ao seu site."
 
-#: wp-admin/includes/class-wp-site-health.php:2315
+#: wp-admin/includes/class-wp-site-health.php:2307
 msgid "When testing the REST API, an unexpected result was returned:"
 msgstr "Ao testar a REST API, foi devolvido um resultado inesperado:"
 
 #. translators: 1: The WordPress error code. 2: The WordPress error message.
 #. translators: 1: The WordPress error code. 2: The HTTP status code error
 #. message.
-#: wp-admin/includes/class-wp-site-health.php:2303
-#: wp-admin/includes/class-wp-site-health.php:2323
+#: wp-admin/includes/class-wp-site-health.php:2295
+#: wp-admin/includes/class-wp-site-health.php:2315
 msgid "REST API Response: (%1$s) %2$s"
 msgstr "Resposta da REST API: (%1$s) %2$s"
 
 #. translators: %s: The REST API URL.
-#: wp-admin/includes/class-wp-site-health.php:2298
-#: wp-admin/includes/class-wp-site-health.php:2318
+#: wp-admin/includes/class-wp-site-health.php:2290
+#: wp-admin/includes/class-wp-site-health.php:2310
 msgid "REST API Endpoint: %s"
 msgstr "Endpoint da REST API: %s"
 
-#: wp-admin/includes/class-wp-site-health.php:2295
+#: wp-admin/includes/class-wp-site-health.php:2287
 msgid "When testing the REST API, an error was encountered:"
 msgstr "Ao testar a REST API, foi encontrado um erro:"
 
@@ -1635,7 +1887,7 @@ msgid "Cannot send password reset, permission denied."
 msgstr "Não foi possível enviar reposição de senha, permissão negada."
 
 #. translators: 1: post_max_size, 2: upload_max_filesize
-#: wp-admin/includes/class-wp-site-health.php:2419
+#: wp-admin/includes/class-wp-site-health.php:2411
 msgid "The setting for %1$s is currently configured as 0, this could cause some problems when trying to upload files through plugin or theme features that rely on various upload methods. It is recommended to configure this setting to a fixed value, ideally matching the value of %2$s, as some upload methods read the value 0 as either unlimited, or disabled."
 msgstr "A opção %1$s está de momento configurada como 0, isto pode criar problemas aco tentar carregar ficheiros através de plugins ou temas que dependam de vários métodos de carregamento. É recomendado configurar esta opção com um valor concreto, idealmente deve corresponder ao valor de %2$s, uma vez que alguns métodos de carregamento interpretam o valor 0 como ilimitado ou desactivado."
 
@@ -1761,7 +2013,7 @@ msgstr "Actualização de PHP recomendada"
 msgid "Your website appears to use Basic Authentication, which is not currently compatible with Application Passwords."
 msgstr "O seu site parece utilizar autenticação básica, que de momento é incompatível com as senhas de aplicação."
 
-#: wp-admin/includes/class-wp-site-health.php:2492
+#: wp-admin/includes/class-wp-site-health.php:2484
 msgid "https://developer.wordpress.org/rest-api/frequently-asked-questions/#why-is-authentication-not-working"
 msgstr "https://developer.wordpress.org/rest-api/frequently-asked-questions/#why-is-authentication-not-working"
 
@@ -2011,27 +2263,27 @@ msgstr "- %1$s (da versão %2$s para a versão %3$s)"
 msgid "Current Header Video"
 msgstr "Vídeo de cabeçalho actual"
 
-#: wp-admin/includes/class-wp-site-health.php:2833
+#: wp-admin/includes/class-wp-site-health.php:2825
 msgid "Authorization header"
 msgstr "Cabeçalho de autorização"
 
-#: wp-admin/includes/class-wp-site-health.php:2493
+#: wp-admin/includes/class-wp-site-health.php:2485
 msgid "Learn how to configure the Authorization header."
 msgstr "Saiba como configurar o cabeçalho de autorização."
 
-#: wp-admin/includes/class-wp-site-health.php:2487
+#: wp-admin/includes/class-wp-site-health.php:2479
 msgid "Flush permalinks"
 msgstr "Regenerar as ligações permanentes"
 
-#: wp-admin/includes/class-wp-site-health.php:2468
+#: wp-admin/includes/class-wp-site-health.php:2460
 msgid "The authorization header is invalid"
 msgstr "O cabeçalho de autorização é inválido"
 
-#: wp-admin/includes/class-wp-site-health.php:2466
+#: wp-admin/includes/class-wp-site-health.php:2458
 msgid "The authorization header is missing"
 msgstr "Cabeçalho de autorização em falta"
 
-#: wp-admin/includes/class-wp-site-health.php:2451
+#: wp-admin/includes/class-wp-site-health.php:2443
 msgid "The Authorization header is working as expected"
 msgstr "O cabeçalho de autorização está a funcionar como esperado"
 
@@ -2157,7 +2409,7 @@ msgid "You can choose whether or not your site will be crawled by robots, ping s
 msgstr "Pode decidir se o seu site vai ser, ou não, indexado por <em>robôs</em>, serviços de ping e <em>spiders</em>. Se pretende que esses serviços ignorem o seu site, escolha a opção &#8220;Desencorajar os motores de pesquisa de indexarem este site&#8220; e clique em Guardar alterações."
 
 #. translators: 1: post_max_size, 2: upload_max_filesize
-#: wp-admin/includes/class-wp-site-health.php:2408
+#: wp-admin/includes/class-wp-site-health.php:2400
 msgid "The \"%1$s\" value is smaller than \"%2$s\""
 msgstr "O valor de \"%1$s\" é inferior ao de \"%2$s\""
 
@@ -2186,27 +2438,27 @@ msgstr "Esta actualização não funciona com as suas versões do WordPress e do
 msgid "Disallowed Comment Keys"
 msgstr "Termos não permitidos nos comentários"
 
-#: wp-admin/includes/class-wp-site-health.php:2790
+#: wp-admin/includes/class-wp-site-health.php:2782
 msgid "Plugin and theme auto-updates"
 msgstr "Actualizações automáticas de plugins e temas"
 
-#: wp-admin/includes/class-wp-site-health.php:3122
+#: wp-admin/includes/class-wp-site-health.php:3114
 msgid "There appear to be no issues with plugin and theme auto-updates."
 msgstr "Parece não haver problemas com actualizações automáticas de plugins e temas."
 
-#: wp-admin/includes/class-wp-site-health.php:3116
+#: wp-admin/includes/class-wp-site-health.php:3108
 msgid "Auto-updates for themes appear to be disabled. This will prevent your site from receiving new versions automatically when available."
 msgstr "As actualizações automáticas de temas parecem estar desactivadas. Isto impedirá o seu site de receber automaticamente novas versões quando disponíveis."
 
-#: wp-admin/includes/class-wp-site-health.php:3111
+#: wp-admin/includes/class-wp-site-health.php:3103
 msgid "Auto-updates for plugins appear to be disabled. This will prevent your site from receiving new versions automatically when available."
 msgstr "As actualizações automáticas de plugins parecem estar desactivadas. Isto impedirá o seu site de receber automaticamente novas versões quando disponíveis."
 
-#: wp-admin/includes/class-wp-site-health.php:3106
+#: wp-admin/includes/class-wp-site-health.php:3098
 msgid "Auto-updates for plugins and themes appear to be disabled. This will prevent your site from receiving new versions automatically when available."
 msgstr "As actualizações automáticas de plugins e temas parecem estar desactivadas. Isto impedirá o seu site de receber automaticamente novas versões quando disponíveis."
 
-#: wp-admin/includes/class-wp-site-health.php:3097
+#: wp-admin/includes/class-wp-site-health.php:3089
 msgid "Auto-updates for plugins and/or themes appear to be disabled, but settings are still set to be displayed. This could cause auto-updates to not work as expected."
 msgstr "As actualizações automáticas para plugins e/ou temas parecem estar desactivadas, mas as definições ainda estão definidas para serem exibidas. Isto pode fazer com que as actualizações automáticas não funcionem como esperado."
 
@@ -2236,26 +2488,26 @@ msgid "Sorry, you are not allowed to modify plugins."
 msgstr "Não tem permissão para modificar plugins."
 
 #. translators: 1: post_max_size, 2: upload_max_filesize
-#: wp-admin/includes/class-wp-site-health.php:2429
+#: wp-admin/includes/class-wp-site-health.php:2421
 msgid "The setting for %1$s is smaller than %2$s, this could cause some problems when trying to upload files."
 msgstr "A definição de %1$s é inferior à de %2$s, o que pode causar alguns problemas ao tentar carregar ficheiros."
 
 #. translators: 1: file_uploads, 2: 0
-#: wp-admin/includes/class-wp-site-health.php:2394
+#: wp-admin/includes/class-wp-site-health.php:2386
 msgid "%1$s is set to %2$s. You won't be able to upload files on your site."
 msgstr "%1$s está definido como %2$s. Não é possível carregar ficheiros para o seu site."
 
 #. translators: %s: ini_get()
-#: wp-admin/includes/class-wp-site-health.php:2382
+#: wp-admin/includes/class-wp-site-health.php:2374
 msgid "The %s function has been disabled, some media settings are unavailable because of this."
 msgstr "A função %s foi desactivada, algumas definições de multimédia não estão disponíveis devido a isso."
 
 #. translators: 1: file_uploads, 2: php.ini
-#: wp-admin/includes/class-wp-site-health.php:2369
+#: wp-admin/includes/class-wp-site-health.php:2361
 msgid "The %1$s directive in %2$s determines if uploading files is allowed on your site."
 msgstr "A directiva %1$s em %2$s determina se o carregamento de ficheiros é permitido no seu site."
 
-#: wp-admin/includes/class-wp-site-health.php:2359
+#: wp-admin/includes/class-wp-site-health.php:2351
 msgid "Files can be uploaded"
 msgstr "É possível carregar ficheiros"
 
@@ -2276,7 +2528,7 @@ msgid "Max size of post data allowed"
 msgstr "Tamanho máximo permitido para dados de conteúdo"
 
 #: wp-admin/includes/class-wp-debug-data.php:558
-#: wp-admin/includes/class-wp-site-health.php:2786
+#: wp-admin/includes/class-wp-site-health.php:2778
 msgid "File uploads"
 msgstr "Carregamento de ficheiros"
 
@@ -2605,7 +2857,7 @@ msgctxt "comment"
 msgid "Not spam"
 msgstr "Não é spam"
 
-#: wp-admin/includes/class-wp-site-health.php:2753
+#: wp-admin/includes/class-wp-site-health.php:2745
 msgid "PHP Sessions"
 msgstr "Sessões de PHP"
 
@@ -2993,13 +3245,13 @@ msgstr "Nenhum comentário encontrado no lixo."
 msgid "File is empty. Please upload something more substantial. This error could also be caused by uploads being disabled in your %1$s file or by %2$s being defined as smaller than %3$s in %1$s."
 msgstr "Ficheiro vazio. Por favor carregue algo mais substancial. Este erro pode também ser causado pelo facto de os carregamentos estarem desactivados no seu ficheiro %1$s ou por a opção %2$s estar definida com um valor inferior a %3$s no ficheiro %1$s."
 
-#: wp-admin/includes/class-wp-site-health.php:3301
+#: wp-admin/includes/class-wp-site-health.php:3293
 #: wp-admin/js/site-health.js:340
 msgid "A test is unavailable"
 msgstr "Um teste está indisponível"
 
 #. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: wp-admin/includes/class-wp-site-health.php:3173
+#: wp-admin/includes/class-wp-site-health.php:3165
 msgid "Error: %1$s (%2$s)"
 msgstr "Erro: %1$s (%2$s)"
 
@@ -3081,7 +3333,7 @@ msgstr "Eliminar pedidos"
 msgid "Table prefix"
 msgstr "Prefixo das tabelas"
 
-#: wp-admin/includes/class-wp-site-health.php:2749
+#: wp-admin/includes/class-wp-site-health.php:2741
 msgid "PHP Default Timezone"
 msgstr "Fuso horário por omissão do PHP"
 
@@ -3786,12 +4038,12 @@ msgid "Sorry, you are not allowed to perform this action."
 msgstr "Não tem permissão para executar esta acção."
 
 #. translators: 1: Name of the constant used. 2: List of allowed hostnames.
-#: wp-admin/includes/class-wp-site-health.php:2226
+#: wp-admin/includes/class-wp-site-health.php:2218
 msgid "HTTP requests have been blocked by the %1$s constant, with some allowed hosts: %2$s."
 msgstr "Os pedidos HTTP foram bloqueados pela constante %1$s, com alguns endereços autorizados: %2$s."
 
 #. translators: %s: Name of the constant used.
-#: wp-admin/includes/class-wp-site-health.php:2211
+#: wp-admin/includes/class-wp-site-health.php:2203
 msgid "HTTP requests have been blocked by the %s constant, with no allowed hosts."
 msgstr "Os pedidos HTTP foram bloqueados pela constante %s, sem endereços autorizados."
 
@@ -3819,12 +4071,12 @@ msgstr "A Equipa de Alojamento do WordPress mantém uma lista destes módulos, t
 #: wp-admin/includes/class-wp-site-health.php:1213
 #: wp-admin/includes/class-wp-site-health.php:1306
 #: wp-admin/includes/class-wp-site-health.php:1761
-#: wp-admin/includes/class-wp-site-health.php:2137
-#: wp-admin/includes/class-wp-site-health.php:2180
-#: wp-admin/includes/class-wp-site-health.php:2251
-#: wp-admin/includes/class-wp-site-health.php:2362
-#: wp-admin/includes/class-wp-site-health.php:2516
-#: wp-admin/includes/class-wp-site-health.php:2641
+#: wp-admin/includes/class-wp-site-health.php:2129
+#: wp-admin/includes/class-wp-site-health.php:2172
+#: wp-admin/includes/class-wp-site-health.php:2243
+#: wp-admin/includes/class-wp-site-health.php:2354
+#: wp-admin/includes/class-wp-site-health.php:2508
+#: wp-admin/includes/class-wp-site-health.php:2633
 msgid "Performance"
 msgstr "Desempenho"
 
@@ -3879,9 +4131,9 @@ msgstr[1] "O seu site tem %d plugins inactivos."
 #: wp-admin/includes/class-wp-site-health.php:1715
 #: wp-admin/includes/class-wp-site-health.php:1834
 #: wp-admin/includes/class-wp-site-health.php:1909
-#: wp-admin/includes/class-wp-site-health.php:1954
-#: wp-admin/includes/class-wp-site-health.php:2000
-#: wp-admin/includes/class-wp-site-health.php:2454
+#: wp-admin/includes/class-wp-site-health.php:1950
+#: wp-admin/includes/class-wp-site-health.php:1992
+#: wp-admin/includes/class-wp-site-health.php:2446
 msgid "Security"
 msgstr "Segurança"
 
@@ -3983,129 +4235,129 @@ msgstr "Bom trabalho!"
 msgid "Secondary menu"
 msgstr "Menu secundário"
 
-#: wp-admin/includes/class-wp-site-health.php:3194
+#: wp-admin/includes/class-wp-site-health.php:3186
 msgid "The loopback request to your site completed successfully."
 msgstr "O pedido de loopback para o seu site foi concluído com sucesso."
 
 #. translators: %d: The HTTP response code returned.
-#: wp-admin/includes/class-wp-site-health.php:3186
+#: wp-admin/includes/class-wp-site-health.php:3178
 msgid "The loopback request returned an unexpected http status code, %d, it was not possible to determine if this will prevent features from working as expected."
 msgstr "O pedido de loopback devolveu um código de estado http inesperado, %d. Não foi possível determinar se isto impede o funcionamento dos recursos conforme o previsto."
 
-#: wp-admin/includes/class-wp-site-health.php:3170
+#: wp-admin/includes/class-wp-site-health.php:3162
 msgid "The loopback request to your site failed, this means features relying on them are not currently working as expected."
 msgstr "O pedido de loopback para o seu site falhou. Isto significa que os recursos que dependem desse pedido não estão a funcionar como previsto."
 
-#: wp-admin/includes/class-wp-site-health.php:2962
+#: wp-admin/includes/class-wp-site-health.php:2954
 msgid "No scheduled events exist on this site."
 msgstr "Não há eventos agendados neste site."
 
-#: wp-admin/includes/class-wp-site-health.php:2777
+#: wp-admin/includes/class-wp-site-health.php:2769
 msgid "REST API availability"
 msgstr "Disponibilidade da REST API"
 
-#: wp-admin/includes/class-wp-site-health.php:2816
+#: wp-admin/includes/class-wp-site-health.php:2808
 msgid "Loopback request"
 msgstr "Pedido de loopback"
 
-#: wp-admin/includes/class-wp-site-health.php:2782
+#: wp-admin/includes/class-wp-site-health.php:2774
 msgid "Debugging enabled"
 msgstr "Depuração activada"
 
-#: wp-admin/includes/class-wp-site-health.php:2773
+#: wp-admin/includes/class-wp-site-health.php:2765
 msgid "HTTP Requests"
 msgstr "Pedidos HTTP"
 
-#: wp-admin/includes/class-wp-site-health.php:2769
+#: wp-admin/includes/class-wp-site-health.php:2761
 msgid "Scheduled events"
 msgstr "Eventos agendados"
 
-#: wp-admin/includes/class-wp-site-health.php:2765
+#: wp-admin/includes/class-wp-site-health.php:2757
 msgid "Secure communication"
 msgstr "Comunicação segura"
 
-#: wp-admin/includes/class-wp-site-health.php:2822
+#: wp-admin/includes/class-wp-site-health.php:2814
 msgid "HTTPS status"
 msgstr "Estado de HTTPS"
 
-#: wp-admin/includes/class-wp-site-health.php:2761
+#: wp-admin/includes/class-wp-site-health.php:2753
 msgid "MySQL utf8mb4 support"
 msgstr "Suporte de utf8mb4 do MySQL"
 
-#: wp-admin/includes/class-wp-site-health.php:2745
+#: wp-admin/includes/class-wp-site-health.php:2737
 msgid "PHP Extensions"
 msgstr "Extensões do PHP"
 
-#: wp-admin/includes/class-wp-site-health.php:2757
+#: wp-admin/includes/class-wp-site-health.php:2749
 msgid "Database Server version"
 msgstr "Versão do servidor da base de dados"
 
-#: wp-admin/includes/class-wp-site-health.php:2741
+#: wp-admin/includes/class-wp-site-health.php:2733
 msgid "PHP Version"
 msgstr "Versão do PHP"
 
-#: wp-admin/includes/class-wp-site-health.php:2737
+#: wp-admin/includes/class-wp-site-health.php:2729
 msgid "Theme Versions"
 msgstr "Versões dos temas"
 
-#: wp-admin/includes/class-wp-site-health.php:2733
+#: wp-admin/includes/class-wp-site-health.php:2725
 msgid "Plugin Versions"
 msgstr "Versões dos plugins"
 
-#: wp-admin/includes/class-wp-site-health.php:2729
+#: wp-admin/includes/class-wp-site-health.php:2721
 msgid "WordPress Version"
 msgstr "Versão do WordPress"
 
 #. translators: %s: The name of the query parameter being tested.
-#: wp-admin/includes/class-wp-site-health.php:2340
+#: wp-admin/includes/class-wp-site-health.php:2332
 msgid "The REST API did not process the %s query parameter correctly."
 msgstr "A REST API não processou correctamente o parâmetro de consulta %s."
 
-#: wp-admin/includes/class-wp-site-health.php:2334
+#: wp-admin/includes/class-wp-site-health.php:2326
 msgid "The REST API did not behave correctly"
 msgstr "Ocorreu um erro de funcionamento da REST API"
 
-#: wp-admin/includes/class-wp-site-health.php:2311
+#: wp-admin/includes/class-wp-site-health.php:2303
 msgid "The REST API encountered an unexpected result"
 msgstr "A REST API encontrou um resultado inesperado"
 
-#: wp-admin/includes/class-wp-site-health.php:2291
+#: wp-admin/includes/class-wp-site-health.php:2283
 msgid "The REST API encountered an error"
 msgstr "A REST API encontrou um erro"
 
-#: wp-admin/includes/class-wp-site-health.php:2256
+#: wp-admin/includes/class-wp-site-health.php:2248
 msgid "The REST API is one way that WordPress and other applications communicate with the server. For example, the block editor screen relies on the REST API to display and save your posts and pages."
 msgstr "A REST API é uma forma de comunicação do WordPress e de outras aplicações com o servidor. Por exemplo, o ecrã do editor de blocos depende da REST API para mostrar, e guardar, a informação dos artigos e das páginas."
 
-#: wp-admin/includes/class-wp-site-health.php:2248
+#: wp-admin/includes/class-wp-site-health.php:2240
 msgid "The REST API is available"
 msgstr "A REST API está disponível"
 
-#: wp-admin/includes/class-wp-site-health.php:2220
+#: wp-admin/includes/class-wp-site-health.php:2212
 msgid "HTTP requests are partially blocked"
 msgstr "Os pedidos HTTP estão parcialmente bloqueados"
 
-#: wp-admin/includes/class-wp-site-health.php:2205
+#: wp-admin/includes/class-wp-site-health.php:2197
 msgid "HTTP requests are blocked"
 msgstr "Os pedidos HTTP estão bloqueados"
 
-#: wp-admin/includes/class-wp-site-health.php:2185
+#: wp-admin/includes/class-wp-site-health.php:2177
 msgid "It is possible for site maintainers to block all, or some, communication to other sites and services. If set up incorrectly, this may prevent plugins and themes from working as intended."
 msgstr "Os gestores do site podem bloquear total ou parcialmente as comunicações com outros sites e serviços. Se isto não for configurado de forma correcta, pode impedir que plugins e temas funcionem conforme o previsto."
 
-#: wp-admin/includes/class-wp-site-health.php:2177
+#: wp-admin/includes/class-wp-site-health.php:2169
 msgid "HTTP requests seem to be working as expected"
 msgstr "Os pedidos HTTP parecem estar a funcionar tal como esperado"
 
-#: wp-admin/includes/class-wp-site-health.php:2153
+#: wp-admin/includes/class-wp-site-health.php:2145
 msgid "Your site could not complete a loopback request"
 msgstr "O seu site não conseguiu concluir um pedido de loopback"
 
-#: wp-admin/includes/class-wp-site-health.php:2142
+#: wp-admin/includes/class-wp-site-health.php:2134
 msgid "Loopback requests are used to run scheduled events, and are also used by the built-in editors for themes and plugins to verify code stability."
 msgstr "Os pedidos de loopback são usados para executar eventos agendados, e também são usados pelos editores internos de temas e plugins para verificar a estabilidade do código."
 
-#: wp-admin/includes/class-wp-site-health.php:2134
+#: wp-admin/includes/class-wp-site-health.php:2126
 msgid "Your site can perform loopback requests"
 msgstr "O seu site consegue executar pedidos de loopback"
 
@@ -4744,7 +4996,7 @@ msgstr "WordPress.org está acessível"
 
 #: wp-admin/includes/class-wp-debug-data.php:419
 #: wp-admin/includes/class-wp-debug-data.php:425
-#: wp-admin/includes/class-wp-site-health.php:2804
+#: wp-admin/includes/class-wp-site-health.php:2796
 msgid "Communication with WordPress.org"
 msgstr "Comunicação com WordPress.org"
 
@@ -9312,7 +9564,7 @@ msgstr "A actualizar as traduções para %1$s (%2$s)&#8230;"
 msgid "Update Translations"
 msgstr "Actualizar traduções"
 
-#: wp-admin/includes/class-wp-site-health.php:2810
+#: wp-admin/includes/class-wp-site-health.php:2802
 msgid "Background updates"
 msgstr "Actualizações automáticas"
 
@@ -10089,7 +10341,7 @@ msgid "Search engine visibility"
 msgstr "Visibilidade nos motores de pesquisa"
 
 #. translators: 1: WordPress version, 2: URL to About screen.
-#: wp-admin/includes/update-core.php:1708 wp-admin/update-core.php:912
+#: wp-admin/includes/update-core.php:1712 wp-admin/update-core.php:912
 msgid "Welcome to WordPress %1$s. You will be redirected to the About WordPress screen. If not, click <a href=\"%2$s\">here</a>."
 msgstr "Boas-vindas ao WordPress %1$s. A redireccionar para a página sobre o WordPress. Se não quer ver essa página, clique <a href=\"%2$s\">aqui</a>."
 
@@ -10869,7 +11121,7 @@ msgid "This screen allows you to choose your permalink structure. You can choose
 msgstr "Esta página permite-lhe escolher a sua estrutura de ligações permanente. Pode escolher de entre as configurações mais comuns ou criar estruturas de URL personalizadas."
 
 #. translators: 1: WordPress version, 2: URL to About screen.
-#: wp-admin/includes/update-core.php:1716 wp-admin/update-core.php:920
+#: wp-admin/includes/update-core.php:1720 wp-admin/update-core.php:920
 msgid "Welcome to WordPress %1$s. <a href=\"%2$s\">Learn more</a>."
 msgstr "Boas-vindas ao WordPress %1$s. <a href=\"%2$s\">Mais informações</a>."
 
@@ -12867,7 +13119,7 @@ msgid "User already exists. Password inherited."
 msgstr "Utilizador já existe. Senha herdada."
 
 #: wp-admin/includes/class-wp-automatic-updater.php:485
-#: wp-admin/includes/update-core.php:1702 wp-admin/update-core.php:908
+#: wp-admin/includes/update-core.php:1706 wp-admin/update-core.php:908
 msgid "WordPress updated successfully."
 msgstr "WordPress actualizado com sucesso."
 
@@ -14099,7 +14351,7 @@ msgstr "Actualizar para %s"
 msgid "You are using a development version (%1$s). Cool! Please <a href=\"%2$s\">stay updated</a>."
 msgstr "Está a usar uma versão de desenvolvimento (%1$s). Muito bem! Por favor <a href=\"%2$s\">mantenha-se actualizado</a>."
 
-#: wp-admin/includes/update-core.php:1575
+#: wp-admin/includes/update-core.php:1579
 msgid "Upgrading database&#8230;"
 msgstr "A actualizar a base de dados&#8230;"
 
@@ -15073,7 +15325,7 @@ msgid "Empty archive."
 msgstr "Ficheiro de arquivo vazio."
 
 #: wp-admin/includes/file.php:1778 wp-admin/includes/file.php:1908
-#: wp-admin/includes/file.php:1961 wp-admin/includes/update-core.php:1513
+#: wp-admin/includes/file.php:1961 wp-admin/includes/update-core.php:1517
 msgid "Could not copy file."
 msgstr "Não foi possível copiar ficheiro."
 
@@ -15382,7 +15634,7 @@ msgid "The plugin is at the latest version."
 msgstr "O plugin está na sua versão mais recente."
 
 #: wp-admin/includes/class-wp-upgrader.php:207
-#: wp-admin/includes/update-core.php:1460
+#: wp-admin/includes/update-core.php:1464
 msgid "Disabling Maintenance mode&#8230;"
 msgstr "A desactivar o modo de manutenção&#8230;"
 
@@ -15419,7 +15671,7 @@ msgstr "Falhou ao descarregar."
 msgid "Unable to locate needed folder (%s)."
 msgstr "Impossível localizar o directório necessário (%s)"
 
-#: wp-admin/includes/class-wp-site-health.php:2031
+#: wp-admin/includes/class-wp-site-health.php:2023
 msgid "Unable to locate WordPress content directory"
 msgstr "Não é possível encontrar o directório de conteúdos do WordPress"
 
@@ -15440,7 +15692,7 @@ msgstr "Impossível localizar o directório de raiz do WordPress."
 msgid "Filesystem error."
 msgstr "Erro do sistema de ficheiros."
 
-#: wp-admin/includes/class-wp-site-health.php:2022
+#: wp-admin/includes/class-wp-site-health.php:2014
 msgid "Could not access filesystem"
 msgstr "Não foi possível aceder ao sistema de ficheiros."
 
