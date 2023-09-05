@@ -1,9 +1,8 @@
-if(typeof Trustindex_JS_loaded == 'undefined')
-{
-	var Trustindex_JS_loaded = {};
+if (typeof TrustindexJsLoaded === 'undefined') {
+	var TrustindexJsLoaded = {};
 }
 
-Trustindex_JS_loaded.common = true;
+TrustindexJsLoaded.common = true;
 
 String.prototype.ucfirst = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1)
@@ -34,19 +33,17 @@ jQuery.fn.expand = function() {
 jQuery(document).ready(function() {
 	/*************************************************************************/
 	/* PASSWORD TOGGLE */
-	jQuery(".ti-toggle-password").on('click', function(event) {
+	jQuery('.ti-toggle-password').on('click', function(event) {
 		event.preventDefault();
 
 		let icon = jQuery(this);
 		let parent = icon.closest('.form-group, .ti-input-field');
 
-		if(icon.hasClass('dashicons-visibility'))
-		{
+		if (icon.hasClass('dashicons-visibility')) {
 			parent.find('input').attr('type', 'text');
 			icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
 		}
-		else
-		{
+		else {
 			parent.find('input').attr('type', 'password');
 			icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
 		}
@@ -54,8 +51,7 @@ jQuery(document).ready(function() {
 
 	// nav padding-right
 	let nav = jQuery('#trustindex-plugin-settings-page .nav-tab-wrapper');
-	if(nav.length)
-	{
+	if (nav.length) {
 		let width = nav.find('.nav-tab-right').outerWidth();
 		nav.css('padding-right', parseInt(width + 5) + 'px');
 	}
@@ -65,70 +61,64 @@ jQuery(document).ready(function() {
 
 	/*************************************************************************/
 	/* TOGGLE */
-	jQuery("#trustindex-plugin-settings-page .btn-toggle").on('click', function(e) {
-		e.preventDefault();
+	jQuery('#trustindex-plugin-settings-page .btn-toggle').on('click', function(event) {
+		event.preventDefault();
 
-		jQuery(jQuery(this).attr("href")).toggle();
+		jQuery(jQuery(this).attr('href')).toggle();
 
 		return false;
 	});
 
 	/*************************************************************************/
 	/* STYLE */
-	var apply_style = function() {
-		let style_id = jQuery('#ti-style-id').val();
+	var applyStyle = function() {
+		let styleId = jQuery('#ti-style-id').val();
 		let box = jQuery('#ti-review-list').closest('.ti-preview-box');
 
-		if(['8', '9', '10', '11', '12', '20', '22'].indexOf(style_id) != -1 && !is_no_reviews_with_filter)
-		{
+		if ([ '8', '9', '10', '11', '12', '20', '22' ].indexOf(styleId) != -1 && !isNoReviewsWithFilter) {
 			box.css('width', '30%');
 		}
-		else if(['6', '7', '24', '25', '26', '27', '28', '29', '35'].indexOf(style_id) != -1 && !is_no_reviews_with_filter)
-		{
+		else if([ '6', '7', '24', '25', '26', '27', '28', '29', '35' ].indexOf(styleId) != -1 && !isNoReviewsWithFilter) {
 			box.css('width', '50%');
 		}
-		else
-		{
+		else {
 			box.css('width', 'auto');
 		}
 
-		//This is necessary to round up x.5 px width
+		// this is necessary to round up x.5 px width
 		box.css('width', box.width());
 	};
 
 	/*************************************************************************/
 	/* FILTER */
-	//Checkbox
+	// checkbox
 	jQuery('.ti-checkbox:not(.disabled)').on('click', function() {
 		let checkbox = jQuery(this).find('input[type=checkbox], input[type=radio]');
-		checkbox.prop('checked', !checkbox.prop('checked')).trigger("change");
+		checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
 
 		return false;
 	});
 
-	//Custom select - init
+	// custom select - init
 	jQuery('.ti-select').each(function() {
 		let el = jQuery(this);
 		let selected = el.find('ul li.selected');
 
-		if(selected.length == 0)
-		{
+		if (selected.length === 0) {
 			selected = el.find('ul li:first');
 		}
 
 		el.data('value', selected.data('value')).find('font').html(selected.html());
 	});
 
-	//Custom select - toggle click
+	// custom select - toggle click
 	jQuery(document).on('click', '.ti-select', function() {
 		let el = jQuery(this);
 		el.toggleClass('active');
 
-		if(el.hasClass('active'))
-		{
-			jQuery(window).unbind().on('click', function(e) {
-				if(!jQuery(e.target).is(el) && jQuery(e.target).closest('.ti-select').length == 0)
-				{
+		if (el.hasClass('active')) {
+			jQuery(window).unbind().on('click', function(event) {
+				if (!jQuery(event.target).is(el) && jQuery(event.target).closest('.ti-select').length === 0) {
 					el.removeClass('active');
 					jQuery(window).unbind();
 				}
@@ -136,74 +126,66 @@ jQuery(document).ready(function() {
 		}
 	});
 
-	//Custom select - select item
+	// custom select - select item
 	jQuery(document).on('click', '.ti-select li', function() {
 		let el = jQuery(this);
+
 		el.parent().parent().data('value', el.data('value')).trigger('change').find('font').html(el.html());
 
 		el.parent().find('li').removeClass('selected');
 		el.addClass('selected');
 	});
 
-	var is_no_reviews_with_filter = false;
+	var isNoReviewsWithFilter = false;
 
-	//Get reviews to memory
-	var reviews_el = jQuery('#ti-review-list .ti-widget').clone();
+	// get reviews to memory
+	var reviewsElement = jQuery('#ti-review-list .ti-widget').clone();
 
-	//Set reviews' rating and empty to attributes
-	reviews_el.find('.ti-review-item').each(function() {
+	// set reviews' rating and empty to attributes
+	reviewsElement.find('.ti-review-item').each(function() {
 		let el = jQuery(this);
 		let rating = el.find('.ti-stars .ti-star.f, .stars .ti-star.f').length;
 
-		//Facebook recommendations
-		if(el.find('.ti-recommendation-icon.positive').length)
-		{
+		// facebook recommendations
+		if (el.find('.ti-recommendation-icon.positive').length) {
 			rating = 5;
 		}
-		else if(el.find('.ti-recommendation-icon.negative').length)
-		{
+		else if (el.find('.ti-recommendation-icon.negative').length) {
 			rating = 1;
 		}
 
-		if(el.find('.ti-polarity-icon.positive').length)
-		{
+		if (el.find('.ti-polarity-icon.positive').length) {
 			rating = 5;
 		}
-		else if(el.find('.ti-polarity-icon.neutral').length)
-		{
+		else if (el.find('.ti-polarity-icon.neutral').length) {
 			rating = 3;
 		}
-		else if(el.find('.ti-polarity-icon.negative').length)
-		{
+		else if (el.find('.ti-polarity-icon.negative').length) {
 			rating = 1;
 		}
 
-		//Ten scale
-		if(el.find('.ti-rating-box').length)
-		{
+		// ten scale
+		if (el.find('.ti-rating-box').length) {
 			rating = Math.round(parseFloat(el.find('.ti-rating-box').text()) / 2);
 		}
 
 		let selector = '.ti-review-content';
-		if(el.find('.ti-review-content .ti-inner').length)
-		{
+		if (el.find('.ti-review-content .ti-inner').length) {
 			selector = '.ti-review-content .ti-inner';
 		}
-		else if(el.find('.ti-review-text').length)
-		{
+		else if (el.find('.ti-review-text').length) {
 			selector = '.ti-review-text';
 		}
 
 		el.attr('data-rating', rating);
 
-		if(typeof el.attr('data-empty') == 'undefined')
-		{
+		if (typeof el.attr('data-empty') === 'undefined') {
 			el.attr('data-empty', el.find(selector).text().trim() == "" ? 1 : 0);
 		}
 	});
 
-	//Set the stars background in the filter for the corresponding platform
-	var set_star_background = function() {
+	// set the stars background in the filter for the corresponding platform
+	var setStarBackground = function() {
 		let platform = (jQuery('#ti-filter #show-star').data('platform') || 'google').ucfirst();
 
 		let el = jQuery('<div class="ti-widget" style="display: none"><div class="source-'+ platform +'"><span class="ti-star f"></span><span class="ti-star e"></span></div></div>');
@@ -215,151 +197,138 @@ jQuery(document).ready(function() {
 
 		el.remove();
 	};
-	set_star_background();
+	setStarBackground();
 
-	//Check badge type
-	var is_badge_widget = function() {
-		let layout_id = jQuery('#ti-review-list .ti-widget').data('layout-id');
+	// check badge type
+	var isBadgeWidget = function() {
+		let layoutId = jQuery('#ti-review-list .ti-widget').data('layout-id');
 
-		return [11, 12, 20, 22, 24, 25, 26, 27, 28, 29, 35, 55, 56, 57, 58, 59, 60, 61, 62].indexOf(layout_id) != -1;
+		return [ 11, 12, 20, 22, 24, 25, 26, 27, 28, 29, 35, 55, 56, 57, 58, 59, 60, 61, 62 ].indexOf(layoutId) != -1;
 	};
 
-	//Apply filter when change or init
-	var apply_filter = function(init) {
-		let style_id = jQuery('#ti-style-id').val();
+	// apply filter when change or init
+	var applyFilter = function(init) {
+		let styleId = jQuery('#ti-style-id').val();
 
-		//get stars
+		// get stars
 		let stars = (jQuery('#ti-filter #show-star').data('value') + "").split(',').map(function(i) { return parseInt(i); });
 
-		//only ratings
-		let show_only_ratings = jQuery('#ti-filter-only-ratings').prop('checked');
+		// only ratings
+		let showOnlyRatings = jQuery('#ti-filter-only-ratings').prop('checked');
 
-		//filter removed
-		if(!jQuery('#ti-filter').length)
-		{
+		// filter removed
+		if (!jQuery('#ti-filter').length) {
 			stars = [ 1, 2, 3, 4, 5 ];
-			show_only_ratings = false;
+			showOnlyRatings = false;
 		}
 
-		//remove current review elements
+		// remove current review elements
 		jQuery('.ti-widget .ti-reviews-container-wrapper .ti-review-item').remove();
 
-		//remove all event listeners on the widget
-		let widget = document.querySelector(".ti-widget");
+		// remove all event listeners on the widget
+		let widget = document.querySelector('.ti-widget');
 		widget.replaceWith(widget.cloneNode(true));
 
-		//iterate through stored reviews
+		// iterate through stored reviews
 		let results = 0;
-		reviews_el.find('.ti-review-item').each(function() {
+		reviewsElement.find('.ti-review-item').each(function() {
 			let el = jQuery(this);
 
-			//check rating
-			if(stars.indexOf(el.data('rating')) !== -1)
-			{
-				//check only ratings
-				if(show_only_ratings && el.data('empty'))
-				{
+			// check rating
+			if (stars.indexOf(el.data('rating')) !== -1) {
+				// check only ratings
+				if (showOnlyRatings && el.data('empty')) {
 					return;
 				}
 
-				//return after 5 results (vertical widgets)
-				if(['8', '9', '10', '18', '33'].indexOf(style_id) != -1 && results > 4)
-				{
+				// return after 5 results (vertical widgets)
+				if ([ '8', '9', '10', '18', '33' ].indexOf(styleId) !== -1 && results > 4) {
 					return;
 				}
 
-				//clone and append element
+				// clone and append element
 				let clone = el.clone();
 				jQuery('#ti-review-list .ti-widget .ti-reviews-container-wrapper').append(clone);
 				clone.hide();
 				clone.fadeIn();
 
-				//increase count
+				// increase count
 				results++;
 			}
 		});
 
-		//clear pager interval
-		if(typeof Trustindex != "undefined" && Trustindex.intervalPointer)
-		{
+		// clear pager interval
+		if (typeof Trustindex !== 'undefined' && Trustindex.intervalPointer) {
 			clearInterval(Trustindex.intervalPointer);
 		}
 
-		//show empty text
-		if(results == 0 && !is_badge_widget())
-		{
+		// show empty text
+		if (results === 0 && !isBadgeWidget()) {
 			jQuery('#ti-review-list').hide().next().fadeIn();
-			is_no_reviews_with_filter = true;
+			isNoReviewsWithFilter = true;
 		}
-		else
-		{
+		else {
 			jQuery('#ti-review-list').fadeIn().next().hide();
-			is_no_reviews_with_filter = false;
+			isNoReviewsWithFilter = false;
 
-			//start pager
-			if(init === undefined)
-			{
-				let dot_container = jQuery('#ti-review-list .ti-widget .ti-controls-dots');
-				if(dot_container.length)
-				{
-					let dot = dot_container.children(":first").clone();
-					if(dot.length)
-					{
-						dot_container.html(" " + dot.removeAttr('data-pager-state')[0].outerHTML + " ");
+			// start pager
+			if (init === undefined) {
+				let container = jQuery('#ti-review-list .ti-widget .ti-controls-dots');
+				if (container.length) {
+					let dot = container.children(':first').clone();
+					if (dot.length) {
+						container.html(' ' + dot.removeAttr('data-pager-state')[0].outerHTML + ' ');
 					}
 				}
 			}
 
-			if(typeof Trustindex != "undefined")
-			{
+			if (typeof Trustindex !== 'undefined') {
 				Trustindex.pager_inited = true;
-				Trustindex.init_pager(document.querySelectorAll(".ti-widget"));
+				Trustindex.init_pager(document.querySelectorAll('.ti-widget'));
 				Trustindex.resize_widgets();
 			}
 		}
 
-		//ajax save
-		if(init !== true)
-		{
+		// ajax save
+		if (init !== true) {
 			jQuery.post('', {
 				command: 'save-filter',
 				filter: JSON.stringify({
 					'stars': stars,
-					'only-ratings': show_only_ratings
+					'only-ratings': showOnlyRatings
 				})
 			});
 		}
 
-		apply_style();
+		applyStyle();
 	}
 
-	//hooks
-	jQuery('#ti-filter #show-star').on('change', apply_filter);
-	jQuery('#ti-filter-only-ratings').on('change', function(e) {
-		e.preventDefault();
-		apply_filter();
+	// hooks
+	jQuery('#ti-filter #show-star').on('change', applyFilter);
+	jQuery('#ti-filter-only-ratings').on('change', function(event) {
+		event.preventDefault();
+
+		applyFilter();
+
 		return false;
 	});
 
-	//init
-	if(reviews_el.length)
-	{
-		apply_filter(true);
-		apply_style();
+	// init
+	if (reviewsElement.length) {
+		applyFilter(true);
+		applyStyle();
 	}
 
-	//Background post save - style and set change
-	jQuery("#ti-style-id, #ti-set-id, #ti-lang-id, #ti-dateformat-id, #ti-widget-options input[type=checkbox]:not(.no-form-update), #ti-align-id, #ti-review-text-mode-id").on('change', function() {
+	// background post save - style and set change
+	jQuery('#ti-style-id, #ti-set-id, #ti-lang-id, #ti-dateformat-id, #ti-widget-options input[type=checkbox]:not(.no-form-update), #ti-align-id, #ti-review-text-mode-id').on('change', function() {
 		let form = jQuery(this).closest('form');
-
 		let data = form.serializeArray();
 
 		// include unchecked checkboxes
 		form.find('input[type=checkbox]:not(.no-form-update)').each(function() {
 			let checkbox = jQuery(this);
 
-			if(!checkbox.prop('checked') && checkbox.attr('name'))
-			{
+			if (!checkbox.prop('checked') && checkbox.attr('name')) {
 				data.push({
 					name: checkbox.attr('name'),
 					value: 0
@@ -371,58 +340,51 @@ jQuery(document).ready(function() {
 		jQuery('#ti-loading').addClass('active');
 
 		jQuery('li.ti-preview-box').addClass('disabled');
+
 		jQuery.ajax({
 			url: form.attr('action'),
 			type: 'post',
 			dataType: 'application/json',
 			data: data
-		}).always(function() {
-			location.reload(true);
-		});
+		}).always(() => location.reload(true));
 
 		return false;
 	});
 
-	//Layout select filter
-	jQuery('input[name=layout-select]').on('change', function(e) {
-		e.preventDefault();
+	// layout select filter
+	jQuery('input[name=layout-select]').on('change', function(event) {
+		event.preventDefault();
 
 		let ids = (jQuery('input[name=layout-select]:checked').data('ids') + "").split(',');
 
-		if(ids == "")
-		{
+		if (ids === "") {
 			jQuery('.ti-preview-boxes-container').find('.ti-full-width, .ti-half-width').fadeIn();
 		}
-		else
-		{
+		else {
 			jQuery('.ti-preview-boxes-container').find('.ti-full-width, .ti-half-width').hide();
-			ids.forEach(function(id) {
-				jQuery('.ti-preview-boxes-container').find('.ti-preview-boxes[data-layout-id="'+ id + '"]').parent().fadeIn();
-			});
+			ids.forEach(id => jQuery('.ti-preview-boxes-container').find('.ti-preview-boxes[data-layout-id="'+ id + '"]').parent().fadeIn());
 		}
 
 		return false;
 	});
 
-	//Free step stepping
-	let is_stepping = false;
-	jQuery('.ti-free-steps li.done, .ti-free-steps li.active').on('click', function(e) {
-		e.preventDefault();
+	// gree step stepping
+	let isStepping = false;
+	jQuery('.ti-free-steps li.done, .ti-free-steps li.active').on('click', function(event) {
+		event.preventDefault();
 
-		if(is_stepping)
-		{
+		if (isStepping) {
 			return false;
 		}
 
-		is_stepping = true;
+		isStepping = true;
 		window.location.href = jQuery(this).attr('href');
 
 		return false;
 	});
 
-	//Set auto active if not present
-	if(jQuery('.ti-free-steps:not(.ti-setup-guide-steps) li.current').length == 0)
-	{
+	// set auto active if not present
+	if (jQuery('.ti-free-steps:not(.ti-setup-guide-steps) li.current').length === 0) {
 		jQuery('.ti-free-steps:not(.ti-setup-guide-steps) li.active:last').addClass('current');
 	}
 
@@ -435,12 +397,10 @@ jQuery(document).ready(function() {
 	});
 
 	jQuery(document).on('click', '.ti-modal', function(event) {
-		if(event.target.nodeName != 'A')
-		{
+		if (event.target.nodeName !== 'A') {
 			event.preventDefault();
 
-			if(!jQuery(event.target).closest('.ti-modal-dialog').length)
-			{
+			if (!jQuery(event.target).closest('.ti-modal-dialog').length) {
 				jQuery(this).fadeOut();
 			}
 		}
@@ -454,8 +414,7 @@ jQuery(document).ready(function() {
 
 		container.fadeOut(200);
 
-		if(button.data('command') && !button.data('ajax-run'))
-		{
+		if (button.data('command') && !button.data('ajax-run')) {
 			button.data('ajax-run', 1); // prevent multiple triggers
 
 			jQuery.post('', { command: button.data('command') });
@@ -475,8 +434,6 @@ jQuery(document).ready(function() {
 			let arrow = jQuery(this);
 			let button = arrow.closest('td').find(arrow.data('button'));
 
-			console.log('arrow fix', button, button.prevAll('.btn-text'));
-
 			// add prev buttons' width
 			let left = 0;
 			button.prevAll('.btn-text').each(function() {
@@ -495,7 +452,7 @@ jQuery(document).ready(function() {
 	/*************************************************************************/
 	/* AI REPLY */
 	let generateAiReply = function(text, callback) {
-		let ti_window = window.open('', 'trustindex-generate-ai-reply', 'width=500,height=500,menubar=0' + popupCenter(500, 500));
+		let tiWindow = window.open('', 'trustindex-generate-ai-reply', 'width=500,height=500,menubar=0' + popupCenter(500, 500));
 		let form = document.createElement('form');
 		let input = document.createElement('input');
 
@@ -514,8 +471,7 @@ jQuery(document).ready(function() {
 		// add form to body
 		document.body.appendChild(form);
 
-		if(ti_window)
-		{
+		if (tiWindow) {
 			form.submit();
 		}
 
@@ -524,29 +480,26 @@ jQuery(document).ready(function() {
 
 		// popup close interval
 		let timer = setInterval(function() {
-			if(ti_window.closed)
-			{
+			if (tiWindow.closed) {
 				callback(false);
-
 				clearInterval(timer);
 			}
 		}, 1000);
 
 		// wait for response from Trustindex
 		jQuery(window).one('message', function(event) {
-			if(ti_window == event.originalEvent.source) // event comes from the correct window
-			{
+			// event comes from the correct window
+			if (tiWindow == event.originalEvent.source) {
 				clearInterval(timer);
-
 				callback(event.originalEvent.data.reply);
 
-				ti_window.close();
+				tiWindow.close();
 			}
 		});
 	};
 
 	let postReply = function(data, reconnect, callback) {
-		let ti_window = window.open('', 'trustindex-post-reply', 'width=600,height=600,menubar=0' + popupCenter(600, 600));
+		let tiWindow = window.open('', 'trustindex-post-reply', 'width=600,height=600,menubar=0' + popupCenter(600, 600));
 		let form = document.createElement('form');
 		let input = document.createElement('input');
 
@@ -556,8 +509,7 @@ jQuery(document).ready(function() {
 		form.action = 'https://admin.trustindex.io/integration/postReply?type=google';
 		form.style.display = 'none';
 
-		if(reconnect)
-		{
+		if (reconnect) {
 			form.action += '&reconnect=1';
 		}
 
@@ -570,8 +522,7 @@ jQuery(document).ready(function() {
 		// add form to body
 		document.body.appendChild(form);
 
-		if(ti_window)
-		{
+		if (tiWindow) {
 			form.submit();
 		}
 
@@ -580,23 +531,21 @@ jQuery(document).ready(function() {
 
 		// popup close interval
 		let timer = setInterval(function() {
-			if(ti_window.closed)
-			{
+			if (tiWindow.closed) {
 				callback(undefined);
-
 				clearInterval(timer);
 			}
 		}, 1000);
 
 		// wait for response from Trustindex
 		jQuery(window).one('message', function(event) {
-			if(ti_window == event.originalEvent.source) // event comes from the correct window
-			{
+			// event comes from the correct window
+			if (tiWindow == event.originalEvent.source) {
 				clearInterval(timer);
 
 				callback(!!event.originalEvent.data.success);
 
-				ti_window.close();
+				tiWindow.close();
 			}
 		});
 	};
@@ -611,30 +560,28 @@ jQuery(document).ready(function() {
 
 		btn.addClass('btn-loading').blur();
 
-		let reply_box = td.find('.ti-reply-box');
-		reply_box.find('.btn-post-reply').attr('data-reconnect', 0);
-		reply_box.find('.ti-alert').addClass('d-none');
+		let replyBox = td.find('.ti-reply-box');
+		replyBox.find('.btn-post-reply').attr('data-reconnect', 0);
+		replyBox.find('.ti-alert').addClass('d-none');
 
 		// generate reply with AI if not edit
-		if(reply_box.attr('data-state') == 'reply' || reply_box.attr('data-state') == 'copy-reply')
-		{
-			let data = JSON.parse(reply_box.next().html());
+		if (replyBox.attr('data-state') === 'reply' || replyBox.attr('data-state') === 'copy-reply') {
+			let data = JSON.parse(replyBox.next().html());
 			generateAiReply(data.review.text, function(reply) {
 				btn.removeClass('btn-loading');
 
 				// popup closed
-				if(reply === false)
-				{
+				if (reply === false) {
 					return;
 				}
 
 				btn.addClass('btn-default-disabled');
-				reply_box.addClass('active');
+				replyBox.addClass('active');
 
 				td.find('.ti-highlight-box').removeClass('active');
 				td.find('.btn-show-highlight').removeClass('btn-default-disabled');
 
-				let textarea = reply_box.find('.state-'+ reply_box.attr('data-state') +' textarea');
+				let textarea = replyBox.find('.state-'+ replyBox.attr('data-state') +' textarea');
 				textarea.val(reply).focus().expand();
 
 				// save in DB
@@ -645,10 +592,9 @@ jQuery(document).ready(function() {
 				});
 			});
 		}
-		else
-		{
+		else {
 			btn.removeClass('btn-loading').addClass('btn-default-disabled');
-			reply_box.addClass('active');
+			replyBox.addClass('active');
 
 			td.find('.ti-highlight-box').removeClass('active');
 			td.find('.btn-show-highlight').removeClass('btn-default-disabled');
@@ -662,12 +608,11 @@ jQuery(document).ready(function() {
 		let btn = jQuery(this);
 		btn.blur();
 
-		let reply_box = btn.closest('td').find('.ti-reply-box');
-		reply_box.attr('data-state', reply_box.attr('data-original-state'));
+		let replyBox = btn.closest('td').find('.ti-reply-box');
+		replyBox.attr('data-state', replyBox.attr('data-original-state'));
 
-		if(reply_box.attr('data-state') != 'replied')
-		{
-			reply_box.removeClass('active');
+		if (replyBox.attr('data-state') !== 'replied') {
+			replyBox.removeClass('active');
 		}
 
 		btn.closest('td').find('.btn-show-ai-reply').removeClass('btn-default-disabled');
@@ -678,10 +623,10 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let reply_box = btn.closest('td').find('.ti-reply-box');
+		let replyBox = btn.closest('td').find('.ti-reply-box');
 
-		reply_box.attr('data-state', 'edit-reply');
-		reply_box.find('.state-edit-reply textarea').focus().expand();
+		replyBox.attr('data-state', 'edit-reply');
+		replyBox.find('.state-edit-reply textarea').focus().expand();
 	});
 
 	// hide edit reply section
@@ -689,10 +634,10 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let reply_box = btn.closest('td').find('.ti-reply-box');
+		let replyBox = btn.closest('td').find('.ti-reply-box');
 
-		reply_box.find('.ti-alert').addClass('d-none');
-		reply_box.attr('data-state', 'replied');
+		replyBox.find('.ti-alert').addClass('d-none');
+		replyBox.attr('data-state', 'replied');
 	});
 
 	// post reply
@@ -700,16 +645,15 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let reply_box = btn.closest('td').find('.ti-reply-box');
-		let data = JSON.parse(reply_box.next().html());
+		let replyBox = btn.closest('td').find('.ti-reply-box');
+		let data = JSON.parse(replyBox.next().html());
 
 		let textarea = btn.closest('.ti-reply-box-state').find('textarea');
 		let reply = textarea.val().trim();
 
 		textarea.removeClass('has-error');
 
-		if(reply == "")
-		{
+		if (reply === "") {
 			return textarea.addClass('has-error');
 		}
 
@@ -717,17 +661,15 @@ jQuery(document).ready(function() {
 
 		data.reply = reply;
 
-		postReply(data, btn.attr('data-reconnect') == 1, function(is_success) {
+		postReply(data, btn.attr('data-reconnect') == 1, function(isSuccess) {
 			btn.removeClass('btn-loading');
 
 			// popup closed
-			if(is_success === undefined)
-			{
+			if (isSuccess === undefined) {
 				return;
 			}
 
-			if(is_success)
-			{
+			if (isSuccess) {
 				// save in DB
 				jQuery.ajax({
 					method: 'POST',
@@ -739,28 +681,26 @@ jQuery(document).ready(function() {
 				});
 
 				// show replied section
-				reply_box.attr('data-state', 'replied').attr('data-original-state', 'replied');
-				reply_box.find('.state-replied p').html(reply);
-				reply_box.find('.state-edit-reply textarea').val(reply);
-				reply_box.find('.state-replied .ti-alert').removeClass('d-none');
+				replyBox.attr('data-state', 'replied').attr('data-original-state', 'replied');
+				replyBox.find('.state-replied p').html(reply);
+				replyBox.find('.state-edit-reply textarea').val(reply);
+				replyBox.find('.state-replied .ti-alert').removeClass('d-none');
 
 				// change Reply with AI button text
-				let reply_button = reply_box.closest('td').find('.btn-show-ai-reply:not(.btn-default)');
-				if(reply_button.length)
-				{
-					reply_button.html(reply_button.data('edit-reply-text')).addClass('btn-default');
+				let replyButton = replyBox.closest('td').find('.btn-show-ai-reply:not(.btn-default)');
+				if (replyButton.length) {
+					replyButton.html(replyButton.data('edit-reply-text')).addClass('btn-default');
 					setTimeout(fixDropdownArrows, 100);
 				}
 			}
-			else
-			{
+			else {
 				// set try again button state
-				reply_box.find('.state-copy-reply .btn-try-reply-again').data('state', reply_box.attr('data-state'));
+				replyBox.find('.state-copy-reply .btn-try-reply-again').data('state', replyBox.attr('data-state'));
 
 				// show copy section
-				reply_box.attr('data-state', 'copy-reply');
-				reply_box.find('.state-copy-reply textarea').val(reply).focus().expand();
-				reply_box.find('.state-copy-reply .ti-alert').removeClass('d-none');
+				replyBox.attr('data-state', 'copy-reply');
+				replyBox.find('.state-copy-reply textarea').val(reply).focus().expand();
+				replyBox.find('.state-copy-reply .ti-alert').removeClass('d-none');
 			}
 		});
 	});
@@ -774,13 +714,13 @@ jQuery(document).ready(function() {
 
 		let btn = jQuery(this);
 		let td = btn.closest('td');
-		let reply_box = td.find('.ti-reply-box');
+		let replyBox = td.find('.ti-reply-box');
 
 		btn.addClass('btn-default-disabled').blur();
 		td.find('.ti-highlight-box').addClass('active');
 
-		reply_box.attr('data-state', reply_box.attr('data-original-state'));
-		reply_box.removeClass('active');
+		replyBox.attr('data-state', replyBox.attr('data-original-state'));
+		replyBox.removeClass('active');
 
 		td.find('.btn-show-ai-reply').removeClass('btn-default-disabled');
 	});
@@ -798,8 +738,7 @@ jQuery(document).ready(function() {
 		td.find('.btn-show-highlight').removeClass('btn-default-disabled');
 		td.find('.ti-reply-box[data-state="replied"]').addClass('active');
 
-		if(td.find('.ti-reply-box').attr('data-state') == 'replied')
-		{
+		if (td.find('.ti-reply-box').attr('data-state') === 'replied') {
 			td.find('.btn-show-ai-reply').addClass('btn-default-disabled');
 		}
 	});
@@ -809,11 +748,10 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let highlight_content = btn.closest('td').find('.ti-highlight-content .selection-content');
-		let data = TI_highlight_getSelection(highlight_content.get(0));
+		let highlightContent = btn.closest('td').find('.ti-highlight-content .selection-content');
+		let data = TI_highlight_getSelection(highlightContent.get(0));
 
-		if(data.start !== null)
-		{
+		if (data.start !== null) {
 			data.id = btn.attr('href');
 			data['save-highlight'] = 1;
 
@@ -821,12 +759,10 @@ jQuery(document).ready(function() {
 			btn.closest('td').find('.btn-text').css('pointer-events', 'none');
 
 			jQuery.ajax({
-				method: "POST",
+				method: 'POST',
 				url: window.location.href,
 				data: data
-			}).always(function() {
-				location.reload(true);
-			});
+			}).always(() => location.reload(true));
 		}
 	});
 
@@ -840,15 +776,13 @@ jQuery(document).ready(function() {
 		btn.closest('td').find('.btn-text').css('pointer-events', 'none');
 
 		jQuery.ajax({
-			method: "POST",
+			method: 'POST',
 			url: window.location.href,
 			data: {
 				id: btn.attr('href'),
-				"save-highlight": 1
+				'save-highlight': 1
 			}
-		}).always(function() {
-			location.reload(true);
-		});
+		}).always(() => location.reload(true));
 	});
 });
 
@@ -871,20 +805,18 @@ jQuery(document).on('click', '.btn-copy2clipboard', function(event) {
 	let feedback = () => {
 		btn.addClass('show-tooltip');
 
-		if(typeof this.timeout != 'undefined')
-		{
+		if (typeof this.timeout !== 'undefined') {
 			clearTimeout(this.timeout);
 		}
 
 		this.timeout = setTimeout(() => btn.removeClass('show-tooltip'), 3000);
 	};
 
-	if(!navigator.clipboard)
-	{
-		//fallback
-		textArea = document.createElement("textarea");
+	if (!navigator.clipboard) {
+		// fallback
+		textArea = document.createElement('textarea');
 		textArea.value = text;
-		textArea.style.position = "fixed"; //avoid scrolling to bottom
+		textArea.style.position = 'fixed'; // avoid scrolling to bottom
 		document.body.appendChild(textArea);
 		textArea.focus();
 		textArea.select();
@@ -893,7 +825,8 @@ jQuery(document).on('click', '.btn-copy2clipboard', function(event) {
 			var successful = document.execCommand('copy');
 
 			feedback();
-		} catch (err) { }
+		}
+		catch (err) { }
 
 		document.body.removeChild(textArea);
 		return;
@@ -910,28 +843,23 @@ jQuery(document).on('click', '.ti-input-file-upload button', function(event) {
 	let input = btn.prev();
 
 	input.val('').click();
-
 	input.off().on('change', function(event) {
 		event.preventDefault();
 
 		let files = [];
-
-		for(let i = 0; i < input[0].files.length; i++)
-		{
+		for (let i = 0; i < input[0].files.length; i++) {
 			let tmp = input[0].files[i].name.split('.');
 			let ext = tmp.pop();
 			let name = tmp.join('.');
 
-			if(name.length > 20)
-			{
+			if (name.length > 20) {
 				name = name.substr(0, 20) + '..';
 			}
 
 			files.push(name + '.' + ext);
 		}
 
-		if(btn.find('.ti-info-text').length == 0)
-		{
+		if (btn.find('.ti-info-text').length === 0) {
 			btn.append('<span class="ti-info-text"></span>');
 		}
 
@@ -954,45 +882,37 @@ jQuery(document).on('click', '.btn-send-feature-request', function(event) {
 	container.find('.is-invalid').removeClass('is-invalid');
 
 	// check email
-	if(email == "" || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email))
-	{
+	if (email === "" || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) {
 		container.find('input[name="email"]').addClass('is-invalid');
 	}
 
 	// check text
-	if(text == "")
-	{
+	if (text === "") {
 		container.find('textarea[name="description"]').addClass('is-invalid');
 	}
 
 	// check attachments
 	let attachments = container.find('input[type="file"]')[0].files;
-
-	if(attachments.length > 3)
-	{
+	if (attachments.length > 3) {
 		container.find('.ti-input-file-upload').addClass('is-invalid');
 	}
-	else
-	{
-		let found_larger = false;
-		for(let i = 0; i < attachments.length; i++)
-		{
-			if(attachments[i].size > 3145728)
-			{
-				found_larger = true;
+	else {
+		let foundLarger = false;
+		for (let i = 0; i < attachments.length; i++) {
+			if (attachments[i].size > 3145728) {
+				foundLarger = true;
+
 				break;
 			}
 		}
 
-		if(found_larger)
-		{
+		if (foundLarger) {
 			container.find('.ti-input-file-upload').addClass('is-invalid');
 		}
 	}
 
 	// there is error
-	if(container.find('.is-invalid').length)
-	{
+	if (container.find('.is-invalid').length) {
 		return false;
 	}
 
@@ -1022,8 +942,7 @@ jQuery(document).on('mouseenter', '.ti-rate-us-box .ti-quick-rating', function(e
 	let container = jQuery(this);
 	let selected = container.find('.ti-star-check.active');
 
-	if(selected.length)
-	{
+	if (selected.length) {
 		// add index to data & remove all active stars
 		container.data('selected', selected.index()).find('.ti-star-check').removeClass('active');
 
@@ -1046,24 +965,20 @@ jQuery(document).on('click', '.ti-rate-us-box .ti-quick-rating .ti-star-check', 
 	star.addClass('active');
 
 	// show modals
-	if(parseInt(star.data('value')) >= 4)
-	{
+	if (parseInt(star.data('value')) >= 4) {
 		// open new window
 		window.open(location.href + '&command=rate-us-feedback&star=' + star.data('value'), '_blank');
 
 		jQuery('.ti-rate-us-box').fadeOut();
 	}
-	else
-	{
+	else {
 		let feedback_modal = jQuery('#ti-rateus-modal-feedback');
 
-		if(feedback_modal.data('bs') == '5')
-		{
+		if (feedback_modal.data('bs') == '5') {
 			feedback_modal.modal('show');
 			setTimeout(() => feedback_modal.find('textarea').focus(), 500);
 		}
-		else
-		{
+		else {
 			feedback_modal.fadeIn();
 			feedback_modal.find('textarea').focus();
 		}
@@ -1087,20 +1002,17 @@ jQuery(document).on('click', '.btn-rateus-support', function(event) {
 	container.find('input[type=text], textarea').removeClass('is-invalid');
 
 	// check email
-	if(email == "" || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email))
-	{
+	if (email === "" || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) {
 		container.find('input[type=text]').addClass('is-invalid').focus();
 	}
 
 	// check text
-	if(text == "")
-	{
+	if (text === "") {
 		container.find('textarea').addClass('is-invalid').focus();
 	}
 
 	// there is error
-	if(container.find('.is-invalid').length)
-	{
+	if (container.find('.is-invalid').length) {
 		return false;
 	}
 
@@ -1118,7 +1030,5 @@ jQuery(document).on('click', '.btn-rateus-support', function(event) {
 			text: text,
 			star: container.find('.ti-quick-rating .ti-star-check.active').data('value')
 		}
-	}).always(function() {
-		location.reload(true);
-	});
+	}).always(() => location.reload(true));
 });

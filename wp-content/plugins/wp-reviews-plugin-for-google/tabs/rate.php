@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+defined('ABSPATH') or die('No script kiddies please!');
 wp_enqueue_script('trustindex-js', 'https://cdn.trustindex.io/loader.js', [], false, true);
 ?>
 <div class="ti-box rate-us en">

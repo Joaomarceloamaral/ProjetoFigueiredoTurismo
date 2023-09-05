@@ -9,7 +9,7 @@ Author: Trustindex.io <support@trustindex.io>
 Author URI: https://www.trustindex.io/
 Contributors: trustindex
 License: GPLv2 or later
-Version: 10.5
+Version: 10.6
 Text Domain: wp-reviews-plugin-for-google
 Domain Path: /languages/
 Donate link: https://www.trustindex.io/prices/
@@ -19,106 +19,95 @@ Copyright 2019 Trustindex Kft (email: support@trustindex.io)
 */
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once plugin_dir_path( __FILE__ ) . 'trustindex-plugin.class.php';
-$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "10.5", "Widgets for Google Reviews", "Google");
-register_activation_hook(__FILE__, array($trustindex_pm_google, 'activate'));
-register_deactivation_hook(__FILE__, array($trustindex_pm_google, 'deactivate'));
-add_action('admin_menu', array($trustindex_pm_google, 'add_setting_menu'), 10);
-add_filter('plugin_action_links', array($trustindex_pm_google, 'add_plugin_action_links'), 10, 2);
-add_filter('plugin_row_meta', array($trustindex_pm_google, 'add_plugin_meta_links'), 10, 2);
-if(!function_exists('register_block_type'))
-{
-add_action('widgets_init', array($trustindex_pm_google, 'init_widget'));
-add_action('widgets_init', array($trustindex_pm_google, 'register_widget'));
+$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "10.6", "Widgets for Google Reviews", "Google");
+register_activation_hook(__FILE__, [ $trustindex_pm_google, 'activate' ]);
+register_deactivation_hook(__FILE__, [ $trustindex_pm_google, 'deactivate' ]);
+add_action('admin_menu', [ $trustindex_pm_google, 'add_setting_menu' ], 10);
+add_filter('plugin_action_links', [ $trustindex_pm_google, 'add_plugin_action_links' ], 10, 2);
+add_filter('plugin_row_meta', [ $trustindex_pm_google, 'add_plugin_meta_links' ], 10, 2);
+if (!function_exists('register_block_type')) {
+add_action('widgets_init', [ $trustindex_pm_google, 'init_widget' ]);
+add_action('widgets_init', [ $trustindex_pm_google, 'register_widget' ]);
 }
-if(is_file($trustindex_pm_google->getCssFile()))
-{
+if (is_file($trustindex_pm_google->getCssFile())) {
 add_action('init', function() {
 global $trustindex_pm_google;
-if(!isset($trustindex_pm_google) || is_null($trustindex_pm_google))
-{
+if (!isset($trustindex_pm_google) || is_null($trustindex_pm_google)) {
 require_once plugin_dir_path( __FILE__ ) . 'trustindex-plugin.class.php';
-$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "10.5", "Widgets for Google Reviews", "Google");
+$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "10.6", "Widgets for Google Reviews", "Google");
 }
 $path = wp_upload_dir()['baseurl'] .'/'. $trustindex_pm_google->getCssFile(true);
-if(is_ssl())
-{
+if (is_ssl()) {
 $path = str_replace('http://', 'https://', $path);
 }
 wp_register_style('ti-widget-css-google', $path, [], filemtime($trustindex_pm_google->getCssFile()));
 });
 }
-if (!function_exists("ti_exclude_js"))
-{
+if (!function_exists('ti_exclude_js')) {
 function ti_exclude_js($list) {
-$list[] = 'trustindex.io';
+$list []= 'trustindex.io';
 return $list;
 }
 }
 add_filter('rocket_exclude_js', 'ti_exclude_js');
 add_filter('litespeed_optimize_js_excludes', 'ti_exclude_js');
-if (!function_exists("ti_exclude_inline_js"))
-{
+if (!function_exists('ti_exclude_inline_js')) {
 function ti_exclude_inline_js($list) {
-$list[] = 'Trustindex.init_pager';
+$list []= 'Trustindex.init_pager';
 return $list;
 }
 }
 add_filter('rocket_excluded_inline_js_content', 'ti_exclude_inline_js');
-add_action('init', array($trustindex_pm_google, 'init_shortcode'));
+add_action('init', [ $trustindex_pm_google, 'init_shortcode' ]);
 add_filter('script_loader_tag', function($tag, $handle) {
-if(strpos($tag, 'trustindex.io/loader.js') !== false && strpos($tag, 'defer async') === false) {
-$tag = str_replace(' src', ' defer async src', $tag );
+if (strpos($tag, 'trustindex.io/loader.js') !== false && strpos($tag, 'defer async') === false) {
+$tag = str_replace(' src', ' defer async src', $tag);
 }
 return $tag;
 }, 10, 2);
-add_action('init', array($trustindex_pm_google, 'register_tinymce_features'));
-add_action('init', array($trustindex_pm_google, 'output_buffer'));
-add_action('wp_ajax_list_trustindex_widgets', array($trustindex_pm_google, 'list_trustindex_widgets_ajax'));
-add_action('admin_enqueue_scripts', array($trustindex_pm_google, 'trustindex_add_scripts'));
-add_action('rest_api_init', array($trustindex_pm_google, 'init_restapi'));
+add_action('init', [ $trustindex_pm_google, 'register_tinymce_features' ]);
+add_action('init', [ $trustindex_pm_google, 'output_buffer' ]);
+add_action('wp_ajax_list_trustindex_widgets', [ $trustindex_pm_google, 'list_trustindex_widgets_ajax' ]);
+add_action('admin_enqueue_scripts', [ $trustindex_pm_google, 'trustindex_add_scripts' ]);
+add_action('rest_api_init', [ $trustindex_pm_google, 'init_restapi' ]);
 add_action('admin_notices', function() {
-$rate_us = get_option('trustindex-google-rate-us', time() - 1);
-if($rate_us == 'hide' || (int)$rate_us > time())
-{
+$rateUs = get_option('trustindex-google-rate-us', time() - 1);
+if ($rateUs === 'hide' || (int)$rateUs > time()) {
 return;
 }
 $dir = plugin_dir_path( __FILE__ );
-$usage_time = time() + 10;
-if(is_dir($dir))
-{
-$usage_time = filemtime($dir) + (1 * 86400);
+$usageTime = time() + 10;
+if (is_dir($dir)) {
+$usageTime = filemtime($dir) + (1 * 86400);
 }
-if($usage_time > time())
-{
+if ($usageTime > time()) {
 return;
 }
 ?>
 <div class="notice notice-warning is-dismissible trustindex-popup" style="position: fixed; top: 50px; right: 20px; padding-right: 30px; z-index: 1; width: auto">
 <p>
-<?php echo TrustindexPlugin_google::___("Hello, I am happy to see that you've been using our <strong>%s</strong> plugin for a while now!", ["Widgets for Google Reviews"]); ?><br>
-<?php echo TrustindexPlugin_google::___("Could you please help us and give it a 5-star rating on WordPress?"); ?><br><br>
-<?php echo TrustindexPlugin_google::___("-- Thanks, Gabor M."); ?>
+<?php echo TrustindexPlugin_google::___("Hello, I am happy to see that you've been using our <strong>%s</strong> plugin for a while now!", [ "Widgets for Google Reviews" ]); ?><br>
+<?php echo TrustindexPlugin_google::___('Could you please help us and give it a 5-star rating on WordPress?'); ?><br><br>
+<?php echo TrustindexPlugin_google::___('-- Thanks, Gabor M.'); ?>
 </p>
 <p>
 <a href="<?php echo admin_url("admin.php?page=wp-reviews-plugin-for-google/settings.php&rate_us=open"); ?>" class="trustindex-rateus" style="text-decoration: none" target="_blank">
-<button class="button ti-button-primary button-primary"><?php echo TrustindexPlugin_google::___("Sure, you deserve it"); ?></button>
+<button class="button ti-button-primary button-primary"><?php echo TrustindexPlugin_google::___('Sure, you deserve it'); ?></button>
 </a>
 <a href="<?php echo admin_url("admin.php?page=wp-reviews-plugin-for-google/settings.php&rate_us=later"); ?>" class="trustindex-rateus" style="text-decoration: none">
-<button class="button ti-button-default button-secondary"><?php echo TrustindexPlugin_google::___("Maybe later"); ?></button>
+<button class="button ti-button-default button-secondary"><?php echo TrustindexPlugin_google::___('Maybe later'); ?></button>
 </a>
 <a href="<?php echo admin_url("admin.php?page=wp-reviews-plugin-for-google/settings.php&rate_us=hide"); ?>" class="trustindex-rateus" style="text-decoration: none">
-<button class="button ti-button-default button-secondary" style="float: right"><?php echo TrustindexPlugin_google::___("Do not remind me again"); ?></button>
+<button class="button ti-button-default button-secondary" style="float: right"><?php echo TrustindexPlugin_google::___('Do not remind me again'); ?></button>
 </a>
 </p>
 </div>
 <?php
 });
-if(class_exists('Woocommerce') && !class_exists('TrustindexCollectorPlugin') && !function_exists('ti_woocommerce_notice'))
-{
+if (class_exists('Woocommerce') && !class_exists('TrustindexCollectorPlugin') && !function_exists('ti_woocommerce_notice')) {
 function ti_woocommerce_notice() {
-$rate_us = get_option('trustindex-wc-notification', time() - 1);
-if($rate_us == 'hide' || (int)$rate_us > time())
-{
+$wcNotification = get_option('trustindex-wc-notification', time() - 1);
+if ($wcNotification == 'hide' || (int)$wcNotification > time()) {
 return;
 }
 ?>
@@ -142,42 +131,35 @@ return;
 }
 add_action('admin_notices', 'ti_woocommerce_notice');
 }
-add_action('plugins_loaded', array($trustindex_pm_google, 'plugin_loaded'));
+add_action('plugins_loaded', [ $trustindex_pm_google, 'plugin_loaded' ]);
 add_action('wp_ajax_nopriv_'. $trustindex_pm_google->get_webhook_action(), $trustindex_pm_google->get_webhook_action());
 add_action('wp_ajax_'. $trustindex_pm_google->get_webhook_action(), $trustindex_pm_google->get_webhook_action());
-function trustindex_reviews_hook_google() {
+function trustindex_reviews_hook_google()
+{
 global $trustindex_pm_google;
 global $wpdb;
 $token = isset($_POST['token']) ? sanitize_text_field($_POST['token']) : "";
-if(isset($_POST['test']) && $token == get_option($trustindex_pm_google->get_option_name('review-download-token')))
-{
+if (isset($_POST['test']) && $token === get_option($trustindex_pm_google->get_option_name('review-download-token'))) {
 echo $token;
 exit;
 }
-$our_token = $trustindex_pm_google->is_review_download_in_progress();
-if(!$our_token)
-{
-$our_token = get_option($trustindex_pm_google->get_option_name('review-download-token'));
+$ourToken = $trustindex_pm_google->is_review_download_in_progress();
+if (!$ourToken) {
+$ourToken = get_option($trustindex_pm_google->get_option_name('review-download-token'));
 }
-try
-{
-if(!$token || $our_token != $token)
-{
+try {
+if (!$token || $ourToken !== $token) {
 throw new Exception('Token invalid');
 }
-if(!$trustindex_pm_google->is_noreg_linked())
-{
+if (!$trustindex_pm_google->is_noreg_linked() || !$trustindex_pm_google->is_table_exists('reviews')) {
 throw new Exception('Platform not connected');
 }
 $name = 'Unknown source';
-if(isset($_POST['error']) && $_POST['error'])
-{
+if (isset($_POST['error']) && $_POST['error']) {
 update_option($trustindex_pm_google->get_option_name('review-download-inprogress'), 'error', false);
 }
-else
-{
-if(isset($_POST['details']))
-{
+else {
+if (isset($_POST['details'])) {
 $trustindex_pm_google->save_details($_POST['details']);
 $trustindex_pm_google->save_reviews(isset($_POST['reviews']) ? $_POST['reviews'] : []);
 }
@@ -185,9 +167,10 @@ delete_option($trustindex_pm_google->get_option_name('review-download-inprogress
 delete_option($trustindex_pm_google->get_option_name('review-manual-download'));
 }
 update_option($trustindex_pm_google->get_option_name('download-timestamp'), time() + (86400 * 10), false);
+$notification = get_option($trustindex_pm_google->get_option_name('review-download-notification'), null);
+if (is_null($notification)) {
 update_option($trustindex_pm_google->get_option_name('review-download-notification'), 1, false);
-try
-{
+try {
 $subject = 'Google reviews downloaded';
 $message = '
 <p>Great news!</p>
@@ -207,7 +190,8 @@ $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 wp_mail(get_option('admin_email'), $subject, $message, $headers, [ '' ]);
 }
 catch(Exception $e) { }
-echo $our_token;
+}
+echo $ourToken;
 }
 catch(Exception $e) {
 echo 'Error in WP: '. $e->getMessage();
@@ -216,8 +200,7 @@ exit;
 }
 add_action('admin_notices', function() {
 $notification = get_option('trustindex-google-review-download-notification', 0);
-if(!$notification)
-{
+if (!$notification) {
 return;
 }
 ?>
@@ -227,7 +210,10 @@ return;
 </p>
 <p>
 <a href="<?php echo admin_url("admin.php?page=wp-reviews-plugin-for-google/settings.php&review_download_notification"); ?>" style="text-decoration: none">
-<button class="button button-primary"><?php echo TrustindexPlugin_google::___("Create review widget now! »"); ?></button>
+<button class="button ti-button-default button-secondary"><?php echo TrustindexPlugin_google::___('Hide'); ?></button>
+</a>
+<a href="<?php echo admin_url("admin.php?page=wp-reviews-plugin-for-google/settings.php&review_download_notification"); ?>" style="text-decoration: none">
+<button class="button button-primary"><?php echo TrustindexPlugin_google::___('Create review widget now! »'); ?></button>
 </a>
 </p>
 </div>

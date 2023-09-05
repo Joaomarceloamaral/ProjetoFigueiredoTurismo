@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+defined('ABSPATH') or die('No script kiddies please!');
 ?>
 <div id="tab-setup_trustindex">
 <div class="ti-box">
@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 <ul class="ti-check">
 <li><?php echo TrustindexPlugin_google::___('Display unlimited number of reviews'); ?></li>
 <li><?php echo TrustindexPlugin_google::___('Create unlimited number of widgets'); ?></li>
-<li><?php echo TrustindexPlugin_google::___("%d review platforms", [ 66 ]); ?></li>
+<li><?php echo TrustindexPlugin_google::___('%d review platforms', [ 66 ]); ?></li>
 <li><?php echo TrustindexPlugin_google::___('Mix reviews from different platforms'); ?></li>
 <li><?php echo TrustindexPlugin_google::___('Get more reviews'); ?></li>
 <li><?php echo TrustindexPlugin_google::___('Manage all reviews in one place'); ?></li>
@@ -27,7 +27,6 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 <div class="clear"></div>
 </div>
 </div>
-
 </div>
 </div>
 </div>

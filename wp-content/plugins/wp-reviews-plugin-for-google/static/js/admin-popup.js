@@ -11,21 +11,20 @@ jQuery(document).ready(function() {
 	popupPosition();
 	jQuery(window).resize(popupPosition);
 
-	jQuery(document).on('click', 'a.trustindex-rateus', function(e) {
-		//Get link, close button and url
-		let link = jQuery(this),
-			closeButton = link.closest('.notice').find('.notice-dismiss'),
-			url = link.attr('href');
+	jQuery(document).on('click', 'a.trustindex-rateus', function(event) {
+		// get link, close button and url
+		let link = jQuery(this);
+		let closeButton = link.closest('.notice').find('.notice-dismiss');
+		let url = link.attr('href');
 
-		//Hide the modal - click close button
+		// hide the modal - click close button
 		closeButton.click();
 
-		//Make ajax at the background if not the rate button clicked
-		if(link.attr('target') === undefined)
-		{
-			e.preventDefault();
-			jQuery.get(url);
-			return false;
+		// make ajax at the background if not the rate button clicked
+		if (link.attr('target') === undefined) {
+			event.preventDefault();
+
+			return jQuery.get(url);
 		}
 	});
 });

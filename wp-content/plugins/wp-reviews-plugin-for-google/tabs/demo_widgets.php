@@ -12,7 +12,7 @@
 </div>
 </div>
 <?php
-$demo_list = [
+$demoList = [
 5 => 'light-minimal',
 36 => 'ligth-border',
 34 => 'drop-shadow',
@@ -39,22 +39,21 @@ $demo_list = [
 11 => 'drop-shadow',
 12 => 'light-minimal'
 ];
-foreach($demo_list as $layout => $style): ?>
+foreach ($demoList as $layout => $style): ?>
 <?php
 $template = TrustindexPlugin_google::$widget_templates['templates'][ $layout ];
-$class_name = 'ti-full-width';
-if(in_array($template['type'], [ 'badge', 'button', 'floating', 'popup', 'sidebar' ]))
-{
-$class_name = 'ti-half-width';
+$className = 'ti-full-width';
+if (in_array($template['type'], [ 'badge', 'button', 'floating', 'popup', 'sidebar' ])) {
+$className = 'ti-half-width';
 }
 ?>
-<div class="<?php echo esc_attr($class_name); ?>">
+<div class="<?php echo esc_attr($className); ?>">
 <div class="ti-box ti-preview-boxes" data-layout-id="<?php echo esc_attr($layout); ?>" data-set-id="<?php echo esc_attr($style); ?>">
 <div class="ti-box-header">
 <span class="ti-header-layout-text">
 <?php echo TrustindexPlugin_google::___('Example Widget'); ?>:
 <strong><?php echo esc_html(TrustindexPlugin_google::___($template['name'])); ?></strong>
- (<?php echo esc_html(TrustindexPlugin_google::___(TrustindexPlugin_google::$widget_styles[$style]['name'])); ?>)
+ (<?php echo esc_html(TrustindexPlugin_google::___(TrustindexPlugin_google::$widget_styles[ $style ]['name'])); ?>)
 </span>
 </div>
 <div class="preview">

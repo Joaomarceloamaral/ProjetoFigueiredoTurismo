@@ -1,13 +1,11 @@
-if(typeof Trustindex_JS_loaded == 'undefined')
-{
-	var Trustindex_JS_loaded = {};
+if (typeof TrustindexJsLoaded === 'undefined') {
+	var TrustindexJsLoaded = {};
 }
 
-Trustindex_JS_loaded.unique = true;
+TrustindexJsLoaded.unique = true;
 
 jQuery(document).ready(function($) {
-
-	$(".btn-connect-public").click(function(event) {
+	$('.btn-connect-public').click(function(event) {
 		event.preventDefault();
 
 		let button = $(this);
@@ -15,7 +13,7 @@ jQuery(document).ready(function($) {
 
 		button.addClass('btn-loading').blur();
 
-		let dont_remove_loading = false;
+		let dontRemoveLoading = false;
 
 		// get url params
 		let params = new URLSearchParams({
@@ -27,31 +25,28 @@ jQuery(document).ready(function($) {
 			version: $('#ti-noreg-version').val()
 		});
 
-		let ti_window = window.open('https://admin.trustindex.io/source/edit2?' + params.toString(), 'trustindex', 'width=850,height=850,menubar=0' + popupCenter(850, 850));
+		let tiWindow = window.open('https://admin.trustindex.io/source/edit2?' + params.toString(), 'trustindex', 'width=850,height=850,menubar=0' + popupCenter(850, 850));
 
 		window.addEventListener('message', function(event) {
-			if(event.origin.startsWith('https://admin.trustindex.io/'.replace(/\/$/,'')) && event.data.id)
-			{
-				dont_remove_loading = true;
+			if (event.origin.startsWith('https://admin.trustindex.io/'.replace(/\/$/,'')) && event.data.id) {
+				dontRemoveLoading = true;
 
-				ti_window.close();
+				tiWindow.close();
 				$('#ti-connect-info').hide();
 
-				$("#ti-noreg-page_details").val(JSON.stringify(event.data));
+				$('#ti-noreg-page_details').val(JSON.stringify(event.data));
 				$('#ti-noreg-review-download').val(token);
 
-				button.closest("form").submit();
+				button.closest('form').submit();
 			}
 		});
 
 		$('#ti-connect-info').fadeIn();
 		let timer = setInterval(function() {
-			if(ti_window.closed)
-			{
+			if (tiWindow.closed) {
 				$('#ti-connect-info').hide();
 
-				if(!dont_remove_loading)
-				{
+				if (!dontRemoveLoading) {
 					button.removeClass('btn-loading');
 				}
 
@@ -65,9 +60,9 @@ jQuery(document).ready(function($) {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let reply_box = btn.closest('td').find('.ti-reply-box');
+		let replyBox = btn.closest('td').find('.ti-reply-box');
 
-		reply_box.attr('data-state', btn.data('state'));
-		reply_box.find('.state-'+ btn.data('state') +' .btn-post-reply').attr('data-reconnect', 1).trigger('click');
+		replyBox.attr('data-state', btn.data('state'));
+		replyBox.find('.state-'+ btn.data('state') +' .btn-post-reply').attr('data-reconnect', 1).trigger('click');
 	});
 });
