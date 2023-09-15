@@ -61,6 +61,11 @@ $trustindex_pm_google->save_reviews($pageDetails['reviews']);
 update_option($trustindex_pm_google->get_option_name('download-timestamp'), intval($_POST['review_download_timestamp']), false);
 exit;
 }
+if (isset($_POST['save-review-download-notification-email'])) {
+$email = strtolower(trim(sanitize_text_field($_POST['save-review-download-notification-email'])));
+update_option($trustindex_pm_google->get_option_name('review-download-notification-email'), $email, false);
+exit;
+}
 $reviews = [];
 if ($trustindex_pm_google->is_noreg_linked()) {
 $reviews = $wpdb->get_results('SELECT * FROM `'. $trustindex_pm_google->get_tablename('reviews') .'` ORDER BY date DESC');
@@ -123,13 +128,13 @@ $pageDetails = get_option($trustindex_pm_google->get_option_name('page-details')
 <div class="ti-box">
 <div class="ti-box-header"><?php echo TrustindexPlugin_google::___('My Reviews'); ?></div>
 <?php if (!$isReviewDownloadInProgress): ?>
-<div class="tablenav top" style="margin-bottom: 26px">
-<div class="alignleft actions">
+<div class="tablenav top">
+<div class="actions">
 <?php if ($downloadTimestamp < time()): ?>
-<a href="#" class="btn-text btn-refresh btn-download-reviews" style="margin-left: 0" data-delay=10><?php echo TrustindexPlugin_google::___('Download new reviews') ;?></a>
+<a href="#" class="btn-text btn-refresh btn-download-reviews" style="margin: 0" data-delay=10><?php echo TrustindexPlugin_google::___('Download new reviews') ;?></a>
 <?php else: ?>
-<a href="#" class="btn-text btn-disabled" style="margin-left: 0; pointer-events: none"> <?php echo TrustindexPlugin_google::___('Download new reviews'); ?></a>
-<div class="ti-notice notice-warning" style="margin: 0 0 15px 0">
+<a href="#" class="btn-text btn-disabled" style="margin: 0; pointer-events: none"> <?php echo TrustindexPlugin_google::___('Download new reviews'); ?></a>
+<div class="ti-notice notice-warning" style="margin: 5px 0 0 0">
 <p style="margin: 6px 0">
 <?php echo TrustindexPlugin_google::___('You have to wait to be able to update.'); ?>
  <a href="https://www.trustindex.io/frequently-asked-questions/#my-reviews-aren-t-updating"><?php echo TrustindexPlugin_google::___('Why?'); ?></a>
@@ -145,7 +150,7 @@ $pageDetails = get_option($trustindex_pm_google->get_option_name('page-details')
 <input type="hidden" id="ti-noreg-page-id" value="<?php echo esc_attr($pageDetails['id']); ?>" />
 <input type="hidden" id="ti-noreg-webhook-url" value="<?php echo $trustindex_pm_google->get_webhook_url(); ?>" />
 <input type="hidden" id="ti-noreg-email" value="<?php echo get_option('admin_email'); ?>" />
-<input type="hidden" id="ti-noreg-version" value="10.6" />
+<input type="hidden" id="ti-noreg-version" value="10.7" />
 <?php if (isset($pageDetails['access_token'])): ?>
 <input type="hidden" id="ti-noreg-access-token" value="<?php echo esc_attr($pageDetails['access_token']); ?>" />
 <?php endif; ?>
@@ -197,6 +202,15 @@ update_option($trustindex_pm_google->get_option_name('review-download-token'), $
 </p>
 </div>
 <?php endif; ?>
+<div id="ti-review-download-notification-email">
+<div class="ti-inner">
+<span><?php echo TrustindexPlugin_google::___('Send email notification to:'); ?></span>
+<input type="text" class="form-control" value="<?php echo get_option($trustindex_pm_google->get_option_name('review-download-notification-email'), get_option('admin_email')); ?>" />
+</div>
+<span class="d-none ti-text-success"><?php echo TrustindexPlugin_google::___('Saved'); ?></span>
+<span class="d-none ti-text-danger"><?php echo TrustindexPlugin_google::___('Invalid email'); ?></span>
+<div class="ti-info-text"><?php echo TrustindexPlugin_google::___('Leave the field blank if you do not want email notification.'); ?></div>
+</div>
 <?php if (!count($reviews)): ?>
 <?php if (!$isReviewDownloadInProgress): ?>
 <div class="ti-notice notice-warning" style="margin-left: 0">

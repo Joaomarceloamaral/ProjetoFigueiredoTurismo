@@ -299,9 +299,10 @@ return [
 'review-download-token',
 'review-download-inprogress',
 'review-download-request-id',
-'review-manual-download',
 'review-download-notification',
 'review-download-modal',
+'review-download-notification-email',
+'review-manual-download',
 'reply-generated',
 'footer-filter-text',
 'show-header-button'
@@ -432,7 +433,7 @@ $filePath = __FILE__;
 if (isset($this->plugin_slugs[ $forcePlatform ])) {
 $filePath = preg_replace('/[^\/\\\\]+([\\\\\/]trustindex-plugin\.class\.php)/', $this->plugin_slugs[ $forcePlatform ] . '$1', $filePath);
 }
-$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-10.6", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
+$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-10.7", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
 if (!$chosedPlatform->is_noreg_linked()) {
 return $this->error_box_for_admins(self::___('You have to connect your business (%s)!', [ $forcePlatform ]));
 }
@@ -1082,6 +1083,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1172,6 +1175,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1262,6 +1267,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1352,6 +1359,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -1442,6 +1451,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1532,6 +1543,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -1622,6 +1635,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1712,6 +1727,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1802,6 +1819,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1892,6 +1911,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1982,6 +2003,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2072,6 +2095,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2162,6 +2187,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2252,6 +2279,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2342,6 +2371,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2432,6 +2463,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2522,6 +2555,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2612,6 +2647,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2702,6 +2739,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2792,6 +2831,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2882,6 +2923,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2972,6 +3015,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -3062,6 +3107,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -3152,6 +3199,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '14px',
  ),
  ),
@@ -3242,6 +3291,8 @@ public static $widget_styles = array (
  'header-btn-padding' => '7px',
  'header-btn-color' => '#ffffff',
  'header-btn-size' => '13px',
+ 'review-gap' => '16px',
+ 'button-widget-font-size' => '14px',
  'original-rating-text' => '15px',
  ),
  ),
@@ -5357,7 +5408,10 @@ $reviews = $this->getRandomReviews($ratingNum);
 if (!count($reviews)) {
 $text = self::___('There are no reviews on your %s platform.', [ ucfirst($this->shortname) ]);
 if ($this->is_review_download_in_progress()) {
-$text = self::___('Your reviews are being downloaded, this process should only take a few minutes.');
+$text = self::___('Your reviews are being downloaded.');
+if (!in_array($this->shortname, [ 'facebook', 'google' ])) {
+$text .= ' ' . self::___('This process should only take a few minutes.');
+}
 }
 return $this->error_box_for_admins($text);
 }
@@ -6006,6 +6060,8 @@ wp_enqueue_script('trustindex_settings_script_'. $this->shortname, $this->get_pl
 wp_register_script('trustindex_admin_popup', $this->get_plugin_file_url('static/js/admin-popup.js') );
 wp_enqueue_script('trustindex_admin_popup');
 wp_enqueue_style('trustindex_admin_popup', $this->get_plugin_file_url('static/css/admin-popup.css'));
+wp_register_script('trustindex_admin_notification', $this->get_plugin_file_url('static/js/admin-notification.js') );
+wp_enqueue_script('trustindex_admin_notification');
 }
 
 

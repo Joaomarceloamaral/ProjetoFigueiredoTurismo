@@ -37,8 +37,14 @@ header('Location: admin.php?page=' . sanitize_text_field($_GET['page']) .'&tab='
 exit;
 }
 if (isset($_GET['review_download_notification'])) {
-update_option($trustindex_pm_google->get_option_name('review-download-notification'), 0, false);
+$v = 0;
+if ($_GET['review_download_notification'] === 'later') {
+$v = time() + (2 * 86400);
+}
+update_option($trustindex_pm_google->get_option_name('review-download-notification'), $v, false);
+if ($_GET['review_download_notification'] !== 'hide') {
 header('Location: admin.php?page=' . sanitize_text_field($_GET['page']) .'&tab=setup_no_reg');
+}
 exit;
 }
 $tabs = [];

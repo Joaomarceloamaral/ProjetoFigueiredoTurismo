@@ -784,6 +784,31 @@ jQuery(document).ready(function() {
 			}
 		}).always(() => location.reload(true));
 	});
+
+	// review download notification email
+	jQuery(document).on('change', '#ti-review-download-notification-email input[type="text"]', function(event) {
+		event.preventDefault();
+
+		let email = jQuery(this).val().trim().toLowerCase();
+		let container = jQuery('#ti-review-download-notification-email');
+
+		// hide alerts
+		container.find('.ti-text-danger, .ti-text-success').addClass('d-none');
+
+		// check email
+		if (email !== "" && !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) {
+			container.find('.ti-text-danger').removeClass('d-none');
+			return setTimeout(() => container.find('.ti-text-danger').addClass('d-none'), 3000);
+		}
+
+		// save email
+		jQuery.post("", {
+			'save-review-download-notification-email': email
+		}, () => {
+			container.find('.ti-text-success').removeClass('d-none');
+			return setTimeout(() => container.find('.ti-text-success').addClass('d-none'), 3000);
+		});
+	});
 });
 
 
