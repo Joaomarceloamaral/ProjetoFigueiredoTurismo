@@ -305,7 +305,8 @@ return [
 'review-manual-download',
 'reply-generated',
 'footer-filter-text',
-'show-header-button'
+'show-header-button',
+'reviews-load-more'
 ];
 }
 public function get_platforms()
@@ -433,7 +434,7 @@ $filePath = __FILE__;
 if (isset($this->plugin_slugs[ $forcePlatform ])) {
 $filePath = preg_replace('/[^\/\\\\]+([\\\\\/]trustindex-plugin\.class\.php)/', $this->plugin_slugs[ $forcePlatform ] . '$1', $filePath);
 }
-$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-10.7", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
+$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-10.8", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
 if (!$chosedPlatform->is_noreg_linked()) {
 return $this->error_box_for_admins(self::___('You have to connect your business (%s)!', [ $forcePlatform ]));
 }
@@ -1019,8 +1020,8 @@ public static $widget_styles = array (
  'rating-text' => '15px',
  'company-font-size' => '15px',
  'review-lines' => '4',
- 'box-background-color' => '#F4F4F4',
- 'box-border-color' => '#F4F4F4',
+ 'box-background-color' => '#f4f4f4',
+ 'box-border-color' => '#f4f4f4',
  'box-border-radius' => '4px',
  'box-padding' => '20px',
  'scroll-color' => '#555555',
@@ -1059,8 +1060,8 @@ public static $widget_styles = array (
  'review-text-mode' => 'readmore',
  'aggregate-rating-text-size' => '24px',
  'nav-line' => 'mobile',
- 'header-background-color' => '#F4F4F4',
- 'header-border-color' => '#F4F4F4',
+ 'header-background-color' => '#f4f4f4',
+ 'header-border-color' => '#f4f4f4',
  'header-border-top-width' => '1px',
  'header-border-bottom-width' => '1px',
  'header-border-left-width' => '1px',
@@ -1073,8 +1074,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1111,8 +1112,8 @@ public static $widget_styles = array (
  'rating-text' => '15px',
  'company-font-size' => '15px',
  'review-lines' => '5',
- 'box-background-color' => '#F4F4F4',
- 'box-border-color' => '#F4F4F4',
+ 'box-background-color' => '#f4f4f4',
+ 'box-border-color' => '#f4f4f4',
  'box-border-radius' => '10px',
  'box-padding' => '25px',
  'scroll-color' => '#c3c3c3',
@@ -1165,8 +1166,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1204,7 +1205,7 @@ public static $widget_styles = array (
  'company-font-size' => '15px',
  'review-lines' => '4',
  'box-background-color' => '#ffffff',
- 'box-border-color' => '#DBDDE1',
+ 'box-border-color' => '#dbdde1',
  'box-border-radius' => '4px',
  'box-padding' => '20px',
  'scroll-color' => '#555555',
@@ -1244,7 +1245,7 @@ public static $widget_styles = array (
  'aggregate-rating-text-size' => '24px',
  'nav-line' => 'mobile',
  'header-background-color' => '#ffffff',
- 'header-border-color' => '#DBDDE1',
+ 'header-border-color' => '#dbdde1',
  'header-border-top-width' => '1px',
  'header-border-bottom-width' => '1px',
  'header-border-left-width' => '1px',
@@ -1257,8 +1258,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1349,8 +1350,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1441,8 +1442,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1533,8 +1534,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1625,8 +1626,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.1',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1717,8 +1718,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.1',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1755,8 +1756,8 @@ public static $widget_styles = array (
  'rating-text' => '15px',
  'company-font-size' => '15px',
  'review-lines' => '4',
- 'box-background-color' => '#F4F4F4',
- 'box-border-color' => '#F4F4F4',
+ 'box-background-color' => '#f4f4f4',
+ 'box-border-color' => '#f4f4f4',
  'box-border-radius' => '4px',
  'box-padding' => '20px',
  'scroll-color' => '#555555',
@@ -1809,8 +1810,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1901,8 +1902,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -1930,7 +1931,7 @@ public static $widget_styles = array (
  '_vars' => 
  array (
  'style_id' => '"soft"',
- 'bg-color' => '#F6F6F9',
+ 'bg-color' => '#f6f6f9',
  'text-color' => '#000000',
  'outside-text-color' => '#000000',
  'profile-color' => '#000000',
@@ -1993,8 +1994,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2085,8 +2086,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2177,8 +2178,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2269,8 +2270,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2361,8 +2362,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2453,8 +2454,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2545,8 +2546,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '0.3',
  'header-backdrop-blur' => '5px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2637,8 +2638,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2729,8 +2730,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2821,8 +2822,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2913,8 +2914,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -2951,8 +2952,8 @@ public static $widget_styles = array (
  'rating-text' => '15px',
  'company-font-size' => '15px',
  'review-lines' => '4',
- 'box-background-color' => '#ffffff',
- 'box-border-color' => '#444444',
+ 'box-background-color' => '#000000',
+ 'box-border-color' => '#000000',
  'box-border-radius' => '0px',
  'box-padding' => '20px',
  'scroll-color' => '#555555',
@@ -3005,8 +3006,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -3097,8 +3098,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -3189,8 +3190,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '1',
  'header-backdrop-blur' => '0px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -3251,7 +3252,7 @@ public static $widget_styles = array (
  'popup-separator-width' => '1px',
  'box-shadow' => 'true',
  'box-shadow-color' => '#000000',
- 'box-shadow-opacity' => '0.20',
+ 'box-shadow-opacity' => '0.2',
  'box-border-top-width' => '0px',
  'box-border-bottom-width' => '0px',
  'box-border-left-width' => '0px',
@@ -3281,8 +3282,8 @@ public static $widget_styles = array (
  'header-shadow-opacity' => '0.15',
  'header-background-opacity' => '0.3',
  'header-backdrop-blur' => '5px',
- 'header-btn-background-color' => '#4285F4',
- 'header-btn-border-color' => '#4285F4',
+ 'header-btn-background-color' => '#4285f4',
+ 'header-btn-border-color' => '#4285f4',
  'header-btn-border-top-width' => '1px',
  'header-btn-border-bottom-width' => '1px',
  'header-btn-border-left-width' => '1px',
@@ -5325,6 +5326,7 @@ $showLogos = get_option($this->get_option_name('show-logos'), self::$widget_styl
 $showStars = get_option($this->get_option_name('show-stars'), self::$widget_styles[ $setId ]['hide-stars'] ? 0 : 1);
 $footerFilterText = get_option($this->get_option_name('footer-filter-text'), 0);
 $showHeaderButton = get_option($this->get_option_name('show-header-button'), 1);
+$reviewsLoadMore = get_option($this->get_option_name('reviews-load-more'), 1);
 $needToParse = true;
 if ($onlyPreview) {
 $content = false;
@@ -5361,18 +5363,6 @@ $sql .= 'and text != "" ';
 }
 }
 $sql .= 'ORDER BY date DESC';
-if ($onlyPreview || !$listAll) {
-switch ($styleId) {
-case 16:
-case 31:
-case 38:
-$sql .= ' LIMIT 9';
-break;
-default:
-$sql .= ' LIMIT 10';
-break;
-}
-}
 $reviews = $wpdb->get_results($sql);
 if ($defaultReviews && ($forceDefaultReviews || !count($reviews))) {
 $lang = substr(get_locale(), 0, 2);
@@ -5382,13 +5372,7 @@ $lang = 'en';
 if (!isset($pageDetails['avatar_url'])) {
 $pageDetails['avatar_url'] = 'https://cdn.trustindex.io/companies/default_avatar.jpg';
 }
-$ratingNum = 5;
-if (in_array($styleId, [ 16, 31, 38 ])) {
-$ratingNum = 9;
-}
-else if (in_array(self::$widget_templates[ 'templates' ][ $styleId ]['type'], [ 'sidebar', 'list' ])) {
-$ratingNum = 3;
-}
+$ratingNum = 10;
 $pageDetails['rating_number'] = $ratingNum;
 $scoreTmp = round((($ratingNum - 1) * 5 + 4) / ($ratingNum * 5) * 10, 1);
 if ($this->is_ten_scale_rating_platform()) {
@@ -5461,7 +5445,8 @@ $content = $this->parse_noreg_list_reviews([
 'verified-icon' => $verifiedIcon,
 'show-reviewers-photo' => $showReviewersPhoto,
 'footer-filter-text' => $footerFilterText,
-'show-header-button' => $showHeaderButton
+'show-header-button' => $showHeaderButton,
+'reviews-load-more' => $reviewsLoadMore,
 ]);
 $this->previewContent = [
 'id' => $styleId,
@@ -5708,6 +5693,9 @@ $array['content'] = str_replace('%footer_link%', $this->getPageUrl(), $array['co
 }
 else {
 $array['content'] = preg_replace('/<a href=[\'"]%footer_link%[\'"][^>]*>(.+)<\/a>/mU', '$1', $array['content']);
+}
+if (!$array['reviews-load-more']) {
+$array['content'] = preg_replace('/<div class="ti-load-more-reviews-container"[^>]*>.+<\/div>\s*<\/div>/U', '', $array['content']);
 }
 if ($array['no-rating-text'] && in_array($array['style-id'], [ 4, 6, 7, 15, 16, 19, 31, 33, 36, 37, 38, 39, 44 ])) {
 if (in_array($array['style-id'], [ 6, 7 ])) {

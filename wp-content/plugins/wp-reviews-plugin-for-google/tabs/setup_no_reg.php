@@ -122,7 +122,7 @@ update_option($trustindex_pm_google->get_option_name('review-download-token'), $
 <input type="hidden" id="ti-noreg-connect-token" name="ti-noreg-connect-token" value="<?php echo $reviewDownloadToken; ?>" />
 <input type="hidden" id="ti-noreg-webhook-url" value="<?php echo $trustindex_pm_google->get_webhook_url(); ?>" />
 <input type="hidden" id="ti-noreg-email" value="<?php echo get_option('admin_email'); ?>" />
-<input type="hidden" id="ti-noreg-version" value="10.7" />
+<input type="hidden" id="ti-noreg-version" value="10.8" />
 <input type="hidden" id="ti-noreg-review-download" name="review_download" value="0" />
 <input type="hidden" id="ti-noreg-review-request-id" name="review_request_id" value="" />
 <input type="hidden" id="ti-noreg-manual-download" name="manual_download" value=0 />
@@ -395,6 +395,12 @@ break;
 <span class="ti-checkbox row">
 <input type="checkbox" name="show-header-button" value="1" <?php if ($showHeaderButton): ?>checked<?php endif;?>>
 <label><?php echo TrustindexPlugin_google::___('Show write review button'); ?></label>
+</span>
+<?php endif; ?>
+<?php if (in_array($styleId, [ 8, 16, 18, 31, 33 ])): ?>
+<span class="ti-checkbox row">
+<input type="checkbox" name="reviews-load-more" value="1" <?php if ($reviewsLoadMore): ?>checked<?php endif;?>>
+<label><?php echo TrustindexPlugin_google::___('Show "Load more" button'); ?></label>
 </span>
 <?php endif; ?>
 <?php if ($widgetHasReviews && in_array(ucfirst($trustindex_pm_google->shortname), TrustindexPlugin_google::$verified_platforms)): ?>

@@ -125,6 +125,7 @@ delete_option($trustindex_pm_google->get_option_name('verified-icon'));
 delete_option($trustindex_pm_google->get_option_name('enable-animation'));
 delete_option($trustindex_pm_google->get_option_name('show-arrows'));
 delete_option($trustindex_pm_google->get_option_name('show-header-button'));
+delete_option($trustindex_pm_google->get_option_name('reviews-load-more'));
 delete_option($trustindex_pm_google->get_option_name('show-reviewers-photo'));
 delete_option($trustindex_pm_google->get_option_name('widget-setted-up'));
 }
@@ -235,6 +236,11 @@ if (isset($_POST['show-header-button'])) {
 $r = sanitize_text_field($_POST['show-header-button']);
 }
 update_option($trustindex_pm_google->get_option_name('show-header-button'), $r, false);
+$r = 1;
+if (isset($_POST['reviews-load-more'])) {
+$r = sanitize_text_field($_POST['reviews-load-more']);
+}
+update_option($trustindex_pm_google->get_option_name('reviews-load-more'), $r, false);
 $r = 1;
 if (isset($_POST['show-reviewers-photo'])) {
 $r = sanitize_text_field($_POST['show-reviewers-photo']);
@@ -347,6 +353,7 @@ $verifiedIcon = get_option($trustindex_pm_google->get_option_name('verified-icon
 $enableAnimation = get_option($trustindex_pm_google->get_option_name('enable-animation'), 1);
 $showArrows = get_option($trustindex_pm_google->get_option_name('show-arrows'), 1);
 $showHeaderButton = get_option($trustindex_pm_google->get_option_name('show-header-button'), 1);
+$reviewsLoadMore = get_option($trustindex_pm_google->get_option_name('reviews-load-more'), 1);
 $widgetSettedUp = get_option($trustindex_pm_google->get_option_name('widget-setted-up'), 0);
 $disableFont = get_option($trustindex_pm_google->get_option_name('disable-font'), 0);
 $align = get_option($trustindex_pm_google->get_option_name('align'), in_array($styleId, [ 36, 37, 38, 39 ]) ? 'center' : 'left');
