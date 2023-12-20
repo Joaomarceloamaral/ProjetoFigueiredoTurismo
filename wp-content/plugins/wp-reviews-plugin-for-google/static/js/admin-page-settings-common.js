@@ -37,7 +37,7 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let icon = jQuery(this);
-		let parent = icon.closest('.form-group, .ti-input-field');
+		let parent = icon.closest('.ti-form-group');
 
 		if (icon.hasClass('dashicons-visibility')) {
 			parent.find('input').attr('type', 'text');
@@ -48,13 +48,6 @@ jQuery(document).ready(function() {
 			icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
 		}
 	});
-
-	// nav padding-right
-	let nav = jQuery('#trustindex-plugin-settings-page .nav-tab-wrapper');
-	if (nav.length) {
-		let width = nav.find('.nav-tab-right').outerWidth();
-		nav.css('padding-right', parseInt(width + 5) + 'px');
-	}
 
 	// toggle opacity
 	jQuery('.ti-toggle-opacity').css('opacity', 1);
@@ -70,29 +63,9 @@ jQuery(document).ready(function() {
 	});
 
 	/*************************************************************************/
-	/* STYLE */
-	var applyStyle = function() {
-		let styleId = jQuery('#ti-style-id').val();
-		let box = jQuery('#ti-review-list').closest('.ti-preview-box');
-
-		if ([ '8', '9', '10', '11', '12', '20', '22' ].indexOf(styleId) != -1 && !isNoReviewsWithFilter) {
-			box.css('width', '30%');
-		}
-		else if([ '6', '7', '24', '25', '26', '27', '28', '29', '35' ].indexOf(styleId) != -1 && !isNoReviewsWithFilter) {
-			box.css('width', '50%');
-		}
-		else {
-			box.css('width', 'auto');
-		}
-
-		// this is necessary to round up x.5 px width
-		box.css('width', box.width());
-	};
-
-	/*************************************************************************/
 	/* FILTER */
 	// checkbox
-	jQuery('.ti-checkbox:not(.disabled)').on('click', function() {
+	jQuery('.ti-checkbox:not(.ti-disabled)').on('click', function() {
 		let checkbox = jQuery(this).find('input[type=checkbox], input[type=radio]');
 		checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
 
@@ -102,7 +75,7 @@ jQuery(document).ready(function() {
 	// custom select - init
 	jQuery('.ti-select').each(function() {
 		let el = jQuery(this);
-		let selected = el.find('ul li.selected');
+		let selected = el.find('ul li.ti-selected');
 
 		if (selected.length === 0) {
 			selected = el.find('ul li:first');
@@ -114,12 +87,12 @@ jQuery(document).ready(function() {
 	// custom select - toggle click
 	jQuery(document).on('click', '.ti-select', function() {
 		let el = jQuery(this);
-		el.toggleClass('active');
+		el.toggleClass('ti-active');
 
-		if (el.hasClass('active')) {
+		if (el.hasClass('ti-active')) {
 			jQuery(window).unbind().on('click', function(event) {
 				if (!jQuery(event.target).is(el) && jQuery(event.target).closest('.ti-select').length === 0) {
-					el.removeClass('active');
+					el.removeClass('ti-active');
 					jQuery(window).unbind();
 				}
 			});
@@ -132,14 +105,14 @@ jQuery(document).ready(function() {
 
 		el.parent().parent().data('value', el.data('value')).trigger('change').find('font').html(el.html());
 
-		el.parent().find('li').removeClass('selected');
-		el.addClass('selected');
+		el.parent().find('li').removeClass('ti-selected');
+		el.addClass('ti-selected');
 	});
 
 	var isNoReviewsWithFilter = false;
 
 	// get reviews to memory
-	var reviewsElement = jQuery('#ti-review-list .ti-widget').clone();
+	var reviewsElement = jQuery('.ti-widget-editor-preview .ti-widget').clone();
 
 	// set reviews' rating and empty to attributes
 	reviewsElement.find('.ti-review-item').each(function() {
@@ -184,40 +157,25 @@ jQuery(document).ready(function() {
 		}
 	});
 
-	// set the stars background in the filter for the corresponding platform
-	var setStarBackground = function() {
-		let platform = (jQuery('#ti-filter #show-star').data('platform') || 'google').ucfirst();
-
-		let el = jQuery('<div class="ti-widget" style="display: none"><div class="source-'+ platform +'"><span class="ti-star f"></span><span class="ti-star e"></span></div></div>');
-		el.append('body');
-
-		jQuery('body').append(el);
-		jQuery('#ti-filter .ti-star.e').css('background', el.find('.ti-star.e').css('background'));
-		jQuery('#ti-filter .ti-star.f').css('background', el.find('.ti-star.f').css('background'));
-
-		el.remove();
-	};
-	setStarBackground();
-
 	// check badge type
 	var isBadgeWidget = function() {
-		let layoutId = jQuery('#ti-review-list .ti-widget').data('layout-id');
+		let layoutId = jQuery('.ti-widget-editor-preview .ti-widget').data('layout-id');
 
 		return [ 11, 12, 20, 22, 24, 25, 26, 27, 28, 29, 35, 55, 56, 57, 58, 59, 60, 61, 62 ].indexOf(layoutId) != -1;
 	};
 
 	// apply filter when change or init
 	var applyFilter = function(init) {
-		let styleId = jQuery('#ti-style-id').val();
+		let styleId = parseInt(jQuery('.ti-widget').data('layout-id'));
 
 		// get stars
-		let stars = (jQuery('#ti-filter #show-star').data('value') + "").split(',').map(function(i) { return parseInt(i); });
+		let stars = (jQuery('#ti-filter-star').data('value') + "").split(',').map(function(i) { return parseInt(i); });
 
 		// only ratings
 		let showOnlyRatings = jQuery('#ti-filter-only-ratings').prop('checked');
 
 		// filter removed
-		if (!jQuery('#ti-filter').length) {
+		if (!jQuery('#ti-filter-star').length) {
 			stars = [ 1, 2, 3, 4, 5 ];
 			showOnlyRatings = false;
 		}
@@ -248,7 +206,7 @@ jQuery(document).ready(function() {
 
 				// clone and append element
 				let clone = el.clone();
-				jQuery('#ti-review-list .ti-widget .ti-reviews-container-wrapper').append(clone);
+				jQuery('.ti-widget-editor-preview .ti-widget .ti-reviews-container-wrapper').append(clone);
 				clone.hide();
 				clone.fadeIn();
 
@@ -264,23 +222,12 @@ jQuery(document).ready(function() {
 
 		// show empty text
 		if (results === 0 && !isBadgeWidget()) {
-			jQuery('#ti-review-list').hide().next().fadeIn();
+			jQuery('.ti-widget-editor-preview .ti-widget').hide().next().fadeIn();
 			isNoReviewsWithFilter = true;
 		}
 		else {
-			jQuery('#ti-review-list').fadeIn().next().hide();
+			jQuery('.ti-widget-editor-preview .ti-widget').fadeIn().next().hide();
 			isNoReviewsWithFilter = false;
-
-			// start pager
-			if (init === undefined) {
-				let container = jQuery('#ti-review-list .ti-widget .ti-controls-dots');
-				if (container.length) {
-					let dot = container.children(':first').clone();
-					if (dot.length) {
-						container.html(' ' + dot.removeAttr('data-pager-state')[0].outerHTML + ' ');
-					}
-				}
-			}
 
 			if (typeof Trustindex !== 'undefined') {
 				Trustindex.pager_inited = true;
@@ -293,18 +240,17 @@ jQuery(document).ready(function() {
 		if (init !== true) {
 			jQuery.post('', {
 				command: 'save-filter',
+				_wpnonce: jQuery('#ti-filter-star').data('nonce'),
 				filter: JSON.stringify({
 					'stars': stars,
 					'only-ratings': showOnlyRatings
 				})
 			});
 		}
-
-		applyStyle();
 	}
 
 	// hooks
-	jQuery('#ti-filter #show-star').on('change', applyFilter);
+	jQuery('#ti-filter-star').on('change', applyFilter);
 	jQuery('#ti-filter-only-ratings').on('change', function(event) {
 		event.preventDefault();
 
@@ -316,11 +262,10 @@ jQuery(document).ready(function() {
 	// init
 	if (reviewsElement.length) {
 		applyFilter(true);
-		applyStyle();
 	}
 
 	// background post save - style and set change
-	jQuery('#ti-style-id, #ti-set-id, #ti-lang-id, #ti-dateformat-id, #ti-widget-options input[type=checkbox]:not(.no-form-update), #ti-align-id, #ti-review-text-mode-id').on('change', function() {
+	jQuery('#ti-widget-selects select, #ti-widget-options input[type=checkbox]:not(.no-form-update)').on('change', function() {
 		let form = jQuery(this).closest('form');
 		let data = form.serializeArray();
 
@@ -337,7 +282,7 @@ jQuery(document).ready(function() {
 		});
 
 		// show loading
-		jQuery('#ti-loading').addClass('active');
+		jQuery('#ti-loading').addClass('ti-active');
 
 		jQuery('li.ti-preview-box').addClass('disabled');
 
@@ -357,7 +302,9 @@ jQuery(document).ready(function() {
 
 		let ids = (jQuery('input[name=layout-select]:checked').data('ids') + "").split(',');
 
-		if (ids === "") {
+		console.log('filter', ids);
+
+		if (ids.length === 0 || ids[0] === "") {
 			jQuery('.ti-preview-boxes-container').find('.ti-full-width, .ti-half-width').fadeIn();
 		}
 		else {
@@ -367,26 +314,6 @@ jQuery(document).ready(function() {
 
 		return false;
 	});
-
-	// gree step stepping
-	let isStepping = false;
-	jQuery('.ti-free-steps li.done, .ti-free-steps li.active').on('click', function(event) {
-		event.preventDefault();
-
-		if (isStepping) {
-			return false;
-		}
-
-		isStepping = true;
-		window.location.href = jQuery(this).attr('href');
-
-		return false;
-	});
-
-	// set auto active if not present
-	if (jQuery('.ti-free-steps:not(.ti-setup-guide-steps) li.current').length === 0) {
-		jQuery('.ti-free-steps:not(.ti-setup-guide-steps) li.active:last').addClass('current');
-	}
 
 	/*************************************************************************/
 	/* MODAL */
@@ -422,7 +349,7 @@ jQuery(document).ready(function() {
 	});
 
 	jQuery('.ti-checkbox input[type=checkbox][onchange]').on('change', function() {
-		jQuery('#ti-loading').addClass('active');
+		jQuery('#ti-loading').addClass('ti-active');
 	});
 
 	/*************************************************************************/
@@ -436,7 +363,7 @@ jQuery(document).ready(function() {
 
 			// add prev buttons' width
 			let left = 0;
-			button.prevAll('.btn-text').each(function() {
+			button.prevAll('.ti-btn').each(function() {
 				left += jQuery(this).outerWidth(true);
 			});
 
@@ -558,28 +485,28 @@ jQuery(document).ready(function() {
 		let btn = jQuery(this);
 		let td = btn.closest('td');
 
-		btn.addClass('btn-loading').blur();
+		btn.addClass('ti-btn-loading').blur();
 
 		let replyBox = td.find('.ti-reply-box');
 		replyBox.find('.btn-post-reply').attr('data-reconnect', 0);
-		replyBox.find('.ti-alert').addClass('d-none');
+		replyBox.find('.ti-alert').addClass('ti-d-none');
 
 		// generate reply with AI if not edit
 		if (replyBox.attr('data-state') === 'reply' || replyBox.attr('data-state') === 'copy-reply') {
 			let data = JSON.parse(replyBox.next().html());
 			generateAiReply(data.review.text, function(reply) {
-				btn.removeClass('btn-loading');
+				btn.removeClass('ti-btn-loading');
 
 				// popup closed
 				if (reply === false) {
 					return;
 				}
 
-				btn.addClass('btn-default-disabled');
-				replyBox.addClass('active');
+				btn.addClass('ti-btn-default-disabled');
+				replyBox.addClass('ti-active');
 
-				td.find('.ti-highlight-box').removeClass('active');
-				td.find('.btn-show-highlight').removeClass('btn-default-disabled');
+				td.find('.ti-highlight-box').removeClass('ti-active');
+				td.find('.btn-show-highlight').removeClass('ti-btn-default-disabled');
 
 				let textarea = replyBox.find('.state-'+ replyBox.attr('data-state') +' textarea');
 				textarea.val(reply).focus().expand();
@@ -593,11 +520,11 @@ jQuery(document).ready(function() {
 			});
 		}
 		else {
-			btn.removeClass('btn-loading').addClass('btn-default-disabled');
-			replyBox.addClass('active');
+			btn.removeClass('ti-btn-loading').addClass('ti-btn-default-disabled');
+			replyBox.addClass('ti-active');
 
-			td.find('.ti-highlight-box').removeClass('active');
-			td.find('.btn-show-highlight').removeClass('btn-default-disabled');
+			td.find('.ti-highlight-box').removeClass('ti-active');
+			td.find('.btn-show-highlight').removeClass('ti-btn-default-disabled');
 		}
 	});
 
@@ -612,10 +539,10 @@ jQuery(document).ready(function() {
 		replyBox.attr('data-state', replyBox.attr('data-original-state'));
 
 		if (replyBox.attr('data-state') !== 'replied') {
-			replyBox.removeClass('active');
+			replyBox.removeClass('ti-active');
 		}
 
-		btn.closest('td').find('.btn-show-ai-reply').removeClass('btn-default-disabled');
+		btn.closest('td').find('.btn-show-ai-reply').removeClass('ti-btn-default-disabled');
 	});
 
 	// show edit reply section
@@ -636,7 +563,7 @@ jQuery(document).ready(function() {
 		let btn = jQuery(this);
 		let replyBox = btn.closest('td').find('.ti-reply-box');
 
-		replyBox.find('.ti-alert').addClass('d-none');
+		replyBox.find('.ti-alert').addClass('ti-d-none');
 		replyBox.attr('data-state', 'replied');
 	});
 
@@ -651,18 +578,18 @@ jQuery(document).ready(function() {
 		let textarea = btn.closest('.ti-reply-box-state').find('textarea');
 		let reply = textarea.val().trim();
 
-		textarea.removeClass('has-error');
+		textarea.removeClass('is-invalid');
 
 		if (reply === "") {
-			return textarea.addClass('has-error');
+			return textarea.addClass('is-invalid');
 		}
 
-		btn.addClass('btn-loading').blur();
+		btn.addClass('ti-btn-loading').blur();
 
 		data.reply = reply;
 
 		postReply(data, btn.attr('data-reconnect') == 1, function(isSuccess) {
-			btn.removeClass('btn-loading');
+			btn.removeClass('ti-btn-loading');
 
 			// popup closed
 			if (isSuccess === undefined) {
@@ -676,6 +603,7 @@ jQuery(document).ready(function() {
 					url: window.location.href,
 					data: {
 						id: btn.attr('href'),
+						_wpnonce: btn.data('nonce'),
 						'save-reply': reply
 					}
 				});
@@ -684,7 +612,7 @@ jQuery(document).ready(function() {
 				replyBox.attr('data-state', 'replied').attr('data-original-state', 'replied');
 				replyBox.find('.state-replied p').html(reply);
 				replyBox.find('.state-edit-reply textarea').val(reply);
-				replyBox.find('.state-replied .ti-alert').removeClass('d-none');
+				replyBox.find('.state-replied .ti-alert').removeClass('ti-d-none');
 
 				// change Reply with AI button text
 				let replyButton = replyBox.closest('td').find('.btn-show-ai-reply:not(.btn-default)');
@@ -700,7 +628,7 @@ jQuery(document).ready(function() {
 				// show copy section
 				replyBox.attr('data-state', 'copy-reply');
 				replyBox.find('.state-copy-reply textarea').val(reply).focus().expand();
-				replyBox.find('.state-copy-reply .ti-alert').removeClass('d-none');
+				replyBox.find('.state-copy-reply .ti-alert').removeClass('ti-d-none');
 			}
 		});
 	});
@@ -716,13 +644,13 @@ jQuery(document).ready(function() {
 		let td = btn.closest('td');
 		let replyBox = td.find('.ti-reply-box');
 
-		btn.addClass('btn-default-disabled').blur();
-		td.find('.ti-highlight-box').addClass('active');
+		btn.addClass('ti-btn-default-disabled').blur();
+		td.find('.ti-highlight-box').addClass('ti-active');
 
 		replyBox.attr('data-state', replyBox.attr('data-original-state'));
-		replyBox.removeClass('active');
+		replyBox.removeClass('ti-active');
 
-		td.find('.btn-show-ai-reply').removeClass('btn-default-disabled');
+		td.find('.btn-show-ai-reply').removeClass('ti-btn-default-disabled');
 	});
 
 	// hide highlight section
@@ -734,12 +662,12 @@ jQuery(document).ready(function() {
 
 		btn.blur();
 
-		td.find('.ti-highlight-box').removeClass('active');
-		td.find('.btn-show-highlight').removeClass('btn-default-disabled');
-		td.find('.ti-reply-box[data-state="replied"]').addClass('active');
+		td.find('.ti-highlight-box').removeClass('ti-active');
+		td.find('.btn-show-highlight').removeClass('ti-btn-default-disabled');
+		td.find('.ti-reply-box[data-state="replied"]').addClass('ti-active');
 
 		if (td.find('.ti-reply-box').attr('data-state') === 'replied') {
-			td.find('.btn-show-ai-reply').addClass('btn-default-disabled');
+			td.find('.btn-show-ai-reply').addClass('ti-btn-default-disabled');
 		}
 	});
 
@@ -748,15 +676,16 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 
 		let btn = jQuery(this);
-		let highlightContent = btn.closest('td').find('.ti-highlight-content .selection-content');
+		let highlightContent = btn.closest('td').find('.ti-highlight-content .ti-selection-content');
 		let data = TI_highlight_getSelection(highlightContent.get(0));
 
 		if (data.start !== null) {
 			data.id = btn.attr('href');
+			data._wpnonce = btn.data('nonce');
 			data['save-highlight'] = 1;
 
-			btn.addClass('btn-loading').blur();
-			btn.closest('td').find('.btn-text').css('pointer-events', 'none');
+			btn.addClass('ti-btn-loading').blur();
+			btn.closest('td').find('.ti-btn').css('pointer-events', 'none');
 
 			jQuery.ajax({
 				method: 'POST',
@@ -772,45 +701,58 @@ jQuery(document).ready(function() {
 
 		let btn = jQuery(this);
 
-		btn.addClass('btn-loading').blur();
-		btn.closest('td').find('.btn-text').css('pointer-events', 'none');
+		btn.addClass('ti-btn-loading').blur();
+		btn.closest('td').find('.ti-btn').css('pointer-events', 'none');
 
 		jQuery.ajax({
 			method: 'POST',
 			url: window.location.href,
 			data: {
 				id: btn.attr('href'),
+				_wpnonce: btn.data('nonce'),
 				'save-highlight': 1
 			}
 		}).always(() => location.reload(true));
 	});
 
 	// review download notification email
-	jQuery(document).on('change', '#ti-review-download-notification-email input[type="text"]', function(event) {
+	jQuery(document).on('click', '.btn-notification-email-save', function(event) {
 		event.preventDefault();
 
-		let email = jQuery(this).val().trim().toLowerCase();
-		let container = jQuery('#ti-review-download-notification-email');
+		let container = jQuery(this).closest('.ti-notification-email');
+		let input = container.find('input[type="text"]');
+		let type = input.data('type');
+		let nonce = input.data('nonce');
+		let email = input.val().trim().toLowerCase();
 
 		// hide alerts
-		container.find('.ti-text-danger, .ti-text-success').addClass('d-none');
+		container.find('.ti-notice').hide();
 
 		// check email
 		if (email !== "" && !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) {
-			container.find('.ti-text-danger').removeClass('d-none');
-			return setTimeout(() => container.find('.ti-text-danger').addClass('d-none'), 3000);
+			return container.find('.ti-notice').fadeIn();
 		}
+
+		// show loading
+		jQuery('#ti-loading').addClass('ti-active');
 
 		// save email
 		jQuery.post("", {
-			'save-review-download-notification-email': email
-		}, () => {
-			container.find('.ti-text-success').removeClass('d-none');
-			return setTimeout(() => container.find('.ti-text-success').addClass('d-none'), 3000);
-		});
+			'save-notification-email': email,
+			'type': type,
+			'_wpnonce': nonce
+		}, () => location.reload(true));
 	});
 });
 
+
+// - import/btn-loading.js
+// loading on click
+jQuery(document).on('click', '.ti-btn-loading-on-click', function() {
+	let btn = jQuery(this);
+
+	btn.addClass('ti-btn-loading').blur();
+});
 
 // - import/copy-to-clipboard.js
 jQuery(document).on('click', '.btn-copy2clipboard', function(event) {
@@ -828,13 +770,13 @@ jQuery(document).on('click', '.btn-copy2clipboard', function(event) {
 	text = textArea.value;
 
 	let feedback = () => {
-		btn.addClass('show-tooltip');
+		btn.removeClass('ti-toggle-tooltip').addClass('ti-show-tooltip');
 
 		if (typeof this.timeout !== 'undefined') {
 			clearTimeout(this.timeout);
 		}
 
-		this.timeout = setTimeout(() => btn.removeClass('show-tooltip'), 3000);
+		this.timeout = setTimeout(() => btn.removeClass('ti-show-tooltip').addClass('ti-toggle-tooltip'), 3000);
 	};
 
 	if (!navigator.clipboard) {
@@ -858,38 +800,6 @@ jQuery(document).on('click', '.btn-copy2clipboard', function(event) {
 	}
 
 	navigator.clipboard.writeText(text).then(feedback);
-});
-
-// - import/input-file-upload.js
-jQuery(document).on('click', '.ti-input-file-upload button', function(event) {
-	event.preventDefault();
-
-	let btn = jQuery(this);
-	let input = btn.prev();
-
-	input.val('').click();
-	input.off().on('change', function(event) {
-		event.preventDefault();
-
-		let files = [];
-		for (let i = 0; i < input[0].files.length; i++) {
-			let tmp = input[0].files[i].name.split('.');
-			let ext = tmp.pop();
-			let name = tmp.join('.');
-
-			if (name.length > 20) {
-				name = name.substr(0, 20) + '..';
-			}
-
-			files.push(name + '.' + ext);
-		}
-
-		if (btn.find('.ti-info-text').length === 0) {
-			btn.append('<span class="ti-info-text"></span>');
-		}
-
-		btn.find('.ti-info-text').html(files.join(', '));
-	});
 });
 
 // - import/feature-request.js
@@ -916,33 +826,13 @@ jQuery(document).on('click', '.btn-send-feature-request', function(event) {
 		container.find('textarea[name="description"]').addClass('is-invalid');
 	}
 
-	// check attachments
-	let attachments = container.find('input[type="file"]')[0].files;
-	if (attachments.length > 3) {
-		container.find('.ti-input-file-upload').addClass('is-invalid');
-	}
-	else {
-		let foundLarger = false;
-		for (let i = 0; i < attachments.length; i++) {
-			if (attachments[i].size > 3145728) {
-				foundLarger = true;
-
-				break;
-			}
-		}
-
-		if (foundLarger) {
-			container.find('.ti-input-file-upload').addClass('is-invalid');
-		}
-	}
-
 	// there is error
 	if (container.find('.is-invalid').length) {
 		return false;
 	}
 
 	// show loading animation
-	btn.addClass('btn-loading');
+	btn.addClass('ti-btn-loading');
 
 	let data = new FormData(jQuery('.ti-feature-request form').get(0));
 
@@ -954,25 +844,25 @@ jQuery(document).on('click', '.btn-send-feature-request', function(event) {
 		contentType: false,
 		processData: false
 	}).always(function() {
-		btn.removeClass('btn-loading');
+		btn.removeClass('ti-btn-loading');
 
-		btn.addClass('show-tooltip');
-		setTimeout(() => btn.removeClass('show-tooltip'), 3000);
+		btn.addClass('ti-show-tooltip').removeClass('ti-toggle-tooltip');
+		setTimeout(() => btn.removeClass('ti-show-tooltip').addClass('ti-toggle-tooltip'), 3000);
 	});
 });
 
 // - import/rate-us.js
 // remember on hover
-jQuery(document).on('mouseenter', '.ti-rate-us-box .ti-quick-rating', function(event) {
+jQuery(document).on('mouseenter', '.ti-quick-rating', function(event) {
 	let container = jQuery(this);
 	let selected = container.find('.ti-star-check.active');
 
 	if (selected.length) {
 		// add index to data & remove all active stars
-		container.data('selected', selected.index()).find('.ti-star-check').removeClass('active');
+		container.data('selected', selected.index()).find('.ti-star-check').removeClass('ti-active');
 
 		// give back active star on mouse enter
-		container.one('mouseleave', () => container.find('.ti-star-check').eq(container.data('selected')).addClass('active'));
+		container.one('mouseleave', () => container.find('.ti-star-check').eq(container.data('selected')).addClass('ti-active'));
 	}
 });
 
@@ -984,31 +874,31 @@ jQuery(document).on('click', '.ti-rate-us-box .ti-quick-rating .ti-star-check', 
 	let container = star.parent();
 
 	// add index to data & remove all active stars
-	container.data('selected', star.index()).find('.ti-star-check').removeClass('active');
+	container.data('selected', star.index()).find('.ti-star-check').removeClass('ti-active');
 
 	// select current star
-	star.addClass('active');
+	star.addClass('ti-active');
 
 	// show modals
 	if (parseInt(star.data('value')) >= 4) {
 		// open new window
-		window.open(location.href + '&command=rate-us-feedback&star=' + star.data('value'), '_blank');
+		window.open(location.href + '&command=rate-us-feedback&_wpnonce='+ container.data('nonce') +'&star=' + star.data('value'), '_blank');
 
 		jQuery('.ti-rate-us-box').fadeOut();
 	}
 	else {
-		let feedback_modal = jQuery('#ti-rateus-modal-feedback');
+		let feedbackModal = jQuery('#ti-rateus-modal-feedback');
 
-		if (feedback_modal.data('bs') == '5') {
-			feedback_modal.modal('show');
-			setTimeout(() => feedback_modal.find('textarea').focus(), 500);
+		if (feedbackModal.data('bs') == '5') {
+			feedbackModal.modal('show');
+			setTimeout(() => feedbackModal.find('textarea').focus(), 500);
 		}
 		else {
-			feedback_modal.fadeIn();
-			feedback_modal.find('textarea').focus();
+			feedbackModal.fadeIn();
+			feedbackModal.find('textarea').focus();
 		}
 
-		feedback_modal.find('.ti-quick-rating .ti-star-check').removeClass('active').eq(star.index()).addClass('active');
+		feedbackModal.find('.ti-quick-rating .ti-star-check').removeClass('ti-active').eq(star.index()).addClass('ti-active');
 	}
 });
 
@@ -1042,8 +932,8 @@ jQuery(document).on('click', '.btn-rateus-support', function(event) {
 	}
 
 	// show loading animation
-	btn.addClass('btn-loading');
-	btn.closest('.ti-modal').find('.btn-light, .btn-text').css('pointer-events', 'none');
+	btn.addClass('ti-btn-loading');
+	container.find('a, button').css('pointer-events', 'none');
 
 	// ajax request
 	jQuery.ajax({
@@ -1051,9 +941,10 @@ jQuery(document).on('click', '.btn-rateus-support', function(event) {
 		dataType: 'application/json',
 		data: {
 			command: 'rate-us-feedback',
+			_wpnonce: btn.data('nonce'),
 			email: email,
 			text: text,
-			star: container.find('.ti-quick-rating .ti-star-check.active').data('value')
+			star: container.find('.ti-quick-rating .ti-star-check.ti-active').data('value')
 		}
 	}).always(() => location.reload(true));
 });

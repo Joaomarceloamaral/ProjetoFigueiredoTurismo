@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
 		let button = $(this);
 		let token = $('#ti-noreg-connect-token').val();
 
-		button.addClass('btn-loading').blur();
+		button.addClass('ti-btn-loading').blur();
 
 		let dontRemoveLoading = false;
 
@@ -32,22 +32,22 @@ jQuery(document).ready(function($) {
 				dontRemoveLoading = true;
 
 				tiWindow.close();
-				$('#ti-connect-info').hide();
+				$('#ti-connect-info').removeClass('ti-d-none');
 
-				$('#ti-noreg-page_details').val(JSON.stringify(event.data));
+				$('#ti-noreg-page-details').val(JSON.stringify(event.data));
 				$('#ti-noreg-review-download').val(token);
 
 				button.closest('form').submit();
 			}
 		});
 
-		$('#ti-connect-info').fadeIn();
+		$('#ti-connect-info').addClass('ti-d-none');
 		let timer = setInterval(function() {
 			if (tiWindow.closed) {
-				$('#ti-connect-info').hide();
+				$('#ti-connect-info').removeClass('ti-d-none');
 
 				if (!dontRemoveLoading) {
-					button.removeClass('btn-loading');
+					button.removeClass('ti-btn-loading');
 				}
 
 				clearInterval(timer);

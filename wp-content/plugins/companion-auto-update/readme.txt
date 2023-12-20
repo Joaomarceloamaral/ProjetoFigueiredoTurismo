@@ -2,10 +2,10 @@
 Contributors: Papin, qweb
 Donate link: https://www.paypal.me/dakel/10/
 Tags: auto, automatic, background, update, updates, updating, automatic updates, automatic background updates, easy update, wordpress update, theme update, plugin update, up-to-date, security, update latest version, update core, update wp, update wp core, major updates, minor updates, update to new version, update core, update plugin, update plugins, update plugins automatically, update theme, plugin, theme, advance, control, mail, notifations, enable
-Requires at least: 3.6.0
-Tested up to: 6.2
+Requires at least: 5.3.0
+Tested up to: 6.4
 Requires PHP: 5.1
-Stable tag: 3.8.7.1
+Stable tag: 3.8.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,11 @@ So obviously, some of you wondered what the difference would be between the defa
 4. Keep track of updates with the update log
 
 == Changelog ==
+
+= 3.8.8 (December 19, 2023) =
+* Fixed a few minor bugs
+* Made some performance improvements
+* We now require at least WordPress 5.3
 
 = 3.8.7.1 (September 28, 2022) =
 * Tweak: Extended function_exists check with get_plugins() for the fatal error when trying to send update emails

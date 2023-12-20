@@ -1,33 +1,33 @@
 <?php
-$dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'wp-reviews-plugin-for-google.php';
-$pluginData = get_plugin_data( $dir );
+$dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $pluginManagerInstance->get_plugin_slug() .'.php';
+$pluginData = get_plugin_data($dir);
 $reviews = null;
-if ($trustindex_pm_google->is_table_exists('reviews')) {
+if (method_exists($pluginManagerInstance, 'is_noreg_linked') && $pluginManagerInstance->is_table_exists('reviews')) {
 $reviews = [];
-if ($trustindex_pm_google->is_noreg_linked()) {
-$reviews = $wpdb->get_results('SELECT * FROM `'. $trustindex_pm_google->get_tablename('reviews') .'` ORDER BY date DESC');
+if ($pluginManagerInstance->is_noreg_linked()) {
+$reviews = $wpdb->get_results('SELECT * FROM `'. $pluginManagerInstance->get_tablename('reviews') .'` ORDER BY date DESC');
 }
 }
 ?>
 <?php
 $memoryLimit = 'N/A';
 if(ini_get('memory_limit')) {
-$memoryLimit = filter_var(ini_get('memory_limit'), FILTER_SANITIZE_STRING);
+$memoryLimit = sanitize_text_field(ini_get('memory_limit'));
 }
 $uploadMax = 'N/A';
 if (ini_get('upload_max_filesize')) {
-$uploadMax = filter_var(ini_get('upload_max_filesize'), FILTER_SANITIZE_STRING);
+$uploadMax = sanitize_text_field(ini_get('upload_max_filesize'));
 }
 $postMax = 'N/A';
 if (ini_get('post_max_size')) {
-$postMax = filter_var(ini_get('post_max_size'), FILTER_SANITIZE_STRING);
+$postMax = sanitize_text_field(ini_get('post_max_size'));
 }
 $maxExecute = 'N/A';
 if (ini_get('max_execution_time')) {
-$maxExecute = filter_var(ini_get('max_execution_time'));
+$maxExecute = sanitize_text_field(ini_get('max_execution_time'));
 }
 $addCss = false;
-if (method_exists($trustindex_pm_google, 'getCssFile')) {
+if (method_exists($pluginManagerInstance, 'getCssFile')) {
 $addCss = true;
 }
 ?>
@@ -38,7 +38,7 @@ WP Version: <?php echo esc_html($wp_version) ."\n"; ?>
 Server Name: <?php echo esc_html($_SERVER['SERVER_NAME']) ."\n"; ?>
 Cookie Domain: <?php $cookieDomain = parse_url(strtolower(get_bloginfo('wpurl'))); echo esc_html($cookieDomain['host']) ."\n"; ?>
 CURL Library Present: <?php echo (function_exists('curl_init') ? 'Yes' : 'No') ."\n"; ?>
-<?php if ($addCss): ?>CSS path: <?php echo esc_html($trustindex_pm_google->getCssFile()) ."\n"; ?><?php endif; ?>
+<?php if ($addCss): ?>CSS path: <?php echo esc_html($pluginManagerInstance->getCssFile()) ."\n"; ?><?php endif; ?>
 PHP Info: <?php echo "\n\t"; ?>
 Version: <?php echo esc_html(phpversion()) ."\n\t"; ?>
 Memory Usage: <?php echo round(memory_get_usage() / 1024 / 1024, 2) . "MB\n\t"; ?>
@@ -53,11 +53,11 @@ WP_HTTP_BLOCK_EXTERNAL: <?php echo (defined('WP_HTTP_BLOCK_EXTERNAL') ? var_expo
 WP_ACCESSIBLE_HOSTS: <?php echo (defined('WP_ACCESSIBLE_HOSTS') ? WP_ACCESSIBLE_HOSTS : 'not defined') . "\n"; ?>
 Plugin: <?php echo esc_html($pluginData['Name']) ."\n"; ?>
 Plugin Version: <?php echo esc_html($pluginData['Version']) ."\n"; ?>
-Options: <?php foreach($trustindex_pm_google->get_option_names() as $optName) {
+Options: <?php foreach($pluginManagerInstance->get_option_names() as $optName) {
 if ($optName == 'css-content') {
 continue;
 }
-$option = get_option($trustindex_pm_google->get_option_name( $optName ));
+$option = get_option($pluginManagerInstance->get_option_name( $optName ));
 echo "\n\t". esc_html($optName) .': ';
 if ($optName === 'page-details' || is_array($option)) {
 if (isset($option['reviews'])) {
@@ -78,7 +78,7 @@ if (!is_null($reviews)) {
 echo "\n\nReviews: ". trim(esc_html(str_replace("\n", "\n\t", print_r($reviews, true))));
 }
 if ($addCss) {
-echo "\n\nCSS: ". esc_html(get_option($trustindex_pm_google->get_option_name('css-content')));
+echo "\n\nCSS: ". esc_html(get_option($pluginManagerInstance->get_option_name('css-content')));
 }
 echo "\n\n";
 ?>

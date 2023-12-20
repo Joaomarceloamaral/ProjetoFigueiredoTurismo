@@ -17,6 +17,13 @@
  */
 class Joinchat_Admin {
 
+	const KSES_LINK = array(
+		'a' => array(
+			'href'   => true,
+			'target' => array( 'values' => array( '_blank' ) ),
+		),
+	);
+
 	/**
 	 * Initialize the settings for WordPress admin
 	 *
@@ -56,14 +63,14 @@ class Joinchat_Admin {
 		$util::maybe_encode_emoji();
 
 		$value['telephone']     = $util::clean_input( $value['telephone'] );
-		$value['mobile_only']   = isset( $value['mobile_only'] ) ? 'yes' : 'no';
+		$value['mobile_only']   = $util::yes_no( $value, 'mobile_only' );
 		$value['button_image']  = intval( $value['button_image'] );
 		$value['button_tip']    = $util::substr( $util::clean_input( $value['button_tip'] ), 0, 40 );
 		$value['button_delay']  = intval( $value['button_delay'] );
-		$value['whatsapp_web']  = isset( $value['whatsapp_web'] ) ? 'yes' : 'no';
-		$value['qr']            = isset( $value['qr'] ) ? 'yes' : 'no';
+		$value['whatsapp_web']  = $util::yes_no( $value, 'whatsapp_web' );
+		$value['qr']            = $util::yes_no( $value, 'qr' );
 		$value['message_text']  = $util::clean_input( $value['message_text'] );
-		$value['message_badge'] = isset( $value['message_badge'] ) ? 'yes' : 'no';
+		$value['message_badge'] = $util::yes_no( $value, 'message_badge' );
 		$value['message_send']  = $util::clean_input( $value['message_send'] );
 		$value['message_start'] = $util::substr( $util::clean_input( $value['message_start'] ), 0, 40 );
 		$value['message_delay'] = intval( $value['message_delay'] );
@@ -72,20 +79,19 @@ class Joinchat_Admin {
 		$value['color']         = preg_match( '/^#[a-f0-9]{6}$/i', $value['color'] ) ? $value['color'] : '#25d366';
 		$value['dark_mode']     = in_array( $value['dark_mode'], array( 'no', 'yes', 'auto' ), true ) ? $value['dark_mode'] : 'no';
 		$value['header']        = in_array( $value['header'], array( '__jc__', '__wa__' ), true ) ? $value['header'] : $util::substr( $util::clean_input( $value['header_custom'] ), 0, 40 );
-		$value['optin_check']   = isset( $value['optin_check'] ) ? 'yes' : 'no';
+		$value['optin_check']   = $util::yes_no( $value, 'optin_check' );
 		$value['optin_text']    = wp_kses(
 			$value['optin_text'],
 			array(
-				'em'     => true,
-				'strong' => true,
+				'em'     => array(),
+				'strong' => array(),
 				'a'      => array( 'href' => true ),
 			)
 		);
 		$value['gads']          = is_array( $value['gads'] ) ? sprintf( 'AW-%s/%s', $util::substr( $util::clean_input( $value['gads'][0] ), 0, 11 ), $util::substr( $util::clean_input( $value['gads'][1] ), 0, 20 ) ) : '';
 		$value['gads']          = 'AW-/' !== $value['gads'] ? $value['gads'] : '';
-		$value['custom_css']    = trim( str_replace( "\r\n", "\n", $value['custom_css'] ) );
-		$value['custom_css']    = $value['custom_css'] !== jc_common()->defaults( 'custom_css' ) ? $value['custom_css'] : '';
-		$value['clear']         = isset( $value['clear'] ) ? 'yes' : 'no';
+		$value['custom_css']    = trim( $util::clean_nl( $value['custom_css'] ) );
+		$value['clear']         = $util::yes_no( $value, 'clear' );
 
 		if ( isset( $value['view'] ) ) {
 			$value['visibility'] = array_filter(
@@ -102,7 +108,7 @@ class Joinchat_Admin {
 		// Filter for other validations or extra settings.
 		$value = apply_filters( 'joinchat_settings_validate', $value, jc_common()->settings );
 
-		add_settings_error( JOINCHAT_SLUG, 'settings_updated', __( 'Settings saved', 'creame-whatsapp-me' ), 'updated' );
+		add_settings_error( JOINCHAT_SLUG, 'settings_updated', esc_html__( 'Settings saved', 'creame-whatsapp-me' ), 'updated' );
 
 		// Delete notice option.
 		if ( $value['telephone'] ) {
@@ -154,7 +160,7 @@ class Joinchat_Admin {
 		if ( $intltel ) {
 			$deps[] = 'intl-tel-input';
 			$config = array(
-				'placeholder' => __( 'e.g.', 'creame-whatsapp-me' ),
+				'placeholder' => esc_attr__( 'e.g.', 'creame-whatsapp-me' ),
 				'version'     => $intltel,
 				'utils_js'    => plugins_url( 'js/utils.js', __FILE__ ),
 			);
@@ -228,7 +234,7 @@ class Joinchat_Admin {
 	 */
 	public function settings_link( $links ) {
 
-		$settings_link = sprintf( '<a href="%s">%s</a>', Joinchat_Util::admin_url(), __( 'Settings', 'creame-whatsapp-me' ) );
+		$settings_link = sprintf( '<a href="%s">%s</a>', Joinchat_Util::admin_url(), esc_html__( 'Settings', 'creame-whatsapp-me' ) );
 
 		array_unshift( $links, $settings_link );
 
@@ -248,8 +254,8 @@ class Joinchat_Admin {
 	public function plugin_links( $plugin_meta, $plugin_file ) {
 
 		if ( JOINCHAT_BASENAME === $plugin_file ) {
-			$plugin_meta[] = sprintf( '<a href="%1$s" target="_blank">%2$s</a>', esc_url( Joinchat_Util::link( 'docs', 'plugins' ) ), __( 'Documentation', 'creame-whatsapp-me' ) );
-			$plugin_meta[] = sprintf( '<a href="%1$s" target="_blank">%2$s</a>', esc_url( Joinchat_Util::link( 'support', 'plugins' ) ), __( 'Support', 'creame-whatsapp-me' ) );
+			$plugin_meta[] = sprintf( '<a href="%1$s" target="_blank">%2$s</a>', esc_url( Joinchat_Util::link( 'docs', 'plugins' ) ), esc_html__( 'Documentation', 'creame-whatsapp-me' ) );
+			$plugin_meta[] = sprintf( '<a href="%1$s" target="_blank">%2$s</a>', esc_url( Joinchat_Util::link( 'support', 'plugins' ) ), esc_html__( 'Support', 'creame-whatsapp-me' ) );
 		}
 
 		return $plugin_meta;

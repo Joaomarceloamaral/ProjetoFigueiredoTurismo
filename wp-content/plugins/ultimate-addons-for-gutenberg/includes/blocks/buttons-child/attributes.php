@@ -22,6 +22,7 @@ $inherit_from_theme = 'enabled' === UAGB_Admin_Helper::get_admin_settings_option
 return array_merge(
 	array(
 		'inheritFromTheme'       => $inherit_from_theme,
+		'buttonType'             => 'primary',
 		'block_id'               => '',
 		'label'                  => '#Click Here',
 		'link'                   => '',
@@ -132,6 +133,9 @@ return array_merge(
 		'borderStyle'            => 'solid',
 		'borderColor'            => '#000',
 		'borderHColor'           => '',
+		// For Global Block Styles.
+		'globalBlockStyleName'   => '',
+		'globalBlockStyleId'     => '',
 	),
 	$border_attribute
 );

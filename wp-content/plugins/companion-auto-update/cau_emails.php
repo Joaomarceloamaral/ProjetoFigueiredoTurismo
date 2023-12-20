@@ -49,17 +49,8 @@ function cau_set_email() {
 
 // Mail format
 function cau_is_html() {
-
-	// Check if cau_get_db_value() function exists.
 	if ( !function_exists( 'cau_get_db_value' ) ) require_once( plugin_dir_path( __FILE__ ) . 'cau_function.php' );
-
-	// Check if html
-	if( cau_get_db_value( 'html_or_text' ) == 'html' ) {
-		$html = true;
-	} else {
-		$html = false;
-	}
-
+	return ( cau_get_db_value( 'html_or_text' ) == 'html' ) ? true : false;
 }
 
 // Set the content for the emails about pending updates

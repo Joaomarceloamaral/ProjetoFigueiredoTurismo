@@ -789,6 +789,7 @@ function monsterinsights_empty_measurement_protocol_token()
 	}
 
 	$message = sprintf(
+		/* translators: Placeholders add a link to an article. */
 		esc_html__(
 			'Your Measurement Protocol API Secret is currently left blank. To see more advanced analytics please enter a Measurement API Secret. %1$sLearn how to find your API Secret%2$s.',
 			'google-analytics-for-wordpress'
@@ -801,3 +802,12 @@ function monsterinsights_empty_measurement_protocol_token()
 
 add_action( 'admin_notices', 'monsterinsights_empty_measurement_protocol_token' );
 add_action( 'network_admin_notices', 'monsterinsights_admin_setup_notices' );
+
+/**
+ * Check if the plugin is MI Lite.
+ *
+ * @return bool
+ */
+function check_is_it_monsterinsights_lite() {
+    return 'googleanalytics.php' == basename( MONSTERINSIGHTS_PLUGIN_FILE );
+}

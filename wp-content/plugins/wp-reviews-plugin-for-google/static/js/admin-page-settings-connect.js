@@ -10,12 +10,14 @@ jQuery(document).ready(function($) {
 	/*************************************************************************/
 	/* NO REG MODE */
 	TrustindexConnect = {
-		box: $('#trustindex-plugin-settings-page .autocomplete .results'),
-		input: $('#trustindex-plugin-settings-page #page-link'),
-		button: $('#trustindex-plugin-settings-page .btn-check'),
-		form: $('#submit-form'),
+		input: $('.ti-connect-platform .ti-form-control'),
+		button: $('.ti-connect-platform .ti-btn'),
+		form: $('#ti-connect-platform-form'),
 		check: function(event) {
 			event.preventDefault();
+
+			TrustindexConnect.form.find('.ti-source-box').addClass('ti-d-none')
+			$('#ti-connect-error').addClass('ti-d-none');
 
 			if (!TrustindexConnect.regex) {
 				return false;
@@ -23,10 +25,9 @@ jQuery(document).ready(function($) {
 
 			let m = TrustindexConnect.regex.exec(TrustindexConnect.input.val().trim());
 			if (!TrustindexConnect.isRegexValid(m)) {
-				TrustindexConnect.box.html('<span>'+ TrustindexConnect.box.data('errortext') +'</span>');
-				TrustindexConnect.box.show();
+				TrustindexConnect.input.focus();
 
-				return false;
+				return $('#ti-connect-error').removeClass('ti-d-none');
 			}
 
 			// support for 2 regexes
@@ -76,13 +77,10 @@ jQuery(document).ready(function($) {
 
 			// no pageId
 			if (pageId.trim() === '' || !valid) {
-				TrustindexConnect.box.html('<span>'+ TrustindexConnect.box.data('errortext') +'</span>');
-				TrustindexConnect.box.show();
+				TrustindexConnect.input.focus();
 
-				return false;
+				return $('#ti-connect-error').removeClass('ti-d-none');
 			}
-
-			TrustindexConnect.box.hide();
 
 			$('#ti-noreg-page-id').val(pageId);
 
@@ -90,14 +88,12 @@ jQuery(document).ready(function($) {
 			let pageDetails = { id: pageId };
 			let url = TrustindexConnect.input.val().trim();
 
-			let div = TrustindexConnect.form.find('.ti-selected-source');
-			TrustindexConnect.form.find('#ti-noreg-page_details').val(JSON.stringify(pageDetails));
+			let div = TrustindexConnect.form.find('.ti-source-box');
+			TrustindexConnect.form.find('#ti-noreg-page-details').val(JSON.stringify(pageDetails));
 
 			div.find('img').attr('src', 'https://cdn.trustindex.io/assets/platform/Google/icon.png');
 			div.find('.ti-source-info').html('<a target="_blank" href="'+ url +'">'+ url +'</a>');
-
-			TrustindexConnect.button.addClass('btn-disabled');
-			div.fadeIn();
+			div.removeClass('ti-d-none');
 		},
 		regex: null,
 		isRegexValid: function(m) {
@@ -127,7 +123,7 @@ jQuery(document).ready(function($) {
 			});
 
 			// show popup info
-			$('#ti-connect-info').fadeIn();
+			$('#ti-connect-info').removeClass('ti-d-none');
 
 			// open window
 			let tiWindow = window.open('https://admin.trustindex.io/source/wordpressPageRequest?' + params.toString(), 'trustindex', 'width=850,height=850,menubar=0' + popupCenter(850, 850));
@@ -136,7 +132,7 @@ jQuery(document).ready(function($) {
 			let noChangeBtnLoading = false;
 			let timer = setInterval(function() {
 				if (tiWindow.closed) {
-					$('#ti-connect-info').hide();
+					$('#ti-connect-info').addClass('ti-d-none');
 
 					if (btn && !noChangeBtnLoading) {
 						btn.removeClass('btn-loading');
@@ -158,7 +154,7 @@ jQuery(document).ready(function($) {
 						callback($('#ti-noreg-connect-token').val(), data.request_id, typeof data.manual_download != 'undefined' && data.manual_download ? 1 : 0, data.place || null);
 					}
 					else {
-						$('#ti-connect-info').hide();
+						$('#ti-connect-info').addClass();
 
 						if (btn) {
 							btn.removeClass('btn-loading');
@@ -198,31 +194,25 @@ jQuery(document).ready(function($) {
 			$('#ti-noreg-manual-download').val(manual_download);
 
 			if (place) {
-				$('#ti-noreg-page_details').val(JSON.stringify(place));
+				$('#ti-noreg-page-details').val(JSON.stringify(place));
 			}
 
 			TrustindexConnect.form.submit();
 		});
 	});
 
-	// show loading text on refresh
-	$('#trustindex-plugin-settings-page .btn-refresh').click(function(event) {
-		let btn = jQuery(this);
-
-		btn.addClass('btn-loading').blur();
-
-		jQuery('#trustindex-plugin-settings-page .btn').css('pointer-events', 'none');
-	});
-
 	// make async request on review download
 	$('.btn-download-reviews').on('click', function(event) {
 		event.preventDefault();
+
+		let btn = jQuery(this);
 
 		TrustindexConnect.asyncRequest(function(token, request_id, manual_download, place) {
 			if (place) {
 				$.ajax({
 					type: 'POST',
 					data: {
+						_wpnonce: btn.data('nonce'),
 						page_details: JSON.stringify(place),
 						review_download_timestamp: place.timestamp
 					}
@@ -232,39 +222,37 @@ jQuery(document).ready(function($) {
 				$.ajax({
 					type: 'POST',
 					data: {
+						_wpnonce: btn.data('nonce'),
 						review_download_request: token,
 						review_download_request_id: request_id,
 						manual_download: manual_download
 					}
 				}).always(() => location.reload());
 			}
-		}, $(this));
+		}, btn);
 	});
 
 	// manual download
-	$('#review-manual-download').on('click', function(event) {
+	$('#ti-review-manual-download').on('click', function(event) {
 		event.preventDefault();
 
 		let btn = $(this);
-		btn.addClass('btn-loading').blur();
+		btn.addClass('ti-btn-loading').blur();
 
 		$.ajax({
-			url: location.search.replace(/&tab=[^&]+/, '&tab=setup_no_reg'),
+			url: location.search.replace(/&tab=[^&]+/, '&tab=free-widget-configurator'),
 			type: 'POST',
-			data: { command: 'review-manual-download' },
+			data: {
+				command: 'review-manual-download',
+				_wpnonce: btn.data('nonce')
+			},
 			success: () => location.reload(),
 			error: function() {
-				btn.removeClass('btn-loading');
-				btn.addClass('show-tooltip');
+				btn.removeClass('ti-btn-loading');
+
+				btn.removeClass('ti-toggle-tooltip').addClass('ti-show-tooltip');
+				setTimeout(() => btn.removeClass('ti-show-tooltip').addClass('ti-toggle-tooltip'), 3000);
 			}
 		});
-	});
-
-	/*************************************************************************/
-	/* CONNECT TO TRUSTINDEX */
-	$('#form-connect').on('submit', function(event) {
-		let btn = $(this).find('.btn-primary');
-
-		btn.addClass('btn-loading').css('pointer-events', 'none').blur();
 	});
 });

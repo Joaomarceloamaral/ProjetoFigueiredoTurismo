@@ -129,7 +129,7 @@ const UAGBImageGalleryMasonry = {
 						loadButton?.classList?.remove( 'disabled' );
 						loadLightBoxImages( currentScope, lightboxSwiper, null, $attr, thumbnailSwiper );
 					} );
-				if ( $attr.customLinks ) {
+				if ( 'url' === $attr.imageClickEvent && $attr.customLinks ) {
 					UAGBImageGalleryMasonry.addClickEvents( element, $attr );
 				}
 				spectraImageGalleryLoadStatus = true;
@@ -231,7 +231,7 @@ const UAGBImageGalleryPagedGrid = {
 
 	getCustomURL( image, $attr ) {
 		const urlValidRegex = new RegExp(
-			'^((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$'
+			'^((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=\\-]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$'
 		);
 		const imageID = parseInt( image.getAttribute( 'data-spectra-gallery-image-id' ) );
 		return urlValidRegex.test( $attr?.customLinks[ imageID ] ) ? $attr.customLinks[ imageID ] : undefined;
@@ -324,7 +324,7 @@ const loadLightBoxImages = ( blockScope, lightboxSwiper, pageNum, attr, thumbnai
 	
 	const theBody = document.querySelector( 'body' );
 	const updateCounter = ( curPage ) => {
-		const lightbox = blockScope.nextElementSibling;
+		const lightbox = blockScope?.nextElementSibling;
 		const counter = lightbox.querySelector( '.spectra-image-gallery__control-lightbox--count-page' );
 		if ( counter ) {
 			counter.innerHTML = parseInt( curPage ) + 1;
@@ -345,8 +345,8 @@ const loadLightBoxImages = ( blockScope, lightboxSwiper, pageNum, attr, thumbnai
 		} );
 
 	}
-	if ( blockScope.nextElementSibling.classList.contains( 'spectra-image-gallery__control-lightbox' ) ) {
-		const lightbox = blockScope.nextElementSibling;
+	const lightbox = blockScope?.nextElementSibling;
+	if ( lightbox && lightbox?.classList.contains( 'spectra-image-gallery__control-lightbox' ) ) {
 		lightbox.addEventListener( 'keydown', ( event ) => {
 			if ( 27 === event.keyCode ) {
 				theBody.style.overflow = '';
@@ -378,7 +378,6 @@ const loadLightBoxImages = ( blockScope, lightboxSwiper, pageNum, attr, thumbnai
 		if ( ! lightboxSwiper ) {
 			return;
 		}
-		const lightbox = blockScope?.nextElementSibling;
 		if ( ! lightbox ) {
 			return;
 		}
@@ -395,19 +394,47 @@ const loadLightBoxImages = ( blockScope, lightboxSwiper, pageNum, attr, thumbnai
 
 	if ( pageNum !== null ) {
 		setTimeout( () => {
-			addClickListeners( blockScope, pageNum, enableLightbox, pageLimit );
+			addClickListeners( blockScope, pageNum, enableLightbox, pageLimit, attr );
 		}, 1000 );
 	} else {
-		addClickListeners( blockScope, null, enableLightbox );
+		addClickListeners( blockScope, null, enableLightbox, null, attr );
 	}
 };
 
 // Common function for adding click event listeners to images
-const addClickListeners = ( $scope, pageNum, enableLightbox, pageLimit )  => {
+const addClickListeners = ( $scope, pageNum, enableLightbox, pageLimit, attr )  => {
 	const images = $scope.querySelectorAll( '.spectra-image-gallery__media-wrapper' );
+	const imageUrls = {};
+	if ( 'image' === attr.imageClickEvent ) {
+		const mediaGallery = attr.mediaGallery;
+		mediaGallery.forEach( media => {
+			imageUrls[ media.id ] = media.url;
+		} );
+	}
+
 	images.forEach( ( image, index ) => {
-		const nextImg = pageNum !== null ? index + ( pageNum - 1 ) * pageLimit : index;
 		image.style.cursor = 'pointer';
-		image.addEventListener( 'click', () => enableLightbox( nextImg ) );
+		if ( 'image' === attr.imageClickEvent ) { // Run when Open image click event option is selected. 
+			const imgId = image.getAttribute( 'data-spectra-gallery-image-id' );
+			const imgURL = imageUrls[ imgId ];
+			image.addEventListener( 'click', () => {
+				openImageInWindow( imgURL ); // To avoid opening multiple tab at same when Popup and redirect is enabled.
+			} );
+		} else {
+			const nextImg = pageNum !== null ? index + ( pageNum - 1 ) * pageLimit : index;
+			image.addEventListener( 'click', () => enableLightbox( nextImg ) );
+		}
 	} );
+}
+
+let imageWindow = null;
+const openImageInWindow = ( imageUrl ) => {
+	// Check if the window is already open
+	if ( imageWindow && !imageWindow.closed ) {
+		// If open, focus on the existing window
+		imageWindow.focus();
+	} else {
+		// If not open or closed, open a new window
+		imageWindow = window.open( imageUrl, '_blank' );
+	}
 }

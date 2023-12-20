@@ -3,9 +3,9 @@ Contributors: trustindex
 Donate link: https://www.trustindex.io/prices/
 Tags: google, google places reviews, reviews, widget, google business, review, testimonial, testimonials, slider, rating, google my business, customer review
 Requires at least: 3.0.1
-Tested up to: 6.3
+Tested up to: 6.5
 Requires PHP: 5.2
-Stable tag: 10.8
+Stable tag: 11.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Plugin Name: Widgets for Google Reviews
@@ -14,7 +14,7 @@ Plugin URI: https://wordpress.org/plugins/wp-reviews-plugin-for-google/
 Author: Trustindex.io <support@trustindex.io>
 Author URI: https://www.trustindex.io/
 Text Domain: wp-reviews-plugin-for-google
-Version: 10.8
+Version: 11.2.2
 
 Embed Google reviews fast and easily into your WordPress site. Increase SEO, trust and sales using Google reviews.
 
@@ -139,10 +139,10 @@ If you have any issues at all setting up the Google Reviews WordPress Plugin for
 We offer 24/7 email support in English.
 
 We recommend the following order when searching for answers:
-1. Plugin FAQ here at the bottom - if you don’t already know why it’s worth displaying Google Reviews 
-2. You can find more info and Troubleshooting in the plugin's admin dashboard after install.
+1. Plugin FAQ here at the bottom - if you don’t already know why it’s worth displaying Google Reviews2. You can find more info and Troubleshooting in the plugin's admin dashboard after install.
 3. [Trustindex FAQ](https://www.trustindex.io/frequently-asked-questions/)
 4. Check topics or ask a new question here: [Support Forum](https://wordpress.org/support/plugin/wp-reviews-plugin-for-google/)
+5. Join our Community on Facebook: https://www.facebook.com/groups/990874785532977
 5. If you still can't find the answer, feel free to email us: support@trustindex.io
 
 To find out more about who we are and what we do, here are some useful links:

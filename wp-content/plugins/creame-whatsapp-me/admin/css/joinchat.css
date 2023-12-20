@@ -24,33 +24,33 @@
   color: #f9603a;
 }
 
-#joinchat_tab_visibility tr:hover {
+.joinchat__visibility__wrapper tr:hover {
   background: rgba(0, 0, 0, .05);
 }
 
-#joinchat_tab_visibility th,
-#joinchat_tab_visibility td {
+.joinchat__visibility__wrapper th,
+.joinchat__visibility__wrapper td {
   padding: 7px 15px;
 }
 
-#joinchat_tab_visibility label {
+.joinchat__visibility__wrapper label {
   margin-right: 15px;
 }
 
-#joinchat_tab_visibility .dashicons {
+.joinchat__visibility__wrapper .dashicons {
   opacity: .5;
 }
 
-#joinchat_tab_visibility input[type=radio]+span {
+.joinchat__visibility__wrapper input[type=radio]+span {
   transition: all 200ms;
 }
 
-#joinchat_tab_visibility input[type=radio]:checked+span {
+.joinchat__visibility__wrapper input[type=radio]:checked+span {
   color: #79ba49;
   opacity: 1;
 }
 
-#joinchat_tab_visibility input[type=radio]:checked+.dashicons-hidden {
+.joinchat__visibility__wrapper input[type=radio]:checked+.dashicons-hidden {
   color: #ca4a1f;
 }
 
@@ -191,6 +191,10 @@ tr.joinchat--focus .joinchat_vars_help {
   background: transparent;
 }
 
+#joinchat_form .CodeMirror {
+  font-size: 13px;
+}
+
 /* Help */
 
 .toplevel_page_joinchat .help-tab-content li ul,
@@ -297,11 +301,12 @@ tr.joinchat--focus .joinchat_vars_help {
 }
 
 .joinchat-header {
-  padding-top: 5px;
-  padding-bottom: 1px;
+  padding: 5px 30px 1px 0;
+  overflow: auto;
 }
 
 #jcadminbar h1 {
+  float: left;
   margin: 0;
 }
 
@@ -321,6 +326,33 @@ tr.joinchat--focus .joinchat_vars_help {
 @media screen and (max-width: 600px) {
   #jcadminbar {
     top: 46px;
+  }
+}
+
+/* Coupon */
+
+.joinchat-coupon {
+  float: right;
+  margin: 10px 0;
+  color: #000;
+}
+
+.joinchat-coupon span {
+  display: inline-block;
+  padding: 0 10px;
+  margin: 0 10px;
+  border: 2px dashed #F9603A;
+  border-radius: 4px;
+  background: rgba(249, 96, 58, 0.15);
+}
+
+.joinchat-coupon a {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 600px) {
+  .joinchat-coupon {
+    display: none;
   }
 }
 

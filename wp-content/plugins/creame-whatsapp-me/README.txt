@@ -2,10 +2,10 @@
 Contributors: creapuntome, pacotole, davidlillo, monillo
 Donate link: https://join.chat/donate/
 Tags: Chat, Click to Chat, Facebook Messenger, WhatsApp, Telegram, Whatsapp Business, button, support chat, support, contact, directly message WhatsApp, floating WhatsApp, WhatsApp chat
-Requires at least: 4.5.0
-Tested up to: 6.3
+Requires at least: 4.9.0
+Tested up to: 6.4
 Requires PHP: 5.5
-Stable tag: 5.0.10
+Stable tag: 5.0.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -187,7 +187,7 @@ Do you want to test the Joinchat configuration panel without installing it? You 
 1. Please leave us a [★★★★★](https://wordpress.org/support/plugin/creame-whatsapp-me/reviews/#new-post) rating. We'll thank you.
 2. Help us with the [translation in your language](https://translate.wordpress.org/projects/wp-plugins/creame-whatsapp-me)
 3. Visit our blog and find tips and tricks at [join.chat](https://join.chat/en/blog/?utm_source=wporg&utm_medium=web).
-4. Follow [@joinchatnow](https://twitter.com/joinchatnow) on twitter.
+4. Follow [@joinchatnow](https://twitter.com/joinchatnow) on twitter. Join chat now!
 
 
 == Installation ==
@@ -380,6 +380,27 @@ Joinchat save two localStorage variables for proper operation:
 
 
 == Changelog ==
+
+= 5.0.15 =
+* FIX PHP typo (thanks to [@kent-brockman](https://profiles.wordpress.org/kent-brockman/) [topic](https://wordpress.org/support/topic/typo-in-class-joinchat-woo-admin-php-lines-157-160/)).
+
+= 5.0.14 =
+* Bump WordPress required at least to 4.9.0.
+* **SECURE** Escape translations (thanks to [@davidperez](https://profiles.wordpress.org/davidperez/) at [#WCMAD](https://madrid.wordcamp.org/2023/)).
+
+= 5.0.13 =
+* FIX Unclosed SVGs.
+* CHANGE Front minor styles improvements.
+
+= 5.0.12 =
+* CHANGE RTL languages show message bubble peak on right.
+* FIX Clean new lines to ensure "\n" format.
+* FIX False positive on un unmarked checkbox settings on first save.
+* NEW Joinchat settings header added Premium discount coupon.
+
+= 5.0.11 =
+* FIX Update inline CSS minifier.
+* CHANGE Custom CSS not prefill example CSS by default.
 
 = 5.0.10 =
 * FIX load customs CSS when use button only styles.

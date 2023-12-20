@@ -1,102 +1,48 @@
 <?php
 
-// What user rights can edit plugin settings? ARRAY
+// What user rights can edit plugin settings?
 function cau_allowed_user_rights_array() {
 
-	// Base rights
-	$allowed_roles[] = 'administrator';
-
-	// Fetch from database
 	global $wpdb;
-	$table_name 	= $wpdb->prefix.'auto_updates'; 
-	$cau_configs 	= $wpdb->get_results( "SELECT name, onoroff FROM {$table_name} WHERE name = 'allow_editor' OR name = 'allow_author'" );
+
+	$allowed_roles[] 	= 'administrator';
+	$table_name 		= $wpdb->prefix.'auto_updates'; 
+	$cau_configs 		= $wpdb->get_results( "SELECT name, onoroff FROM {$table_name} WHERE name = 'allow_editor' OR name = 'allow_author'" );
 
 	foreach ( $cau_configs as $config ) {
 		if( $config->onoroff == 'on' ) $allowed_roles[] = str_replace( "allow_", "", $config->name );
 	}
 
-	// Return array
 	return $allowed_roles;
 
 }
 
 // What user rights can edit plugin settings? TRUE/FALSE
 function cau_allowed_user_rights() {
-
-	// Current user
-	$user 			= wp_get_current_user();
-
-	// Allow roles
-	$allowed_roles 	= cau_allowed_user_rights_array();
-
-	// Check
-	if ( array_intersect( $allowed_roles, $user->roles ) ) {
-		return true;
-	} else {
-		return false;
-	}
-
+	$user 			= wp_get_current_user(); // Current user
+	$allowed_roles 	= cau_allowed_user_rights_array(); // Allow roles
+	return array_intersect( $allowed_roles, $user->roles ) ? true : false;
 }
 
 // Get database value
 function cau_get_db_value( $name, $table = 'auto_updates' ) {
-
 	global $wpdb;
 	$table_name 	= $wpdb->prefix.$table; 
 	$cau_configs 	= $wpdb->get_results( $wpdb->prepare( "SELECT onoroff FROM {$table_name} WHERE name = '%s'", $name ) );
 	foreach ( $cau_configs as $config ) return $config->onoroff;
-
 }
 
 // Get database value
 function cau_get_plugininfo( $check, $field ) {
-
 	global $wpdb;
 	$table_name 	= $wpdb->prefix.'update_log'; 
 	$cau_configs 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE slug = '%s'", $check ) );
 	foreach ( $cau_configs as $config ) return $config->$field;
-
 }
 
 // Get the set timezone
 function cau_get_proper_timezone() {
-
-	// WP 5.3 adds the wp_timezone_string function
-	if ( !function_exists( 'wp_timezone_string' ) ) {
-		$timezone = get_option( 'timezone_string' ); 
-	} else {
-		$timezone = wp_timezone_string(); 
-	}
-
-	// Should fix an reported issue
-	if( $timezone == '+00:00' ) {
-		$timezone = 'UTC';
-	}
-
-	return $timezone;
-
-}
-
-// Copy of the wp_timezone_string for < 5.3 compat
-if ( !function_exists( 'wp_timezone_string' ) ) {
-	function wp_timezone_string() {
-	    $timezone_string = get_option( 'timezone_string' );
-	 
-	    if ( $timezone_string ) {
-	        return $timezone_string;
-	    }
-	 
-	    $offset  = (float) get_option( 'gmt_offset' );
-	    $hours   = (int) $offset;
-	    $minutes = ( $offset - $hours );
-	 
-	    $sign      = ( $offset < 0 ) ? '-' : '+';
-	    $abs_hour  = abs( $hours );
-	    $abs_mins  = abs( $minutes * 60 );
-	    $tz_offset = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
-	 
-	    return $tz_offset;
-	}
+	return ( wp_timezone_string() == '+00:00' ) ? 'UTC' : wp_timezone_string();
 }
 
 // List of incompatible plugins
@@ -127,36 +73,10 @@ function cau_incompatiblePlugins() {
 
 // Check if has issues
 function cau_pluginHasIssues() {
-
-	$return = false;
-
-	if( get_option( 'blog_public' ) == 0 && cau_get_db_value( 'ignore_seo' ) != 'yes' ) {
-		$return 	= true;
-	}
-
-	if( checkAutomaticUpdaterDisabled() ) {
-		$return 	= true;
-	}
-
-	if( checkCronjobsDisabled() && cau_get_db_value( 'ignore_cron' ) != 'yes' ) {
-		$return 	= true;
-	}
-
-	if( cau_incorrectDatabaseVersion() ) {
-		$return 	= true;
-	}
-
-	return $return;
+	return ( cau_pluginIssueCount() > 0 ) ? true : false;
 }
 function cau_pluginIssueLevels() {
-	
-	if( checkAutomaticUpdaterDisabled() ) {
-		$level = 'high';
-	} else {
-		$level = 'low';
-	}
-
-	return $level;
+	return checkAutomaticUpdaterDisabled() ? 'high' : 'low';
 }
 function cau_pluginIssueCount() {
 	
@@ -186,11 +106,7 @@ function cau_pluginIssueCount() {
 	return $count;
 }
 function cau_incorrectDatabaseVersion() {
-	if( get_option( "cau_db_version" ) != cau_db_version() ) {
-		return true;
-	} else {
-		return false;
-	}
+	return ( get_option( "cau_db_version" ) != cau_db_version() ) ? true : false;
 }
 
 // Run custom hooks on plugin update
@@ -209,7 +125,7 @@ function cau_run_custom_hooks_p() {
 	$listOfAll 		= get_plugins();
 
 	// Number of updates
-	$numOfUpdates 	= 0;
+	$totalNum 		= 0;
 
 	// Loop trough all plugins
 	foreach ( $listOfAll as $key => $value ) {
@@ -218,49 +134,43 @@ function cau_run_custom_hooks_p() {
 		$fullPath 		= $dirr.'/'.$key;
 		$fileDate 		= date ( 'YmdHi', filemtime( $fullPath ) );
 		$fileTime 		= date ( 'Hi', filemtime( $fullPath ) );
-		$updateSched 	= wp_get_schedule( 'wp_update_plugins' );
-
-		// Check when the last update was
-		if( $updateSched == 'hourly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 hour', time() ) );
-		} elseif( $updateSched == 'twicedaily' ) {
-			$lastday = date( 'YmdHi', strtotime( '-12 hours', time() ) );
-		} elseif( $updateSched == 'daily' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 day', time() ) );
-		} elseif( $updateSched == 'weekly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 week', time() ) );
-		} elseif( $updateSched == 'monthly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-		} else {
-			$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-		}
-
 		$update_time 	= wp_next_scheduled( 'wp_update_plugins' );
 		$range_start 	= date( 'Hi', strtotime( '-30 minutes', $update_time ) );
 		$range_end 		= date( 'Hi', strtotime( '+30 minutes', $update_time ) );
 
+		// Check when the last update was
+		switch( wp_get_schedule( 'wp_update_plugins' ) ) {
+			case 'hourly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+				break;
+			case 'twicedaily':
+				$lastday 	= date( 'YmdHi', strtotime( '-12 hour', time() ) );
+				break;
+			case 'daily':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 day', time() ) );
+				break;
+			case 'weekly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 week', time() ) );
+				break;
+			case 'monthly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 month', time() ) );
+				break;
+			default:
+				$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+				break;
+		}
+
 		if( $fileDate >= $lastday ) {
-
-			// Push to array
 			array_push( $allDates, $fileDate );
-
-			// Update info
-			if( $fileTime > $range_start && $fileTime < $range_end ) {
-				$status = __( 'Automatic', 'companion-auto-update' );
-			} else {
-				$status = __( 'Manual', 'companion-auto-update' );
-			}
-
-			$numOfUpdates++;
-
+			$status = ( $fileTime > $range_start && $fileTime < $range_end ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
+			$totalNum++;
 			cau_updatePluginInformation( $key, $status );
-
 		}
 
 	}
 
 	// If there have been plugin updates run hook
-	if( $numOfUpdates >= 1 ) {
+	if( $totalNum >= 1 ) {
 		do_action( 'cau_after_plugin_update' );
 	}
 
@@ -283,40 +193,37 @@ function cau_run_custom_hooks_t() {
 		$fullPath 		= $dirr.'/'.$key;
 		$fileDate 		= date ( 'YmdHi', filemtime( $fullPath ) );
 		$fileTime 		= date ( 'Hi', filemtime( $fullPath ) );
-		$updateSched 	= wp_get_schedule( 'wp_update_themes' );
-
-		// Check when the last update was
-		if( $updateSched == 'hourly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 hour', time() ) );
-		} elseif( $updateSched == 'twicedaily' ) {
-			$lastday = date( 'YmdHi', strtotime( '-12 hours', time() ) );
-		} elseif( $updateSched == 'daily' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 day', time() ) );
-		} elseif( $updateSched == 'weekly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 week', time() ) );
-		} elseif( $updateSched == 'monthly' ) {
-			$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-		} else {
-			$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-		}
-
 		$update_time 	= wp_next_scheduled( 'wp_update_themes' );
 		$range_start 	= date( 'Hi', strtotime( '-30 minutes', $update_time ) );
 		$range_end 		= date( 'Hi', strtotime( '+30 minutes', $update_time ) );
 
+		// Check when the last update was
+		switch( wp_get_schedule( 'wp_update_themes' ) ) {
+			case 'hourly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+				break;
+			case 'twicedaily':
+				$lastday 	= date( 'YmdHi', strtotime( '-12 hour', time() ) );
+				break;
+			case 'daily':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 day', time() ) );
+				break;
+			case 'weekly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 week', time() ) );
+				break;
+			case 'monthly':
+				$lastday 	= date( 'YmdHi', strtotime( '-1 month', time() ) );
+				break;
+			default:
+				$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+				break;
+		}
+
 		if( $fileDate >= $lastday ) {
-
-			// Push to array
 			array_push( $allDates, $fileDate );
-
-			// Update info
-			if( $fileTime > $range_start && $fileTime < $range_end ) {
-				$status = __( 'Automatic', 'companion-auto-update' );
-			} else {
-				$status = __( 'Manual', 'companion-auto-update' );
-			}
+			$status = ( $fileTime > $range_start && $fileTime < $range_end ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
+			$totalNum++;
 			cau_updatePluginInformation( $key, $status );
-
 		}
 
 	}
@@ -342,40 +249,37 @@ function cau_run_custom_hooks_c() {
 	// Get data
 	$fullPath 		= ABSPATH.'wp-includes/version.php';
 	$fileDate 		= date ( 'YmdHi', filemtime( $fullPath ) );
-	$updateSched 	= wp_get_schedule( 'wp_version_check' );
-
-	// Check when the last update was
-	if( $updateSched == 'hourly' ) {
-		$lastday = date( 'YmdHi', strtotime( '-1 hour', time() ) );
-	} elseif( $updateSched == 'twicedaily' ) {
-		$lastday = date( 'YmdHi', strtotime( '-12 hours', time() ) );
-	} elseif( $updateSched == 'daily' ) {
-		$lastday = date( 'YmdHi', strtotime( '-1 day', time() ) );
-	} elseif( $updateSched == 'weekly' ) {
-		$lastday = date( 'YmdHi', strtotime( '-1 week', time() ) );
-	} elseif( $updateSched == 'monthly' ) {
-		$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-	} else {
-		$lastday = date( 'YmdHi', strtotime( '-1 month', time() ) );
-	}
-
-	// Check manual or automatic
 	$update_time 	= wp_next_scheduled( 'wp_version_check' );
 	$range_start 	= date( 'Hi', strtotime( '-30 minutes', $update_time ) );
 	$range_end 		= date( 'Hi', strtotime( '+30 minutes', $update_time ) );
 
+	// Check when the last update was
+	switch( wp_get_schedule( 'wp_version_check' ) ) {
+		case 'hourly':
+			$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+			break;
+		case 'twicedaily':
+			$lastday 	= date( 'YmdHi', strtotime( '-12 hour', time() ) );
+			break;
+		case 'daily':
+			$lastday 	= date( 'YmdHi', strtotime( '-1 day', time() ) );
+			break;
+		case 'weekly':
+			$lastday 	= date( 'YmdHi', strtotime( '-1 week', time() ) );
+			break;
+		case 'monthly':
+			$lastday 	= date( 'YmdHi', strtotime( '-1 month', time() ) );
+			break;
+		default:
+			$lastday 	= date( 'YmdHi', strtotime( '-1 hour', time() ) );
+			break;
+	}
+
 	if( $fileDate >= $lastday ) {
-
-		// Update info
-		if( $fileDate > $range_start && $fileDate < $range_end ) {
-			$status = __( 'Automatic', 'companion-auto-update' );
-		} else {
-			$status = __( 'Manual', 'companion-auto-update' );
-		}
-		cau_updatePluginInformation( 'core', $status );
-
+		array_push( $allDates, $fileDate );
+		$status = ( $fileTime > $range_start && $fileTime < $range_end ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
 		$totalNum++;
-
+		cau_updatePluginInformation( 'core', $status );
 	}
 
 	// If there have been plugin updates run hook
@@ -389,28 +293,11 @@ function cau_run_custom_hooks_c() {
 function checkAutomaticUpdaterDisabled() {
 
 	// I mean, I know this can be done waaaay better but I's quite late and I need to push a fix so take it or leave it untill I decide to fix this :)
-
 	if ( defined( 'automatic_updater_disabled' ) ) {
-		if( doing_filter( 'automatic_updater_disabled' ) ) {
-			return true;
-		} elseif( constant( 'automatic_updater_disabled' ) == 'true' ) {
-			return true;
-		} elseif( constant( 'automatic_updater_disabled' ) == 'minor' ) {
-			return true;
-		} else {
-			return false;
-		}
+		return ( doing_filter( 'automatic_updater_disabled' ) OR in_array( constant( 'automatic_updater_disabled' ), array( 'true', 'minor' )  ) ) ? true : false;
 
 	} else if ( defined( 'AUTOMATIC_UPDATER_DISABLED' ) ) {
-		if( doing_filter( 'AUTOMATIC_UPDATER_DISABLED' ) ) {
-			return true;
-		} elseif( constant( 'AUTOMATIC_UPDATER_DISABLED' ) == 'true' ) {
-			return true;
-		} elseif( constant( 'AUTOMATIC_UPDATER_DISABLED' ) == 'minor' ) {
-			return true;
-		} else {
-			return false;
-		}
+		return ( doing_filter( 'AUTOMATIC_UPDATER_DISABLED' ) OR in_array( constant( 'AUTOMATIC_UPDATER_DISABLED' ), array( 'true', 'minor' )  ) ) ? true : false;
 
 	} else {
 		return false;
@@ -420,13 +307,7 @@ function checkAutomaticUpdaterDisabled() {
 
 // Check if cronjobs are disabled
 function checkCronjobsDisabled() {
-
-	if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
-		return true;
-	} else {
-		return false;
-	}
-
+	return ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ? true : false;
 }
 
 // Menu location
@@ -442,57 +323,30 @@ function active_tab( $page, $identifier = 'tab' ) {
 	echo _active_tab( $page, $identifier );
 }
 function _active_tab( $page, $identifier = 'tab' ) {
-
-	if( !isset( $_GET[ $identifier ] ) ) {
-		$cur_page = '';
-	} else {
-		$cur_page = $_GET[ $identifier ];
-	}
-
+	$cur_page = !isset( $_GET[ $identifier ] ) ? '' : $_GET[ $identifier ];
 	if( $page == $cur_page ) {
 		return 'nav-tab-active';
 	}
-
 }
 
 // Get the active subtab
 function active_subtab( $page, $identifier = 'tab' ) {
-
-	if( !isset( $_GET[ $identifier ] ) ) {
-		$cur_page = '';
-	} else {
-		$cur_page = $_GET[ $identifier ];
-	}
-
+	$cur_page = !isset( $_GET[ $identifier ] ) ? '' : $_GET[ $identifier ];
 	if( $page == $cur_page ) {
 		echo 'current';
 	}
-
 }
 
 // List of plugins that should not be updated
 function donotupdatelist( $filter = 'plugins' ) {
 
-	// Select correct database row
-	switch ( $filter ) {
-		case 'themes':
-			$db_table 		= 'notUpdateListTh';
-			break;
-		case 'plugins':
-			$db_table 		= 'notUpdateList';
-			break;
-		default:
-			$db_table 		= 'notUpdateList';
-			break;
-	}
-
-	// Create list
 	global $wpdb;
+
+	$db_table 		= ( $filter == 'themes' ) ? 'notUpdateListTh' : 'notUpdateList';
 	$table_name 	= $wpdb->prefix."auto_updates"; 
 	$config 		= $wpdb->get_results( "SELECT * FROM {$table_name} WHERE name = '{$db_table}'");
 
-	$list 			= $config[0]->onoroff;
-	$list 			= explode( ", ", $list );
+	$list 			= explode( ", ", $config[0]->onoroff );
 	$returnList 	= array();
 
 	foreach ( $list as $key ) array_push( $returnList, $key );
@@ -502,381 +356,215 @@ function donotupdatelist( $filter = 'plugins' ) {
 }
 function plugins_donotupdatelist() {
 
-	 // Base array
-	$array 				= array();
+	$array = array();
 
 	// Filtered plugins
-	$filteredplugins 	= donotupdatelist( 'plugins' );
-	foreach ( $filteredplugins as $filteredplugin ) array_push( $array, $filteredplugin );
+	foreach ( donotupdatelist( 'plugins' ) as $filteredplugin ) {
+		array_push( $array, $filteredplugin );
+	}
 
 	// Plugin added to the delay list
-	$delayedplugins 	= cau_delayed_updates__formated();
-	foreach ( $delayedplugins as $delayedplugin ) array_push( $array, $delayedplugin );
+	foreach ( cau_delayed_updates__formated() as $delayedplugin ) {
+		array_push( $array, $delayedplugin );
+	}
 
-	 // Return array
 	return $array;
+
 }
 function themes_donotupdatelist() {
 	return donotupdatelist( 'themes' );
 }
 
 // Show the update log
-function cau_fetch_log( $limit, $format = 'simple' ) {
+function cau_fetch_log( $limiter, $format = 'simple' ) {
 
-	// Database
 	global $wpdb;
-	$updateLog 		= "update_log"; 
-	$updateLogDB 	= $wpdb->prefix.$updateLog;
 
-	// Filter log
-	if( isset( $_GET['filter'] ) ) {
-		$filter = $_GET['filter'];
-	} else {
-		$filter = 'all';
-	}
+	$updateLog 			= "update_log"; 
+	$updateLogDB 		= $wpdb->prefix.$updateLog;
+	$filter 			= isset( $_GET['filter'] ) ? $_GET['filter'] : 'all';
+	$dateFormat 		= get_option( 'date_format' );
+	$dateToday 			= date ( 'ydm' );
+	$log_items 			= array();
+	$limit 				= ( $limiter != 'all' ) ? $limiter : false;
 
-	switch( $filter ) {
-
-		case 'plugins':
-			$plugins 		= true;
-			$themes 		= false;
-			$core 			= false;
-			$translations 	= false;
-			break;
-
-		case 'themes':
-			$plugins 		= false;
-			$themes 		= true;
-			$core 			= false;
-			$translations 	= false;
-			break;
-
-		case 'translations':
-			$plugins 		= false;
-			$themes 		= false;
-			$core 			= false;
-			$translations 	= true;
-			break;
-		
-		default:
-			$plugins 		= true;
-			$themes 		= true;
-			$core 			= true;
-			$translations 	= false;
-			break;
-	}
-
-	// Create arrays
-	$pluginNames 	= array();
-	$pluginVersion 	= array();
-	$pluginDates 	= array();
-	$pluginDatesF 	= array();
-	$plugslug 		= array();
-	$type 			= array();
-	$method 		= array();
-
-	// Date format
-	$dateFormat = get_option( 'date_format' );
+	$show_plugins 		= ( in_array( $filter, array( 'plugins', 'all' ) ) ) ? true : false;
+	$show_themes 		= ( in_array( $filter, array( 'themes', 'all' ) ) ) ? true : false;
+	$show_core 			= ( $filter == 'all' ) ? true : false;
+	$show_translations 	= ( $filter == 'translations' ) ? true : false;
 
 	// PLUGINS
-	if( $plugins ) {	
+	if( $show_plugins ) {	
 
-		// Check if function exists
-		if ( ! function_exists( 'get_plugins' ) ) {
+		// Make sure some required functions exits
+		if ( !function_exists( 'get_plugins' ) ) {
 	        require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	    }
 
-		// Where to look for plugins
-		$plugdir    = plugin_dir_path( __DIR__ );
-		$allPlugins = get_plugins();
-
 		// Loop trough all plugins
-		foreach ( $allPlugins as $key => $value) {
+		foreach ( get_plugins() as $key => $value ) {
 
-			// Get plugin data
-			$fullPath 		= $plugdir.'/'.$key;
-			$getFile 		= $path_parts = pathinfo( $fullPath );
-			$pluginData 	= get_plugin_data( $fullPath );
-			$pluginSlug 	= explode( "/", plugin_basename( $key ) );
-			$pluginSlug		= $pluginSlug[0];
+			// Get data
+			$fullPath 						= plugin_dir_path( __DIR__ ).'/'.$key;
+			$pluginData 					= get_plugin_data( $fullPath );
+			$pluginSlug 					= explode( '/', plugin_basename( $key ) );
+			$pluginSlug						= $pluginSlug[0];
 
-	        array_push( $plugslug , $pluginSlug );
+			$fileTime 						= date( 'Hi', filemtime( $fullPath ) );
+			$fileDate 						= date( 'ydm', filemtime( $fullPath ) );
+			$fileDateTime 					= strtotime( $fileDate );
+			$updateSched 					= wp_next_scheduled( 'wp_update_plugins' );
 
-	        // Automatic or Manual (non-db-version)
-			$date_tod 		= date ( 'ydm' );
-			$fileDay 		= date ( 'ydm', filemtime( $fullPath ) );
-			$fileTime 		= date ( 'Hi', filemtime( $fullPath ) );
-			$updateSched 	= wp_next_scheduled( 'wp_update_plugins' );
-			$range_start 	= date( 'Hi', strtotime( '-30 minutes', $updateSched ) );
-			$range_end 		= date( 'Hi', strtotime( '+30 minutes', $updateSched ) );
-
-			if( $date_tod == $fileDay ) {
-
-				if( $fileTime > $range_start && $fileTime < $range_end ) {
-					$status = __( 'Automatic', 'companion-auto-update' );
-				} else {
-					$status = __( 'Manual', 'companion-auto-update' );
-				}
-				
-				array_push( $method , $status );
-
+			if( $dateToday == $fileDate ) {
+				$method = ( $fileTime > date( 'Hi', strtotime( '-30 minutes', $updateSched ) ) && $fileTime < date( 'Hi', strtotime( '+30 minutes', $updateSched ) ) ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
 			} else {
-
-				// Get info from database
-		        if( cau_check_if_exists( $key, 'slug', $updateLog ) ) {
-		        	array_push( $method , cau_get_plugininfo( $key, 'method' ) );
-		        } else {
-		        	array_push( $method , '-' );
-		        }
-
+				$method = cau_check_if_exists( $key, 'slug', $updateLog ) ? cau_get_plugininfo( $key, 'method' ) : '-';
 			}
 
-			// Get plugin name
-			foreach ( $pluginData as $dataKey => $dataValue ) {
-				if( $dataKey == 'Name') {
-					array_push( $pluginNames , $dataValue );
-				}
-				if( $dataKey == 'Version') {
-					array_push( $pluginVersion , $dataValue );
-				}
-			}
-
-			// Get last update date
-			$fileDate 	= date ( 'YmdHi', filemtime( $fullPath ) );
-			if( $format == 'table' ) {
-				$fileDateF 	= date_i18n( $dateFormat, filemtime( $fullPath ) );
-				$fileDateF .= ' &dash; '.date( 'H:i', filemtime( $fullPath ) );
-			} else {
-				$fileDateF 	= date_i18n( $dateFormat, filemtime( $fullPath ) );
-			}
-			array_push( $pluginDates, $fileDate );
-			array_push( $pluginDatesF, $fileDateF );
-			array_push( $type, 'Plugin' );
+			$log_items[$fileDateTime.'_'.$pluginSlug] = array(
+				'type' 		=> 'Plugin',
+				'slug'		=> $pluginSlug,
+				'name'		=> $pluginData['Name'],
+				'date'		=> $fileDateTime,
+				'version'	=> $pluginData['Version'],
+				'method'	=> $method,
+			);
 
 		}
 
 	}
 
 	// THEMES
-	if( $themes ) {
-
-		// Where to look for themes
-		$themedir   = get_theme_root();
-		$allThemes 	= wp_get_themes();
+	if( $show_themes ) {
 
 		// Loop trough all themes
-		foreach ( $allThemes as $key => $value) {
+		foreach ( wp_get_themes() as $key => $value ) {
 
-			// Get theme data
-			$fullPath 	= $themedir.'/'.$key;
-			$getFile 	= $path_parts = pathinfo( $fullPath );
+			// Get data
+			$fullPath 						= get_theme_root().'/'.$key;
+			$path_parts 					= pathinfo( $fullPath );
+			$theme_data 					= wp_get_theme( $path_parts['filename'] );
 
-			// Get theme name
-			$theme_data 	= wp_get_theme( $path_parts['filename'] );
-			$themeName 		= $theme_data->get( 'Name' );
-			$themeVersion 	= $theme_data->get( 'Version' ); 
-			array_push( $pluginNames , $themeName ); 
-			array_push( $pluginVersion , $themeVersion );
+			$fileTime 						= date( 'Hi', filemtime( $fullPath ) );
+			$fileDate 						= date( 'ydm', filemtime( $fullPath ) );
+			$fileDateTime 					= strtotime( $fileDate );
+			$updateSched 					= wp_next_scheduled( 'wp_update_themes' );
 
-	        // Automatic or Manual (non-db-version)
-			$date_tod 		= date ( 'ydm' );
-			$fileDay 		= date ( 'ydm', filemtime( $fullPath ) );
-			$fileTime 		= date ( 'Hi', filemtime( $fullPath ) );
-			$updateSched 	= wp_next_scheduled( 'wp_update_themes' );
-			$range_start 	= date( 'Hi', strtotime( '-30 minutes', $updateSched ) );
-			$range_end 		= date( 'Hi', strtotime( '+30 minutes', $updateSched ) );
-
-			if( $date_tod == $fileDay ) {
-
-				if( $fileTime > $range_start && $fileTime < $range_end ) {
-					$status = __( 'Automatic', 'companion-auto-update' );
-				} else {
-					$status = __( 'Manual', 'companion-auto-update' );
-				}
-				
-				array_push( $method , $status );
-
+			if( $dateToday == $fileDate ) {
+				$method = ( $fileTime > date( 'Hi', strtotime( '-30 minutes', $updateSched ) ) && $fileTime < date( 'Hi', strtotime( '+30 minutes', $updateSched ) ) ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
 			} else {
-
-				// Get info from database
-		        if( cau_check_if_exists( $key, 'slug', $updateLog ) ) {
-		        	array_push( $method , cau_get_plugininfo( $key, 'method' ) );
-		        } else {
-		        	array_push( $method , '-' );
-		        }
-
+				$method = cau_check_if_exists( $key, 'slug', $updateLog ) ? cau_get_plugininfo( $key, 'method' ) : '-';
 			}
 
-			// Get last update date
-			$fileDate 	= date( 'YmdHi', filemtime( $fullPath ) );
-
-			if( $format == 'table' ) {
-				$fileDateF 	= date_i18n( $dateFormat, filemtime( $fullPath ) );
-				$fileDateF .= ' &dash; '.date ( 'H:i', filemtime( $fullPath ) );
-			} else {
-				$fileDateF 	= date_i18n( $dateFormat, filemtime( $fullPath ) );
-			}
-
-			array_push( $pluginDates, $fileDate );
-			array_push( $pluginDatesF, $fileDateF );
-			array_push( $type, 'Theme' );
-			array_push( $plugslug , '' );
+			$log_items[$fileDateTime.'_'.$key] = array(
+				'type' 		=> 'Theme',
+				'slug'		=> '',
+				'name'		=> $theme_data->get( 'Name' ),
+				'date'		=> $fileDateTime,
+				'version'	=> $theme_data->get( 'Version' ),
+				'method'	=> $method,
+			);
 
 		}
 
 	}
 
 	// TRANSLATIONS
-	if( $translations ) {
+	if( $show_translations ) {
 
-		// There is no way (at this time) to check if someone changed this link, so therefore it won't work when it's changed, sorry
-		$transFolder = get_home_path().'wp-content/languages';
+		$transFolder = get_home_path() . 'wp-content/languages'; // There is no way (at this time) to check if someone changed this link, so therefore it won't work when it's changed, sorry
 		if( file_exists( $transFolder ) ) {
-
-			$allThemTranslations 	= array();
-			$allThemTypes 			= array();
-
-			$pt = __( 'Plugin translations', 'companion-auto-update' );
-			$tt = __( 'Theme translations', 'companion-auto-update' );
-			$ct = __( 'Core translations', 'companion-auto-update' );
 
 			// Plugin translations
 			$files = glob( $transFolder.'/plugins/*.{mo}', GLOB_BRACE );
 			foreach( $files as $file ) {
-				array_push( $allThemTranslations, $file );
-				array_push( $allThemTypes, $pt );
+
+				$fileDateTime 	= strtotime( date( 'YmdHi', filemtime( $file ) ) );
+				$bn 			= basename( $file );
+
+				$log_items[$fileDateTime.'_'.$bn] = array(
+					'type' 		=> __( 'Plugin translations', 'companion-auto-update' ),
+					'slug'		=> '',
+					'name'		=> str_replace( ".json", "", str_replace( ".mo", "", str_replace( "-", " ", $bn ) ) ),
+					'date'		=> $fileDateTime,
+					'version'	=> '',
+					'method'	=> '',
+				);
+
 			}
 
 			// Theme translations
 			$files = glob( $transFolder.'/themes/*.{mo}', GLOB_BRACE );
 			foreach( $files as $file ) {
-				array_push( $allThemTranslations, $file );
-				array_push( $allThemTypes, $tt );
+
+				$fileDateTime 	= strtotime( date( 'YmdHi', filemtime( $file ) ) );
+				$bn 			= basename( $file );
+
+				$log_items[$fileDateTime.'_'.$bn] = array(
+					'type' 		=> __( 'Theme translations', 'companion-auto-update' ),
+					'slug'		=> '',
+					'name'		=> str_replace( ".json", "", str_replace( ".mo", "", str_replace( "-", " ", $bn ) ) ),
+					'date'		=> $fileDateTime,
+					'version'	=> '',
+					'method'	=> '',
+				);
+
 			}
 
 			// Core translations
 			$files = glob( $transFolder.'/*.{mo}', GLOB_BRACE );
 			foreach( $files as $file ) {
-				array_push( $allThemTranslations, $file );
-				array_push( $allThemTypes, $ct );
+
+				$fileDateTime 	= strtotime( date( 'YmdHi', filemtime( $file ) ) );
+				$bn 			= basename( $file );
+
+				$log_items[$fileDateTime.'_'.$bn] = array(
+					'type' 		=> __( 'Core translations', 'companion-auto-update' ),
+					'slug'		=> '',
+					'name'		=> str_replace( ".json", "", str_replace( ".mo", "", str_replace( "-", " ", $bn ) ) ),
+					'date'		=> $fileDateTime,
+					'version'	=> '',
+					'method'	=> '',
+				);
+
 			}
-
-			foreach( $allThemTranslations as $key => $trans_file ) {
-
-				$transDate 	= date( 'YmdHi', filemtime( $trans_file ) );
-
-				if( $format == 'table' ) {
-					$transDateF 	= date_i18n( $dateFormat, filemtime( $trans_file ) );
-					$transDateF .= ' &dash; '.date ( 'H:i', filemtime( $trans_file ) );
-				} else {
-					$transDateF 	= date_i18n( $dateFormat, filemtime( $trans_file ) );
-				}
-
-				$trans_name 	= basename( $trans_file );
-				$trans_name 	= str_replace( "-", " ", $trans_name );
-				$trans_name 	= str_replace( ".mo", "", $trans_name );
-				$trans_name 	= str_replace( ".json", "", $trans_name );
-				$trans_lang 	= substr( $trans_name, strrpos( $trans_name, " " ) + 1 );
-				$trans_name 	= str_replace( $trans_lang, "", $trans_name );
-				$trans_lang 	= substr( $trans_lang, strrpos( $trans_lang, "_" ) + 1 );
-
-				// Push
-				array_push( $pluginNames, ucfirst( $trans_name ).': '.$trans_lang ); 
-				array_push( $type, $allThemTypes[$key] ); 
-				array_push( $pluginVersion, '-' );
-				array_push( $pluginDates, $transDate );
-				array_push( $pluginDatesF, $transDateF );
-				array_push( $plugslug , '' );
-		        array_push( $method , '-' );
-
-		    }
-
-		} else {
-
-			$transDate 		= date('YmdHi');
-			$transDateF 	= 'Could not read translations date.';
-
-			array_push( $pluginNames, 'Translations' ); 
-			array_push( $type, $trans_type.' translations' ); 
-			array_push( $pluginVersion, '-' );
-			array_push( $pluginDates, $transDate );
-			array_push( $pluginDatesF, $transDateF );
-			array_push( $plugslug , '' );
-
-	        // Get info from database
-	        array_push( $method , '-' );
 
 		}
 
 	}
 
 	// CORE
-	if( $core ) {
+	if( $show_core ) {
 
-		$coreFile 		= ABSPATH.'wp-includes/version.php';
-		$updateSched 	= wp_next_scheduled( 'wp_version_check' );
-
+		$coreFile = ABSPATH . 'wp-includes/version.php';
 		if( file_exists( $coreFile ) ) {
 
-			$coreDate 	= date( 'YmdHi', filemtime( $coreFile ) );
+			$fileTime 			= date( 'Hi', filemtime( $coreFile ) );
+			$fileDate 			= date( 'ydm', filemtime( $coreFile ) );
+			$fileDateTime 		= strtotime( $fileDate );
+			$updateSched 		= wp_next_scheduled( 'wp_version_check' );
 
-			if( $format == 'table' ) {
-				$coreDateF 	= date_i18n( $dateFormat, filemtime( $coreFile ) );
-				$coreDateF .= ' &dash; '.date ( 'H:i', filemtime( $coreFile ) );
+			if( $dateToday == $fileDate ) {
+				$method = ( $fileTime > date( 'Hi', strtotime( '-30 minutes', $updateSched ) ) && $fileTime < date( 'Hi', strtotime( '+30 minutes', $updateSched ) ) ) ? __( 'Automatic', 'companion-auto-update' ) : __( 'Manual', 'companion-auto-update' );
 			} else {
-				$coreDateF 	= date_i18n( $dateFormat, filemtime( $coreFile ) );
-			}
-
-	        // Automatic or Manual (non-db-version)
-			$date_tod 		= date ( 'ydm' );
-			$fileDay 		= date ( 'ydm', filemtime( $coreFile ) );
-			$fileTime 		= date ( 'Hi', filemtime( $coreFile ) );
-			$update_time 	= wp_next_scheduled( 'wp_version_check' );
-			$range_start 	= date( 'Hi', strtotime( '-30 minutes', $update_time ) );
-			$range_end 		= date( 'Hi', strtotime( '+30 minutes', $update_time ) );
-
-			if( $date_tod == $fileDay ) {
-
-				if( $fileTime > $range_start && $fileTime < $range_end ) {
-					$methodVal = __( 'Automatic', 'companion-auto-update' );
-				} else {
-					$methodVal = __( 'Manual', 'companion-auto-update' );
-				}
-
-			} else {
-
-				// Get info from database
-		        if( cau_check_if_exists( $key, 'slug', $updateLog ) ) {
-		        	$methodVal = cau_get_plugininfo( 'core', 'method' );
-		        } else {
-		        	$methodVal = '';
-		        }
-
+				$method = cau_check_if_exists( 'core', 'slug', $updateLog ) ? cau_get_plugininfo( 'core', 'method' ) : '-';
 			}
 
 
 		} else {
-			$coreDate 	= date('YmdHi');
-			$coreDateF 	= 'Could not read core date.';
+			$fileDateTime 	= 'Could not read core date.';
+			$method 		= '-';
 		}
 
-		array_push( $pluginNames, 'WordPress' ); 
-		array_push( $type, 'WordPress' ); 
-		array_push( $pluginVersion, get_bloginfo( 'version' ) );
-		array_push( $pluginDates, $coreDate );
-		array_push( $pluginDatesF, $coreDateF );
-		array_push( $plugslug , '' );
+		$log_items[$fileDateTime.'_'.$key] = array(
+			'type' 		=> 'WordPress',
+			'slug'		=> '',
+			'name'		=> 'WordPress',
+			'date'		=> $fileDateTime,
+			'version'	=> get_bloginfo( 'version' ),
+			'method'	=> $method,
+		);
 
-        // Get info from database
-        array_push( $method , $methodVal );
-
-	}
-
-	// Sort array by date
-	arsort( $pluginDates );
-
-	if( $limit == 'all' ) {
-		$limit = 999;
 	}
 
 	$listClasses = 'wp-list-table widefat autoupdate autoupdatelog';
@@ -906,51 +594,35 @@ function cau_fetch_log( $limit, $format = 'simple' ) {
 
 	echo '<tbody id="the-list">';
 
-	$loopings = 0;
+	krsort( $log_items );
+	$limited_log_items = $limit ? array_slice( $log_items, 0, $limit ) : $log_items;
 
-	foreach ( $pluginDates as $key => $value ) {
+	foreach ( $limited_log_items as $key => $value ) {
 
-		if( $loopings < $limit ) {
+		echo '<tr>';
 
-			echo '<tr>';
+			$log_item__name 	= $value['name'];
+			$log_item__name_f 	= ( $format != 'table' && strlen( $log_item__name ) > 25 ) ? substr( $log_item__name, 0, 25 ).'...' : $log_item__name;
+			$log_item__type 	= $value['type'];
+			$log_item__slug 	= $value['slug'];
+			$log_item__version 	= $value['version'];
+			$log_item__date 	= date_i18n( get_option( 'date_format' ), $value['date'] );
+			$log_item__method 	= $value['method'];
 
-				if( $format == 'table' ) {
-					$pluginName = $pluginNames[$key];
-				} else {
-					$pluginName = substr( $pluginNames[$key], 0, 25);
-					if( strlen( $pluginNames[$key] ) > 25 ) {
-						$pluginName .= '...';
-					}
-				}
+			echo '<td class="column-updatetitle"><p><strong title="'.$log_item__name.'">'.cau_getChangelogUrl( $log_item__type, $log_item__name_f, $log_item__slug ).'</strong></p></td>';
 
-				echo '<td class="column-updatetitle"><p><strong title="'. $pluginNames[$key] .'">'.cau_getChangelogUrl( $type[$key], $pluginNames[$key], $plugslug[$key] ).'</strong></p></td>';
+			if( $format == 'table' ) {
+				if( !$translations ) echo '<td class="cau_hide_on_mobile column-version" style="min-width: 100px;"><p>'.$log_item__version.'</p></td>';
+				echo '<td class="cau_hide_on_mobile column-description"><p>'.$log_item__type.'</p></td>';
+			}
+			echo '<td class="column-date" style="min-width: 100px;"><p>'.$log_item__date.'</p></td>';
 
-				if( $format == 'table' ) {
 
-					if( $type[$key] == 'Plugin' ) {
-						$thisType = __( 'Plugin', 'companion-auto-update' );
-					} else if( $type[$key] == 'Theme' ) {
-						$thisType = __( 'Theme', 'companion-auto-update' );
-					} else {
-						$thisType = $type[$key];
-					}
+			if( $format == 'table' ) {
+				echo '<td class="column-method"><p>'.$log_item__method.'</p></td>';
+			}
 
-					if( !$translations ) echo '<td class="cau_hide_on_mobile column-version" style="min-width: 100px;"><p>'. $pluginVersion[$key] .'</p></td>';
-					echo '<td class="cau_hide_on_mobile column-description"><p>'. $thisType .'</p></td>';
-
-				}
-
-				echo '<td class="column-date" style="min-width: 100px;"><p>'. $pluginDatesF[$key] .'</p></td>';
-
-				if( $format == 'table' ) {
-					echo '<td class="column-method"><p>'. $method[$key] .'</p></td>';
-				}
-
-			echo '</tr>';
-
-			$loopings++;
-
-		}
+		echo '</tr>';
 
 	}
 
@@ -973,38 +645,16 @@ function cau_getChangelogUrl( $type, $name, $plugslug ) {
 	        break;
 	}
 
-	if( !empty( $url ) ) {
-		return '<a href="'.$url.'" class="thickbox open-plugin-details-modal" aria-label="More information about '.$name.'" data-title="'.$name.'">'.$name.'</a>';
-	} else {
-		return $name;
-	}
+	return !empty( $url ) ? "<a href='{$url}' class='thickbox open-plugin-details-modal' aria-label='More information about {$name}' data-title='{$name}'>{$name}</a>" : $name;
 
 }
 
 // Only update plugins which are enabled
 function cau_dontUpdatePlugins( $update, $item ) {
-
-	$plugins = plugins_donotupdatelist();
-
-    if ( in_array( $item->slug, $plugins ) ) {
-    	return false; // Don't update these plugins
-    } else {
-    	return true; // Always update these plugins
-    } 
-
-
+	return in_array( $item->slug, plugins_donotupdatelist() ) ? false : true;
 }
 function cau_dontUpdateThemes( $update, $item ) {
-
-	$themes = themes_donotupdatelist();
-
-    if ( in_array( $item->slug, $themes ) ) {
-    	return false; // Don't update these themes
-    } else {
-    	return true; // Always update these themes
-    } 
-
-
+	return in_array( $item->slug, themes_donotupdatelist() ) ? false : true;
 }
 
 // Get plugin information of repository
@@ -1233,11 +883,7 @@ function cau_updateLogDBisEmpty() {
 	$updateLog 		= $wpdb->prefix.$updateDB; 
 	$row_count 		= $wpdb->get_var( "SELECT COUNT(*) FROM $updateLog" );
 
-	if( $row_count > 0 ) {
-		return false;
-	} else {
-		return true;
-	}
+	return ( $row_count > 0 ) ? false : true;
 }
 
 // Plugin information to DB

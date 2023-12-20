@@ -4,8 +4,8 @@ Donate link: https://www.paypal.me/BrainstormForce
 Tags: gutenberg, blocks, gutenberg blocks, editor, block
 Requires at least: 5.6
 Requires PHP: 7.4
-Tested up to: 6.3.1
-Stable tag: 2.7.10
+Tested up to: 6.4.2
+Stable tag: 2.10.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -214,6 +214,111 @@ When you use the Spectra along with the free Astra theme, you get a huge library
 Our external packages use [Rating Star Component](https://github.com/n49/react-stars) that are distributed under the terms of the ISC. While [Slick](https://github.com/akiran/react-slick), [Lottie](https://github.com/chenqingspring/react-lottie) and [Striptags](https://github.com/ericnorris/striptags) is distributed under the terms of the MIT.
 
 == Changelog ==
+
+= 2.10.5 - MONDAY, 18th DECEMBER 2023 =
+* Fix: Global - Resolved an issue wherein the Astra customizer typography settings would not appear as expected.
+* Fix: Global - Resolved an issue wherein the template styles for the front-page and single-post templates would not load as intended in FSE themes.
+
+= 2.10.4 - TUESDAY, 12th DECEMBER 2023 =
+* Security Fix: Hardened the security of the plugin. Props: Wordfence.
+* Feature: Container - Added new auto-width and equal-width options to the Container block.
+* Improvement: Buttons - Added an option to inherit the secondary styles when using the Astra theme.
+* Improvement: Inline Notice - Added accessibility for the close button.
+* Improvement: Global - Added viewport width as a typography size option.
+* Fix: Container - Resolved an issue wherein the fallback image would appear repeatedly when the Container background was set to video.
+* Fix: Form - Resolved an issue wherein form submissions would not work as intended when a ReCaptcha version is used and ReCaptcha is disabled.
+* Fix: Image Gallery - Resolved an issue wherein the images in the paginated masonry layout would not be clickable.
+* Fix: Popup Builder - Resolved an issue wherein only the latest 10 popups would be visible on the frontend when enabled.
+* Fix: Taxonomy List - Resolved an issue wherein the hierarchy would not be displayed as intended in the list layout.
+
+= 2.10.3 - SATURDAY, 2nd DECEMBER 2023 =
+* Improvement: FAQ - Added block margin and padding settings.
+
+= 2.10.2 - THURSDAY, 30th NOVEMBER 2023 =
+* Fix: Container - Resolved an issue wherein the gradient overlay would not work as intended.
+* Fix: Container - Resolved an issue wherein the slide-right animation would not work as intended with the Testimonial block in Firefox browser.
+* Fix: Image - Resolved an issue in which images would not load as intended after migration.
+* Fix: Buttons - Resolved an issue wherein the padding would be overridden by Astra's default padding styles.
+* Fix: Info Box - Resolved an issue wherein adding a dynamic link to the CTA complete box would result in a recovery issue.
+* Fix: Info Box - Resolved an issue in which the CTA would not work as expected with the dynamic link and complete box settings.
+* Fix: Content Timeline - Resolved an issue in which the block's styling would be applied to other nested blocks in the editor.
+* Fix: FAQ - Resolved an issue wherein the block content padding would appear differently in the editor and the front-end.
+* Fix: Icon List - Resolved an issue in which the vertical layout alignment would not appear as intended in the editor's tablet view.
+* Fix: Inline Notice - Resolved an issue wherein the title would not appear to be full-width in the Firefox browser.
+* Fix: Modal - Resolved an issue wherein the link component would appear behind the Modal in the editor.
+* Fix: Tabs - Resolved an issue in which the tabs wrapper margin would appear differently in the editor and the front-end.
+* Fix: Global - Resolved an issue wherein the WooCommerce and custom template-styles would not load as intended in FSE themes.
+* Fix: Global - Resolved an issue wherein the template styles for custom post types would not load as intended in FSE themes.
+
+= 2.10.1 - SATURDAY, 11th NOVEMBER 2023 =
+* Improvement: Zip AI - Added an option to disable Zip AI.
+* Improvement: Caching - Added compatibility with SiteGround's caching.
+
+= 2.10.0 - THURSDAY, 9th NOVEMBER 2023 =
+* New: Integrated Zip AI into Spectra.
+
+= 2.9.1 - TUESDAY, 7th NOVEMBER 2023 =
+* Improvement: Container - Added a fallback image option for the video background type.
+* Improvement: Container - Added a new 'Centralized Position' setting for custom image background positioning.
+* Improvement: Global - Added the new 'X' logo for Twitter into the icon library.
+* Fix: Container - Resolved an issue wherein the background video opacity would not work as intended.
+* Fix: Container - Resolved an issue wherein the flex properties would not work as intended on the front-end when blocks were added inside a video-background Container.
+* Fix: Buttons - Resolved an issue in which the margins added to the button group would get overridden by child button margins.
+* Fix: FAQ - Resolved an issue in which the default content padding would appear differently in the editor and the front-end.
+* Fix: Form - Added a note for the Form block regarding duplicate name fields requiring distinct labels.
+* Fix: Icon List - Resolved an issue wherein the vertical alignment would not appear as intended in the editor's mobile view.
+* Fix: Post Grid/Carousel/Timeline - Resolved an issue wherein a `preg_replace` warning could appear.
+* Fix: Slider - Resolved an issue wherein the block would not work as intended in the Astra widget customizer.
+* Fix: Table Of Contents - Resolved an issue wherein the Table Of Contents collapse feature would not work as intended.
+* Fix: Global - Resolved an issue with Full Site Editing (FSE) in which changes applied to page templates would not be visible when File Generation was enabled.
+* Fix: Global - Resolved an issue in which the Spectra blocks were unable to be previewed in the widget editor customizer.
+
+= 2.9.0 - THURSDAY, 26th OCTOBER 2023 =
+* New: Core Blocks - Added Global Block Style support for core blocks.
+* Improvement: Container - Enhanced the accessibility of nested Containers.
+* Improvement: Buttons - Added a new vertical alignment option.
+* Improvement: Admin - Made the welcome video GDPR compliant and added a filter to hide it.
+* Fix: Container - Resolved an issue wherein the core Social Share block would get centered by default inside Containers.
+* Fix: Form - Resolved an issue that caused form submissions to fail when the reCAPTCHA badge was hidden with v3 enabled.
+* Fix: Image Gallery - Resolved an issue in which the custom link validation would fail when the root domain contained hyphens.
+* Fix: Lottie - Resolved an issue in which the SVG alignment would not work as intended in the TwentyTwentyThree theme.
+* Fix: Lottie - Resolved an issue in which the width of the block would be adopted from the parent Container.
+* Fix: Global - Resolved an issue wherein a block error would occur when attempting to select typography font-families in the presence of multiple iFrames.
+* Fix: Global - Resolved an issue wherein adding Containers, Forms, Lottie blocks and the Popup Builder would cause errors when the Gutenberg plugin was active.
+* Fix: Global - Resolved an issue wherein the 'normal' text-transformation option would not work as intended.
+
+= 2.8.0 - THURSDAY, 12th OCTOBER 2023 =
+* Feature: Container - Added a new Sticky-Container setting in the Advanced tab.
+* Feature: Visibility Mode - Improved the Coming-Soon Mode by adding the Maintenance Mode feature.
+* Improvement: Container - Updated responsive padding settings to inherit from bigger devices by default.
+* Improvement: Buttons - Added alignment options to both the child and parent blocks in the block controls toolbar.
+* Improvement: Buttons - Reduced the default number of buttons to 1.
+* Improvement: Form - Made the default recipient as the current user's WordPress email address when the To field is left empty in submitted forms.
+* Improvement: Global - Enhanced the reusable block functionality for the following blocks: Tabs and Slider.
+* Fix: Container - Resolved an issue wherein the left and right margins of inner-containers would not work as intended.
+* Fix: Content Timeline - Resolved an issue in which the icons would appear over-sized and the content styling would break on the frontend.
+* Fix: Image Gallery - Resolved an issue with the masonry type wherein the loader would not be hidden after all the images have been loaded.
+* Fix: Post Carousel - Resolved an issue in which the responsive columns would not work as intended in the editor.
+* Fix: Post Grid - Resolved an issue wherein the post meta responsive font-size would not work as intended in the editor.
+* Fix: Separator - Resolved an issue wherein the height would revert from percentage to pixels after reloading the editor.
+* Fix: Global - Removed responsive conditions for core PHP-rendered blocks.
+* Fix: Global - Resolved an issue in which the font-family that was set would not appear as intended in the FSE template editor.
+
+= 2.7.11 - WEDNESDAY, 27th SEPTEMBER 2023 =
+* Fix: Image - Resolved an issue in which the updated responsive images would not appear as intended.
+* Fix: Image - Resolved an issue in which masked images would get cut off when the zoom-in hover effect was used.
+* Fix: Form - Resolved an issue wherein the country-code background color would not match in the editor and the front-end.
+* Fix: Form - Added an error message when the confirmation type is set to "URL text".
+* Fix: Form - Resolved an issue wherein the Forms block would not work inside Containers in Astra's Custom Layout.
+* Fix: Google Maps - Resolved an issue in which the custom classes would not appear on the frontend.
+* Fix: Image Gallery - Resolved an issue in the carousel type wherein the arrow positions would revert from percentage to pixels after reloading.
+* Fix: Marketing Button - Resolved an issue in which the default border-radius would not match in the editor and the front-end.
+* Fix: Post Timeline - Resolved an issue in which the notice links would not redirect users as intended.
+* Fix: Table Of Contents - Resolved an issue wherein headings containing some uppercase latin characters would not function as intended.
+* Fix: Testimonials - Resolved an issue wherein the gradient background  styles would not work as intended.
+* Fix: Global - Resolved an issue wherein a PHP error could occur in the Widget Editor.
+* Fix: Global - Resolved an issue in which non-FSE themes running on PHP 8.1 would encounter PHP issues regarding the `preg_match` and `strlen` functions.
+* Fix: Global - Removed the Block Editor Spacing setting for FSE themes.
 
 = 2.7.10 - FRIDAY, 22nd SEPTEMBER 2023 =
 * Security Fix: Hardened the security of the plugin. Props: Patchstack

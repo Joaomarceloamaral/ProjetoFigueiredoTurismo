@@ -24,7 +24,7 @@ class Joinchat_Admin_Onboard {
 	 */
 	public function add_menu() {
 
-		$title = __( 'Welcome to Joinchat', 'creame-whatsapp-me' );
+		$title = esc_html__( 'Welcome to Joinchat', 'creame-whatsapp-me' );
 
 		if ( Joinchat_Util::options_submenu() ) {
 			add_options_page( $title, $title, Joinchat_Util::capability(), 'joinchat-onboard', array( $this, 'options_page' ) );
@@ -90,14 +90,14 @@ class Joinchat_Admin_Onboard {
 				<div class="wp-header-end"></div>
 
 				<div>
-					<?php _e( 'Exit the wizard and', 'creame-whatsapp-me' ); ?>
-					<a href="<?php echo esc_url( add_query_arg( 'onboard', 'no', Joinchat_Util::admin_url() ) ); ?>"><?php _e( 'go to Joinchat Settings', 'creame-whatsapp-me' ); ?></a>
+					<?php esc_html_e( 'Exit the wizard and', 'creame-whatsapp-me' ); ?>
+					<a href="<?php echo esc_url( add_query_arg( 'onboard', 'no', Joinchat_Util::admin_url() ) ); ?>"><?php esc_html_e( 'go to Joinchat Settings', 'creame-whatsapp-me' ); ?></a>
 				</div>
 
 				<div id="joinchat_onboard">
 					<div class="joinchat__dialog"></div>
 				</div>
-				<svg style="width:0;height:0;position:absolute"><defs><clipPath id="joinchat__message__peak"><path d="M17 25V0C17 12.877 6.082 14.9 1.031 15.91c-1.559.31-1.179 2.272.004 2.272C9.609 18.182 17 18.088 17 25z"/></clipPath></defs></svg>
+				<svg style="width:0;height:0;position:absolute"><defs><clipPath id="joinchat__peak_l"><path d="M17 25V0C17 12.877 6.082 14.9 1.031 15.91c-1.559.31-1.179 2.272.004 2.272C9.609 18.182 17 18.088 17 25z"/></clipPath><clipPath id="joinchat__peak_r"><path d="M0 25.68V0c0 13.23 10.92 15.3 15.97 16.34 1.56.32 1.18 2.34 0 2.34-8.58 0-15.97-.1-15.97 7Z"/></clipPath></defs></svg>
 
 			</div>
 		<?php
@@ -112,7 +112,7 @@ class Joinchat_Admin_Onboard {
 	 */
 	public static function admin_title( $admin_title ) {
 
-		return sprintf( '%s &lsaquo; %s', __( 'Welcome to Joinchat', 'creame-whatsapp-me' ), get_bloginfo( 'name' ) );
+		return sprintf( '%s &lsaquo; %s', esc_html__( 'Welcome to Joinchat', 'creame-whatsapp-me' ), esc_html( get_bloginfo( 'name' ) ) );
 
 	}
 
@@ -177,9 +177,15 @@ class Joinchat_Admin_Onboard {
 		);
 
 		$l10n = array(
-			'step_hi'         => sprintf( /* translators: %s: User display name. */
-				_x( "Hey, <em>%s</em>. Let's set up <strong>Joinchat</strong> in less than 2 minutes.", 'onboard', 'creame-whatsapp-me' ),
-				$user->display_name
+			'step_hi'         => sprintf(
+				wp_kses( /* translators: %s: User display name. */
+					_x( "Hey, <em>%s</em>. Let's set up <strong>Joinchat</strong> in less than 2 minutes.", 'onboard', 'creame-whatsapp-me' ),
+					array(
+						'em'     => array(),
+						'strong' => array(),
+					)
+				),
+				esc_html( $user->display_name )
 			),
 			'step_hi_next'    => _x( "👌 OK, let's start.", 'onboard', 'creame-whatsapp-me' ),
 			'step_phone'      => _x( 'Please tell me your WhatsApp number', 'onboard', 'creame-whatsapp-me' ),
@@ -196,11 +202,13 @@ class Joinchat_Admin_Onboard {
 			'step_cta_no'     => _x( "I don't want a CTA", 'onboard', 'creame-whatsapp-me' ),
 			'step_news'       => _x( 'Finally, do you want us to send you tips to improve conversion with <strong>Joinchat</strong>?', 'onboard', 'creame-whatsapp-me' ),
 			'step_news_terms' => sprintf( /* translators: %s: Terms of Use link. */
-				_x( 'I accept the <a href="%s" target="_blank">terms of use and privacy policy</a>', 'onboard', 'creame-whatsapp-me' ),
+				wp_kses( _x( 'I accept the <a href="%s" target="_blank">terms of use and privacy policy</a>', 'onboard', 'creame-whatsapp-me' ), Joinchat_Admin::KSES_LINK ),
 				esc_url( Joinchat_Util::link( 'terms', 'onboard' ) )
 			),
 			'step_news_yes'   => _x( 'OK, keep me posted', 'onboard', 'creame-whatsapp-me' ),
 			'step_news_no'    => _x( 'No, thanks', 'onboard', 'creame-whatsapp-me' ),
+			'step_inbox'      => _x( '👍 Perfect, we have just sent you an email to your account, visit your mailbox to confirm your subscription.', 'onboard', 'creame-whatsapp-me' ),
+			'step_inbox_next' => _x( 'Done!', 'onboard', 'creame-whatsapp-me' ),
 			'step_success'    => _x( '🥳 Great, <strong>Joinchat</strong> is up and running.', 'onboard', 'creame-whatsapp-me' ),
 			'step_fail'       => _x( '😖 Sorry, something went wrong.', 'onboard', 'creame-whatsapp-me' ),
 			'step_settings'   => ucfirst( __( 'go to Joinchat Settings', 'creame-whatsapp-me' ) ),

@@ -14,6 +14,62 @@ $this->version = $version;
 $this->plugin_name = $pluginName;
 $this->platform_name = $platformName;
 }
+public function getPluginTabs()
+{
+$tabs = [];
+if ($this->is_trustindex_connected()) {
+$tabs[] = [
+'place' => 'left',
+'slug' => 'trustindex-admin',
+'name' => 'Trustindex admin'
+];
+}
+$tabs[] = [
+'place' => 'left',
+'slug' => 'free-widget-configurator',
+'name' => self::___('Free Widget Configurator')
+];
+if ($this->is_noreg_linked()) {
+$tabs[] = [
+'place' => 'left',
+'slug' => 'my-reviews',
+'name' => self::___('My reviews')
+];
+}
+$tabs[] = [
+'place' => 'left',
+'slug' => 'get-reviews',
+'name' => self::___('Get Reviews')
+];
+$tabs[] = [
+'place' => 'left',
+'slug' => 'rate-us',
+'name' => self::___('Rate Us')
+];
+if (!$this->is_trustindex_connected()) {
+$tabs[] = [
+'place' => 'left',
+'slug' => 'get-more-features',
+'name' => self::___('Get more Features')
+];
+$tabs[] = [
+'place' => 'left',
+'slug' => 'trustindex-admin',
+'name' => self::___('Log In')
+];
+}
+$tabs[] = [
+'place' => 'right',
+'slug' => 'feature-request',
+'name' => self::___('Feature request')
+];
+$tabs[] = [
+'place' => 'right',
+'slug' => 'advanced',
+'name' => self::___('Advanced')
+];
+return $tabs;
+}
 public function getShortName()
 {
 return $this->shortname;
@@ -53,13 +109,15 @@ return true;
 }
 public function save_details($tmp)
 {
+$name = isset($tmp['name']) ? sanitize_text_field(stripslashes($tmp['name'])) : "";
+$name = json_encode($name);
 $details = [
 'id' => isset($tmp['page_id']) ? $tmp['page_id'] : $tmp['id'],
-'name' => isset($tmp['name']) ? sanitize_text_field(stripslashes($tmp['name'])) : "",
+'name' => $name,
 'address' => isset($tmp['address']) ? sanitize_text_field(stripslashes($tmp['address'])) : "",
 'avatar_url' => isset($tmp['avatar_url']) ? sanitize_text_field(stripslashes($tmp['avatar_url'])) : "",
-'rating_number' => isset($tmp['reviews']['count']) ? intval($tmp['reviews']['count']) : 0,
-'rating_score' => isset($tmp['reviews']['score']) ? floatval($tmp['reviews']['score']) : 0,
+'rating_number' => isset($tmp['reviews']['count']) ? (int)$tmp['reviews']['count'] : 0,
+'rating_score' => isset($tmp['reviews']['score']) ? (float)$tmp['reviews']['score'] : 0,
 ];
 if (isset($tmp['access_token'])) {
 $details['access_token'] = sanitize_text_field(stripslashes($tmp['access_token']));
@@ -164,6 +222,12 @@ unlink($this->getCssFile());
 public function activate()
 {
 include $this->get_plugin_dir() . 'include' . DIRECTORY_SEPARATOR . 'activate.php';
+$this->setNotificationParam('not-using-no-connection', 'timestamp', time() + 86400);
+if (!$this->getNotificationParam('rate-us', 'hidden', false) && $this->getNotificationParam('rate-us', 'active', true)) {
+$this->setNotificationParam('rate-us', 'active', true);
+$this->setNotificationParam('rate-us', 'timestamp', time() + 86400);
+}
+update_option($this->get_option_name('activation-redirect'), 1, false);
 }
 public function deactivate()
 {
@@ -280,7 +344,6 @@ return [
 'lang',
 'no-rating-text',
 'dateformat',
-'rate-us',
 'rate-us-feedback',
 'verified-icon',
 'enable-animation',
@@ -299,15 +362,80 @@ return [
 'review-download-token',
 'review-download-inprogress',
 'review-download-request-id',
-'review-download-notification',
 'review-download-modal',
-'review-download-notification-email',
+'review-download-is-connecting',
 'review-manual-download',
 'reply-generated',
 'footer-filter-text',
 'show-header-button',
-'reviews-load-more'
+'reviews-load-more',
+'activation-redirect',
+'notifications',
 ];
+}
+public function setNotificationParam($type, $param, $value)
+{
+$notifications = get_option($this->get_option_name('notifications'), []);
+if (!isset($notifications[ $type ])) {
+$notifications[ $type ] = [];
+}
+$notifications[ $type ][ $param ] = $value;
+update_option($this->get_option_name('notifications'), $notifications, false);
+}
+public function getNotificationParam($type, $param, $default = null)
+{
+$notifications = get_option($this->get_option_name('notifications'), []);
+if (!isset($notifications[ $type ]) || !isset($notifications[ $type ][ $param ])) {
+return $default;
+}
+return $notifications[ $type ][ $param ];
+}
+public function isNotificationActive($type, $notifications = null)
+{
+if (!$notifications) {
+$notifications = get_option($this->get_option_name('notifications'), []);
+}
+if (
+!isset($notifications[ $type ]) ||
+!isset($notifications[ $type ]['active']) || !$notifications[ $type ]['active'] ||
+(isset($notifications[ $type ]['hidden']) && $notifications[ $type ]['hidden']) ||
+(isset($notifications[ $type ]['timestamp']) && $notifications[ $type ]['timestamp'] > time())
+) {
+return false;
+}
+return true;
+}
+public function getNotificationText($type)
+{
+$platformName = $this->get_platform_name($this->getShortName());
+switch ($type) {
+case 'not-using-no-connection':
+return self::___('Display %s reviews on your website.', [ $platformName ]);
+case 'not-using-no-widget':
+return self::___('Build trust and display your %s reviews on your website.', [ $platformName ]);
+case 'review-download-available':
+return self::___('You can update your %s reviews.', [ $platformName ]);
+case 'review-download-finished':
+return self::___('Your new %s reviews have been downloaded.', [ $platformName ]);
+case 'rate-us':
+return self::___("Hello, I am happy to see that you've been using our <strong>%s</strong> plugin for a while now!", [ $this->plugin_name ]) . '<br />' .
+self::___('Could you please help us and give it a 5-star rating on WordPress?') . '<br /><br />' .
+self::___('-- Thanks, Gabor M.');
+}
+}
+public function getNotificationButtonText($type)
+{
+$platformName = $this->get_platform_name($this->getShortName());
+switch ($type) {
+case 'not-using-no-connection':
+return self::___('Create a free %s widget! »', [ $platformName ]);
+case 'not-using-no-widget':
+return self::___('Embed the %s reviews widget! »', [ $platformName ]);
+case 'review-download-available':
+return self::___('Download your latest reviews! »');
+case 'review-download-finished':
+return self::___('Reply with %s! »', [ 'ChatGPT' ]);
+}
 }
 public function get_platforms()
 {
@@ -366,7 +494,7 @@ return array_values($this->plugin_slugs);
 
 public static function get_noticebox($type, $message)
 {
-return '<div class="ti-notice notice-'. $type .' is-dismissible"><p>'. self::___($message) .'</p><button type="button" class="notice-dismiss"></button></div>';
+return '<div class="ti-notice ti-notice-'. $type .' is-dismissible"><p>'. self::___($message) .'</p><button type="button" class="notice-dismiss"></button></div>';
 }
 public static function get_alertbox($type, $content, $newline_content = true)
 {
@@ -405,9 +533,9 @@ return 'trustindex';
 public function init_shortcode()
 {
 $tag = $this->get_shortcode_name();
-$currentVersion = floatval($this->version);
+$currentVersion = (float)$this->version;
 if (shortcode_exists($tag)) {
-$initedVersion = floatval(get_option('trustindex-core-shortcode-inited', 0));
+$initedVersion = (float)get_option('trustindex-core-shortcode-inited', 0);
 if (!$initedVersion || $initedVersion <= $currentVersion) {
 remove_shortcode($tag);
 }
@@ -434,7 +562,8 @@ $filePath = __FILE__;
 if (isset($this->plugin_slugs[ $forcePlatform ])) {
 $filePath = preg_replace('/[^\/\\\\]+([\\\\\/]trustindex-plugin\.class\.php)/', $this->plugin_slugs[ $forcePlatform ] . '$1', $filePath);
 }
-$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-10.8", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
+$chosedPlatform = new self($forcePlatform, $filePath, "do-not-care-11.2.2", "do-not-care-Widgets for Google Reviews", "do-not-care-Google");
+$chosedPlatform->setNotificationParam('not-using-no-widget', 'active', false);
 if (!$chosedPlatform->is_noreg_linked()) {
 return $this->error_box_for_admins(self::___('You have to connect your business (%s)!', [ $forcePlatform ]));
 }
@@ -462,8 +591,16 @@ return self::get_alertbox('error', ' @ <strong>'. self::___('Trustindex plugin')
  */
 public function is_noreg_linked()
 {
-$pageDetails = get_option($this->get_option_name('page-details'));
+$pageDetails = $this->getPageDetails();
 return $pageDetails && !empty($pageDetails);
+}
+public function getPageDetails()
+{
+$pageDetails = get_option($this->get_option_name('page-details'));
+if (isset($pageDetails['name']) && $this->isJson($pageDetails['name'])) {
+$pageDetails['name'] = json_decode($pageDetails['name']);
+}
+return $pageDetails;
 }
 public function noreg_save_css($setChange = false)
 {
@@ -558,10 +695,47 @@ $this->noreg_save_css(true);
 }
 }
 $this->handleCssFile();
+if (get_option($this->get_option_name('activation-redirect'))) {
+delete_option($this->get_option_name('activation-redirect'));
+wp_redirect(admin_url('admin.php?page=' . $this->get_plugin_slug() . '/settings.php'));
+exit;
+}
 $this->loadI18N();
+if (
+$this->is_noreg_linked() &&
+!$this->is_review_download_in_progress() &&
+get_option($this->get_option_name('download-timestamp'), time()) < time() &&
+!$this->getNotificationParam('review-download-available', 'hidden') &&
+$this->getNotificationParam('review-download-available', 'do-check', true)
+) {
+$this->setNotificationParam('review-download-available', 'active', true);
+$this->setNotificationParam('review-download-available', 'do-check', false);
+}
+if (
+!$this->is_noreg_linked() &&
+!$this->getNotificationParam('not-using-no-connection', 'active', false) &&
+$this->getNotificationParam('not-using-no-connection', 'do-check', true)
+) {
+$this->setNotificationParam('not-using-no-connection', 'active', true);
+$this->setNotificationParam('not-using-no-connection', 'do-check', false);
+}
 if ( !class_exists('TrustindexGutenbergPlugin') && function_exists( 'register_block_type' ) && !WP_Block_Type_Registry::get_instance()->is_registered( 'trustindex/block-selector' )) {
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR . 'block-editor' . DIRECTORY_SEPARATOR . 'block-editor.php';
 TrustindexGutenbergPlugin::instance();
+}
+$oldRateUs = get_option('trustindex-'. $this->shortname .'-rate-us');
+if ($oldRateUs) {
+if ($oldRateUs === 'hide') {
+$this->setNotificationParam('rate-us', 'hidden', true);
+}
+else {
+$this->setNotificationParam('rate-us', 'active', true);
+$this->setNotificationParam('rate-us', 'timestamp', $oldRateUs);
+}
+}
+$oldNotificationEmail = get_option('trustindex-'. $this->shortname .'-review-download-notification-email');
+if ($oldNotificationEmail) {
+$this->setNotificationParam('review-download-finished', 'email', $oldNotificationEmail);
 }
 $usedOptions = [];
 foreach ($this->get_option_names() as $optName) {
@@ -643,7 +817,7 @@ $html .= self::___('Grant write permissions to upload folder');
 }
 $html .= '<br />' .
 self::___('or') . '<br />' .
-self::___("enable 'CSS internal loading' in the <a href='%s'>Troubleshooting</a> page!", [ admin_url('admin.php?page=' . $this->get_plugin_slug() . '/settings.php&tab=troubleshooting') ]);
+self::___("enable 'CSS internal loading' in the %s page!", [ '<a href="'. admin_url('admin.php?page=' . $this->get_plugin_slug() . '/settings.php&tab=advanced') .'>'. self::___('Advanced') .'</a>' ]);
 }
 echo $html . '</p></div>';
 });
@@ -653,7 +827,7 @@ return $success;
 public static $widget_templates = array (
  'categories' => 
  array (
- 'slider' => '4,5,13,14,15,19,34,36,37,39,44,45,46,47',
+ 'slider' => '4,5,13,14,15,19,34,36,37,39,44,45,46,47,95',
  'sidebar' => '6,7,8,9,10,18,54,81',
  'list' => '33,80',
  'grid' => '16,31,38,48,79',
@@ -698,6 +872,12 @@ public static $widget_templates = array (
  array (
  'name' => 'Grid I. - Big picture',
  'type' => 'grid',
+ 'is-active' => false,
+ ),
+ 95 => 
+ array (
+ 'name' => 'Slider I. - with AI summary',
+ 'type' => 'slider',
  'is-active' => false,
  ),
  5 => 
@@ -1086,6 +1266,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1178,6 +1359,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1270,6 +1452,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1362,6 +1545,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -1454,6 +1638,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1546,6 +1731,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -1638,6 +1824,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1730,6 +1917,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1822,6 +2010,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -1914,6 +2103,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2006,6 +2196,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2098,6 +2289,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2190,6 +2382,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2282,6 +2475,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2374,6 +2568,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2466,6 +2661,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2558,6 +2754,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2650,6 +2847,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -2742,6 +2940,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2834,6 +3033,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -2926,6 +3126,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -3018,6 +3219,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -3110,6 +3312,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -3202,6 +3405,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '14px',
  ),
  ),
@@ -3294,6 +3498,7 @@ public static $widget_styles = array (
  'header-btn-size' => '13px',
  'review-gap' => '16px',
  'button-widget-font-size' => '14px',
+ 'ai-summary-background' => 'true',
  'original-rating-text' => '15px',
  ),
  ),
@@ -3360,29 +3565,13 @@ private static $widget_rating_texts = array (
  3 => 'good',
  4 => 'excellent',
  ),
- 'fr' => 
+ 'af' => 
  array (
- 0 => 'faible',
- 1 => 'moyenne basse',
- 2 => 'moyenne',
- 3 => 'bien',
- 4 => 'excellent',
- ),
- 'de' => 
- array (
- 0 => 'Schwach',
- 1 => 'Unterdurchschnittlich',
- 2 => 'Durchschnittlich',
- 3 => 'Gut',
- 4 => 'Ausgezeichnet',
- ),
- 'es' => 
- array (
- 0 => 'Flojo',
- 1 => 'Por debajo de lo regular',
- 2 => 'Regular',
- 3 => 'Bueno',
- 4 => 'Excelente',
+ 0 => 'arm',
+ 1 => 'onder gemiddeld',
+ 2 => 'gemiddeld',
+ 3 => 'goed',
+ 4 => 'uitstekend',
  ),
  'ar' => 
  array (
@@ -3392,6 +3581,38 @@ private static $widget_rating_texts = array (
  3 => 'جيد جدا',
  4 => 'ممتاز',
  ),
+ 'az' => 
+ array (
+ 0 => 'kasıb',
+ 1 => 'ortalamadan aşağı',
+ 2 => 'orta',
+ 3 => 'yaxşı',
+ 4 => 'əla',
+ ),
+ 'bg' => 
+ array (
+ 0 => 'беден',
+ 1 => 'под средното',
+ 2 => 'средно аритметично',
+ 3 => 'добре',
+ 4 => 'отлично',
+ ),
+ 'bn' => 
+ array (
+ 0 => 'দরিদ্র',
+ 1 => 'গড়ের নিচে',
+ 2 => 'গড়',
+ 3 => 'ভাল',
+ 4 => 'চমৎকার',
+ ),
+ 'bs' => 
+ array (
+ 0 => 'jadan',
+ 1 => 'ispod prosjeka',
+ 2 => 'prosjek',
+ 3 => 'dobro',
+ 4 => 'odličan',
+ ),
  'cs' => 
  array (
  0 => 'Slabý',
@@ -3399,6 +3620,14 @@ private static $widget_rating_texts = array (
  2 => 'Průměrný',
  3 => 'Dobrý',
  4 => 'Vynikající',
+ ),
+ 'cy' => 
+ array (
+ 0 => 'gwael',
+ 1 => 'islaw\'r cyfartaledd',
+ 2 => 'cyffredin',
+ 3 => 'da',
+ 4 => 'rhagorol',
  ),
  'da' => 
  array (
@@ -3408,13 +3637,13 @@ private static $widget_rating_texts = array (
  3 => 'God',
  4 => 'Fremragende',
  ),
- 'et' => 
+ 'de' => 
  array (
- 0 => 'halb',
- 1 => 'alla keskmise',
- 2 => 'keskmine',
- 3 => 'hea',
- 4 => 'suurepärane',
+ 0 => 'Schwach',
+ 1 => 'Unterdurchschnittlich',
+ 2 => 'Durchschnittlich',
+ 3 => 'Gut',
+ 4 => 'Ausgezeichnet',
  ),
  'el' => 
  array (
@@ -3424,6 +3653,30 @@ private static $widget_rating_texts = array (
  3 => 'Καλή',
  4 => 'Άριστη',
  ),
+ 'es' => 
+ array (
+ 0 => 'Flojo',
+ 1 => 'Por debajo de lo regular',
+ 2 => 'Regular',
+ 3 => 'Bueno',
+ 4 => 'Excelente',
+ ),
+ 'et' => 
+ array (
+ 0 => 'halb',
+ 1 => 'alla keskmise',
+ 2 => 'keskmine',
+ 3 => 'hea',
+ 4 => 'suurepärane',
+ ),
+ 'fa' => 
+ array (
+ 0 => 'فقیر',
+ 1 => 'زیر میانگین',
+ 2 => 'میانگین',
+ 3 => 'خوب',
+ 4 => 'عالی',
+ ),
  'fi' => 
  array (
  0 => 'Heikko',
@@ -3432,13 +3685,53 @@ private static $widget_rating_texts = array (
  3 => 'Hyvä',
  4 => 'Erinomainen',
  ),
+ 'fr' => 
+ array (
+ 0 => 'faible',
+ 1 => 'moyenne basse',
+ 2 => 'moyenne',
+ 3 => 'bien',
+ 4 => 'excellent',
+ ),
+ 'gd' => 
+ array (
+ 0 => 'bochd',
+ 1 => 'nas ìsle na a ’chuibheasachd',
+ 2 => 'cuibheasach',
+ 3 => 'math',
+ 4 => 'sgoinneil',
+ ),
+ 'gl' => 
+ array (
+ 0 => 'pobre',
+ 1 => 'por debaixo da media',
+ 2 => 'media',
+ 3 => 'bo',
+ 4 => 'excelente',
+ ),
+ 'he' => 
+ array (
+ 0 => 'עני',
+ 1 => 'מתחת לממוצע',
+ 2 => 'מְמוּצָע',
+ 3 => 'טוֹב',
+ 4 => 'מְעוּלֶה',
+ ),
  'hi' => 
  array (
  0 => 'कमज़ोर',
- 1 => 'औसत से कम ',
- 2 => 'औसत ',
- 3 => 'अच्छा ',
- 4 => 'अति उत्कृष्ट ',
+ 1 => 'औसत से कम',
+ 2 => 'औसत',
+ 3 => 'अच्छा',
+ 4 => 'अति उत्कृष्ट',
+ ),
+ 'hr' => 
+ array (
+ 0 => 'slabo',
+ 1 => 'ispod prosjeka',
+ 2 => 'prosjed',
+ 3 => 'dobro',
+ 4 => 'odličan',
  ),
  'hu' => 
  array (
@@ -3447,6 +3740,30 @@ private static $widget_rating_texts = array (
  2 => 'Átlagos',
  3 => 'Jó',
  4 => 'Kiváló',
+ ),
+ 'hy' => 
+ array (
+ 0 => 'աղքատ',
+ 1 => 'միջինից ցածր',
+ 2 => 'միջին',
+ 3 => 'լավ',
+ 4 => 'գերազանց',
+ ),
+ 'id' => 
+ array (
+ 0 => 'miskin',
+ 1 => 'dibawah rata-rata',
+ 2 => 'rata-rata',
+ 3 => 'bagus',
+ 4 => 'bagus sekali',
+ ),
+ 'is' => 
+ array (
+ 0 => 'fátækur',
+ 1 => 'fyrir neðan meðallag',
+ 2 => 'að meðaltali',
+ 3 => 'góður',
+ 4 => 'Æðislegt',
  ),
  'it' => 
  array (
@@ -3463,6 +3780,54 @@ private static $widget_rating_texts = array (
  2 => '平均',
  3 => '良い',
  4 => '優れた',
+ ),
+ 'ka' => 
+ array (
+ 0 => 'ღარიბი',
+ 1 => 'საშუალოზე დაბლა',
+ 2 => 'საშუალო',
+ 3 => 'კარგი',
+ 4 => 'შესანიშნავი',
+ ),
+ 'kk' => 
+ array (
+ 0 => 'кедей',
+ 1 => 'орташадан төмен',
+ 2 => 'орташа',
+ 3 => 'жақсы',
+ 4 => 'өте жақсы',
+ ),
+ 'ko' => 
+ array (
+ 0 => '가난한',
+ 1 => '평균 이하',
+ 2 => '평균',
+ 3 => '좋은',
+ 4 => '훌륭한',
+ ),
+ 'lt' => 
+ array (
+ 0 => 'vargšas',
+ 1 => 'žemiau vidurkio',
+ 2 => 'vidurkis',
+ 3 => 'gerai',
+ 4 => 'puikus',
+ ),
+ 'mk' => 
+ array (
+ 0 => 'Сиромашен',
+ 1 => 'под просек',
+ 2 => 'просек',
+ 3 => 'Добро',
+ 4 => 'одлично',
+ ),
+ 'ms' => 
+ array (
+ 0 => 'miskin',
+ 1 => 'bawah purata',
+ 2 => 'purata',
+ 3 => 'baik',
+ 4 => 'cemerlang',
  ),
  'nl' => 
  array (
@@ -3512,14 +3877,6 @@ private static $widget_rating_texts = array (
  3 => 'Хорошо',
  4 => 'Отлично',
  ),
- 'sl' => 
- array (
- 0 => 'slabo',
- 1 => 'pod povprečjem',
- 2 => 'povprečno',
- 3 => 'dobro',
- 4 => 'odlično',
- ),
  'sk' => 
  array (
  0 => 'Slabé',
@@ -3528,6 +3885,30 @@ private static $widget_rating_texts = array (
  3 => 'Dobré',
  4 => 'Vynikajúce',
  ),
+ 'sl' => 
+ array (
+ 0 => 'slabo',
+ 1 => 'pod povprečjem',
+ 2 => 'povprečno',
+ 3 => 'dobro',
+ 4 => 'odlično',
+ ),
+ 'sq' => 
+ array (
+ 0 => 'i varfer',
+ 1 => 'nën mesataren',
+ 2 => 'mesatare',
+ 3 => 'mire',
+ 4 => 'e shkëlqyeshme',
+ ),
+ 'sr' => 
+ array (
+ 0 => 'Слабо',
+ 1 => 'Испод просека',
+ 2 => 'Просек',
+ 3 => 'Добро',
+ 4 => 'Oдлично',
+ ),
  'sv' => 
  array (
  0 => 'Dålig',
@@ -3535,6 +3916,14 @@ private static $widget_rating_texts = array (
  2 => 'Genomsnittlig',
  3 => 'Bra',
  4 => 'Utmärkt',
+ ),
+ 'th' => 
+ array (
+ 0 => 'ยากจน',
+ 1 => 'ต่ำกว่าค่าเฉลี่ย',
+ 2 => 'เฉลี่ย',
+ 3 => 'ดี',
+ 4 => 'ยอดเยี่ยม',
  ),
  'tr' => 
  array (
@@ -3552,94 +3941,6 @@ private static $widget_rating_texts = array (
  3 => 'добре',
  4 => 'відмінно',
  ),
- 'zh' => 
- array (
- 0 => '差',
- 1 => '不如一般',
- 2 => '一般',
- 3 => '好',
- 4 => '非常好',
- ),
- 'gd' => 
- array (
- 0 => 'bochd',
- 1 => 'nas ìsle na a ’chuibheasachd',
- 2 => 'cuibheasach',
- 3 => 'math',
- 4 => 'sgoinneil',
- ),
- 'hr' => 
- array (
- 0 => 'slabo',
- 1 => 'ispod prosjeka',
- 2 => 'prosjed',
- 3 => 'dobro',
- 4 => 'odličan',
- ),
- 'id' => 
- array (
- 0 => 'miskin',
- 1 => 'dibawah rata-rata',
- 2 => 'rata-rata',
- 3 => 'bagus',
- 4 => 'bagus sekali',
- ),
- 'is' => 
- array (
- 0 => 'fátækur',
- 1 => 'fyrir neðan meðallag',
- 2 => 'að meðaltali',
- 3 => 'góður',
- 4 => 'Æðislegt',
- ),
- 'he' => 
- array (
- 0 => 'עני',
- 1 => 'מתחת לממוצע',
- 2 => 'מְמוּצָע',
- 3 => 'טוֹב',
- 4 => 'מְעוּלֶה',
- ),
- 'ko' => 
- array (
- 0 => '가난한',
- 1 => '평균 이하',
- 2 => '평균',
- 3 => '좋은',
- 4 => '훌륭한',
- ),
- 'lt' => 
- array (
- 0 => 'vargšas',
- 1 => 'žemiau vidurkio',
- 2 => 'vidurkis',
- 3 => 'gerai',
- 4 => 'puikus',
- ),
- 'ms' => 
- array (
- 0 => 'miskin',
- 1 => 'bawah purata',
- 2 => 'purata',
- 3 => 'baik',
- 4 => 'cemerlang',
- ),
- 'sr' => 
- array (
- 0 => 'Слабо',
- 1 => 'Испод просека',
- 2 => 'Просек',
- 3 => 'Добро',
- 4 => 'Oдлично',
- ),
- 'th' => 
- array (
- 0 => 'ยากจน',
- 1 => 'ต่ำกว่าค่าเฉลี่ย',
- 2 => 'เฉลี่ย',
- 3 => 'ดี',
- 4 => 'ยอดเยี่ยม',
- ),
  'vi' => 
  array (
  0 => 'nghèo nàn',
@@ -3648,109 +3949,13 @@ private static $widget_rating_texts = array (
  3 => 'tốt',
  4 => 'thông minh',
  ),
- 'mk' => 
+ 'zh' => 
  array (
- 0 => 'Сиромашен',
- 1 => 'под просек',
- 2 => 'просек',
- 3 => 'Добро',
- 4 => 'одлично',
- ),
- 'bg' => 
- array (
- 0 => 'беден',
- 1 => 'под средното',
- 2 => 'средно аритметично',
- 3 => 'добре',
- 4 => 'отлично',
- ),
- 'sq' => 
- array (
- 0 => 'i varfer',
- 1 => 'nën mesataren',
- 2 => 'mesatare',
- 3 => 'mire',
- 4 => 'e shkëlqyeshme',
- ),
- 'af' => 
- array (
- 0 => 'arm',
- 1 => 'onder gemiddeld',
- 2 => 'gemiddeld',
- 3 => 'goed',
- 4 => 'uitstekend',
- ),
- 'az' => 
- array (
- 0 => 'kasıb',
- 1 => 'ortalamadan aşağı',
- 2 => 'orta',
- 3 => 'yaxşı',
- 4 => 'əla',
- ),
- 'bn' => 
- array (
- 0 => 'দরিদ্র',
- 1 => 'গড়ের নিচে',
- 2 => 'গড়',
- 3 => 'ভাল',
- 4 => 'চমৎকার',
- ),
- 'bs' => 
- array (
- 0 => 'jadan',
- 1 => 'ispod prosjeka',
- 2 => 'prosjek',
- 3 => 'dobro',
- 4 => 'odličan',
- ),
- 'cy' => 
- array (
- 0 => 'gwael',
- 1 => 'islaw\'r cyfartaledd',
- 2 => 'cyffredin',
- 3 => 'da',
- 4 => 'rhagorol',
- ),
- 'fa' => 
- array (
- 0 => 'فقیر',
- 1 => 'زیر میانگین',
- 2 => 'میانگین',
- 3 => 'خوب',
- 4 => 'عالی',
- ),
- 'gl' => 
- array (
- 0 => 'pobre',
- 1 => 'por debaixo da media',
- 2 => 'media',
- 3 => 'bo',
- 4 => 'excelente',
- ),
- 'hy' => 
- array (
- 0 => 'աղքատ',
- 1 => 'միջինից ցածր',
- 2 => 'միջին',
- 3 => 'լավ',
- 4 => 'գերազանց',
- ),
- 'ka' => 
- array (
- 0 => 'ღარიბი',
- 1 => 'საშუალოზე დაბლა',
- 2 => 'საშუალო',
- 3 => 'კარგი',
- 4 => 'შესანიშნავი',
- ),
- 'kk' => 
- array (
- 0 => 'кедей',
- 1 => 'орташадан төмен',
- 2 => 'орташа',
- 3 => 'жақсы',
- 4 => 'өте жақсы',
+ 0 => '差',
+ 1 => '不如一般',
+ 2 => '一般',
+ 3 => '好',
+ 4 => '非常好',
  ),
 );
 private static $widget_recommendation_texts = array (
@@ -3759,60 +3964,130 @@ private static $widget_recommendation_texts = array (
  'negative' => 'NOT_RECOMMEND_ICON not recommends',
  'positive' => 'RECOMMEND_ICON recommends',
  ),
- 'fr' => 
+ 'af' => 
  array (
- 'negative' => 'NOT_RECOMMEND_ICON ne recommande pas',
- 'positive' => 'RECOMMEND_ICON recommande',
- ),
- 'de' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON wird nicht empfohlen',
- 'positive' => 'RECOMMEND_ICON empfiehlt',
- ),
- 'es' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON no recomienda',
- 'positive' => 'RECOMMEND_ICON recomienda',
+ 'negative' => 'NOT_RECOMMEND_ICON beveel nie aan',
+ 'positive' => 'RECOMMEND_ICON beveel aan',
  ),
  'ar' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON لا توصي',
  'positive' => 'RECOMMEND_ICON توصي',
  ),
+ 'az' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON tövsiyə etmir',
+ 'positive' => 'RECOMMEND_ICON tövsiyə edir',
+ ),
+ 'bg' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON не препоръчва',
+ 'positive' => 'RECOMMEND_ICON препоръчва',
+ ),
+ 'bn' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON সুপারিশ করে না',
+ 'positive' => 'RECOMMEND_ICON সুপারিশ করে',
+ ),
+ 'bs' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ne preporučuje',
+ 'positive' => 'RECOMMEND_ICON preporučuje',
+ ),
  'cs' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON nedoporučuje',
  'positive' => 'RECOMMEND_ICON doporučuje',
+ ),
+ 'cy' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ddim yn argymell',
+ 'positive' => 'RECOMMEND_ICON yn argymell',
  ),
  'da' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON anbefaler ikke',
  'positive' => 'RECOMMEND_ICON anbefaler',
  ),
- 'et' => 
+ 'de' => 
  array (
- 'negative' => 'NOT_RECOMMEND_ICON ei soovita',
- 'positive' => 'RECOMMEND_ICON soovitab',
+ 'negative' => 'NOT_RECOMMEND_ICON wird nicht empfohlen',
+ 'positive' => 'RECOMMEND_ICON empfiehlt',
  ),
  'el' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON δεν συνιστά',
  'positive' => 'RECOMMEND_ICON συνιστά',
  ),
+ 'es' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON no recomienda',
+ 'positive' => 'RECOMMEND_ICON recomienda',
+ ),
+ 'et' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ei soovita',
+ 'positive' => 'RECOMMEND_ICON soovitab',
+ ),
+ 'fa' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON توصیه نمی کند',
+ 'positive' => 'RECOMMEND_ICON توصیه می‌کند',
+ ),
  'fi' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON ei suosittele',
  'positive' => 'RECOMMEND_ICON suosittelee',
+ ),
+ 'fr' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ne recommande pas',
+ 'positive' => 'RECOMMEND_ICON recommande',
+ ),
+ 'gd' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON no moladh',
+ 'positive' => 'RECOMMEND_ICON a ’moladh',
+ ),
+ 'gl' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON non recomendado',
+ 'positive' => 'RECOMMEND_ICON recomenda',
+ ),
+ 'he' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON לא ממליץ',
+ 'positive' => 'RECOMMEND_ICON ממליץ',
  ),
  'hi' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON अनुशंसा नहीं करता है',
  'positive' => 'RECOMMEND_ICON अनुशंसा करता है',
  ),
+ 'hr' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ne preporučuje',
+ 'positive' => 'RECOMMEND_ICON preporučuje',
+ ),
  'hu' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON nem ajánlja',
  'positive' => 'RECOMMEND_ICON ajánlja',
+ ),
+ 'hy' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON-ը խորհուրդ չի տալիս',
+ 'positive' => 'RECOMMEND_ICON խորհուրդ է տալիս',
+ ),
+ 'id' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON tidak merekomendasikan',
+ 'positive' => 'RECOMMEND_ICON merekomendasikan',
+ ),
+ 'is' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON mælir ekki með',
+ 'positive' => 'RECOMMEND_ICON mælir með',
  ),
  'it' => 
  array (
@@ -3823,6 +4098,36 @@ private static $widget_recommendation_texts = array (
  array (
  'negative' => 'NOT_RECOMMEND_ICON おすすめできない',
  'positive' => 'RECOMMEND_ICON おすすめ',
+ ),
+ 'ka' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON არ გირჩევთ',
+ 'positive' => 'RECOMMEND_ICON გირჩევთ',
+ ),
+ 'kk' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ұсынбайды',
+ 'positive' => 'RECOMMEND_ICON ұсынады',
+ ),
+ 'ko' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON 권장하지 않음',
+ 'positive' => 'RECOMMEND_ICON 추천',
+ ),
+ 'lt' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON nerekomenduoja',
+ 'positive' => 'RECOMMEND_ICON rekomenduoja',
+ ),
+ 'mk' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON не препорачува',
+ 'positive' => 'RECOMMEND_ICON препорачува',
+ ),
+ 'ms' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON tidak mengesyorkan',
+ 'positive' => 'RECOMMEND_ICON mengesyorkan',
  ),
  'nl' => 
  array (
@@ -3854,20 +4159,35 @@ private static $widget_recommendation_texts = array (
  'negative' => 'NOT_RECOMMEND_ICON не рекомендует',
  'positive' => 'RECOMMEND_ICON рекомендует',
  ),
- 'sl' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ne priporoča',
- 'positive' => 'RECOMMEND_ICON priporoča',
- ),
  'sk' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON neodporúča',
  'positive' => 'RECOMMEND_ICON odporúča',
  ),
+ 'sl' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ne priporoča',
+ 'positive' => 'RECOMMEND_ICON priporoča',
+ ),
+ 'sq' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON nuk rekomandon',
+ 'positive' => 'RECOMMEND_ICON rekomandon',
+ ),
+ 'sr' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON не препоручује',
+ 'positive' => 'RECOMMEND_ICON препоручује',
+ ),
  'sv' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON rekommenderar inte',
  'positive' => 'RECOMMEND_ICON rekommenderar',
+ ),
+ 'th' => 
+ array (
+ 'negative' => 'NOT_RECOMMEND_ICON ไม่แนะนำ',
+ 'positive' => 'RECOMMEND_ICON แนะนำ',
  ),
  'tr' => 
  array (
@@ -3879,183 +4199,68 @@ private static $widget_recommendation_texts = array (
  'negative' => 'NOT_RECOMMEND_ICON не рекомендує',
  'positive' => 'RECOMMEND_ICON рекомендує',
  ),
- 'zh' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON 不推荐',
- 'positive' => 'RECOMMEND_ICON 推荐',
- ),
- 'gd' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON no moladh',
- 'positive' => 'RECOMMEND_ICON a ’moladh',
- ),
- 'hr' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ne preporučuje',
- 'positive' => 'RECOMMEND_ICON preporučuje',
- ),
- 'id' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON tidak merekomendasikan',
- 'positive' => 'RECOMMEND_ICON merekomendasikan',
- ),
- 'is' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON mælir ekki með',
- 'positive' => 'RECOMMEND_ICON mælir með',
- ),
- 'he' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON לא ממליץ',
- 'positive' => 'RECOMMEND_ICON ממליץ',
- ),
- 'ko' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON 권장하지 않음',
- 'positive' => 'RECOMMEND_ICON 추천',
- ),
- 'lt' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON nerekomenduoja',
- 'positive' => 'RECOMMEND_ICON rekomenduoja',
- ),
- 'ms' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON tidak mengesyorkan',
- 'positive' => 'RECOMMEND_ICON mengesyorkan',
- ),
- 'sr' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON не препоручује',
- 'positive' => 'RECOMMEND_ICON препоручује',
- ),
- 'th' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ไม่แนะนำ',
- 'positive' => 'RECOMMEND_ICON แนะนำ',
- ),
  'vi' => 
  array (
  'negative' => 'NOT_RECOMMEND_ICON không được đề xuất',
  'positive' => 'RECOMMEND_ICON đề xuất',
  ),
- 'mk' => 
+ 'zh' => 
  array (
- 'negative' => 'NOT_RECOMMEND_ICON не препорачува',
- 'positive' => 'RECOMMEND_ICON препорачува',
- ),
- 'bg' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON не препоръчва',
- 'positive' => 'RECOMMEND_ICON препоръчва',
- ),
- 'sq' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON nuk rekomandon',
- 'positive' => 'RECOMMEND_ICON rekomandon',
- ),
- 'af' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON beveel nie aan',
- 'positive' => 'RECOMMEND_ICON beveel aan',
- ),
- 'az' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON tövsiyə etmir',
- 'positive' => 'RECOMMEND_ICON tövsiyə edir',
- ),
- 'bn' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON সুপারিশ করে না',
- 'positive' => 'RECOMMEND_ICON সুপারিশ করে',
- ),
- 'bs' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ne preporučuje',
- 'positive' => 'RECOMMEND_ICON preporučuje',
- ),
- 'cy' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ddim yn argymell',
- 'positive' => 'RECOMMEND_ICON yn argymell',
- ),
- 'fa' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON توصیه نمی کند',
- 'positive' => 'RECOMMEND_ICON توصیه می‌کند',
- ),
- 'gl' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON non recomendado',
- 'positive' => 'RECOMMEND_ICON recomenda',
- ),
- 'hy' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON-ը խորհուրդ չի տալիս',
- 'positive' => 'RECOMMEND_ICON խորհուրդ է տալիս',
- ),
- 'ka' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON არ გირჩევთ',
- 'positive' => 'RECOMMEND_ICON გირჩევთ',
- ),
- 'kk' => 
- array (
- 'negative' => 'NOT_RECOMMEND_ICON ұсынбайды',
- 'positive' => 'RECOMMEND_ICON ұсынады',
+ 'negative' => 'NOT_RECOMMEND_ICON 不推荐',
+ 'positive' => 'RECOMMEND_ICON 推荐',
  ),
 );
 private static $widget_verified_texts = array (
  'en' => 'Verified',
- 'fr' => 'vérifié',
- 'de' => 'Verifiziert',
- 'es' => 'Verificada',
+ 'af' => 'Geverifieer',
  'ar' => 'تم التحقق',
+ 'az' => 'Doğrulanmışdır',
+ 'bg' => 'Проверени',
+ 'bn' => 'যাচাই',
+ 'bs' => 'Provjereno',
  'cs' => 'Ověřená',
+ 'cy' => 'Wedi\'i ddilysu',
  'da' => 'Bekræftet',
- 'et' => 'Kinnitatud',
+ 'de' => 'Verifiziert',
  'el' => 'επαληθεύτηκε',
+ 'es' => 'Verificada',
+ 'et' => 'Kinnitatud',
+ 'fa' => 'تأیید شده',
  'fi' => 'Vahvistettu',
+ 'fr' => 'vérifié',
+ 'gd' => 'Dearbhaichte',
+ 'gl' => 'Verificado',
+ 'he' => 'מְאוּמָת',
  'hi' => 'सत्यापित',
+ 'hr' => 'Potvrđen',
  'hu' => 'Hitelesített',
+ 'hy' => 'Ստուգված',
+ 'id' => 'Diverifikasi',
+ 'is' => 'Staðfesting',
  'it' => 'Verificata',
  'ja' => '確認済み',
+ 'ka' => 'დამოწმებული',
+ 'kk' => 'тексерілген',
+ 'ko' => '검증 된',
+ 'lt' => 'Patvirtinta',
+ 'mk' => 'Потврдена',
+ 'ms' => 'Disahkan',
  'nl' => 'Geverifieerd',
  'no' => 'Bekreftet',
  'pl' => 'Zweryfikowana',
  'pt' => 'Verificada',
  'ro' => 'Verificat',
  'ru' => 'Проверенный',
- 'sl' => 'Preverjeno',
  'sk' => 'Overená',
+ 'sl' => 'Preverjeno',
+ 'sq' => 'Verifikuar',
+ 'sr' => 'Проверено',
  'sv' => 'Verifierad',
+ 'th' => 'ตรวจสอบแล้ว',
  'tr' => 'Doğrulanmış',
  'uk' => 'Перевірено',
- 'zh' => '已验证',
- 'gd' => 'Dearbhaichte',
- 'hr' => 'Potvrđen',
- 'id' => 'Diverifikasi',
- 'is' => 'Staðfesting',
- 'he' => 'מְאוּמָת',
- 'ko' => '검증 된',
- 'lt' => 'Patvirtinta',
- 'ms' => 'Disahkan',
- 'sr' => 'Проверено',
- 'th' => 'ตรวจสอบแล้ว',
  'vi' => 'Đã xác minh',
- 'mk' => 'Потврдена',
- 'bg' => 'Проверени',
- 'sq' => 'Verifikuar',
- 'af' => 'Geverifieer',
- 'az' => 'Doğrulanmışdır',
- 'bn' => 'যাচাই',
- 'bs' => 'Provjereno',
- 'cy' => 'Wedi\'i ddilysu',
- 'fa' => 'تأیید شده',
- 'gl' => 'Verificado',
- 'hy' => 'Ստուգված',
- 'ka' => 'დამოწმებული',
- 'kk' => 'тексерілген',
+ 'zh' => '已验证',
 );
 private static $widget_footer_filter_texts = array (
  'en' => 
@@ -4063,60 +4268,130 @@ private static $widget_footer_filter_texts = array (
  'star' => 'Showing only RATING_STAR_FILTER star reviews',
  'latest' => 'Showing our latest reviews',
  ),
- 'fr' => 
+ 'af' => 
  array (
- 'star' => 'Affichage de RATING_STAR_FILTER avis étoiles uniquement',
- 'latest' => 'Affichage de nos derniers avis',
- ),
- 'de' => 
- array (
- 'star' => 'Es werden nur RATING_STAR_FILTER Sternebewertungen angezeigt',
- 'latest' => 'Wir zeigen unsere neuesten Bewertungen',
- ),
- 'es' => 
- array (
- 'star' => 'Mostrando solo RATING_STAR_FILTER reseñas de estrellas',
- 'latest' => 'Mostrando nuestras últimas reseñas',
+ 'star' => 'Wys tans net RATING_STAR_FILTER sterresensies',
+ 'latest' => 'Wys ons jongste resensies',
  ),
  'ar' => 
  array (
  'star' => 'يتم عرض تقييمات RATING_STAR_FILTER نجمة فقط',
  'latest' => 'عرض أحدث تقييماتنا',
  ),
+ 'az' => 
+ array (
+ 'star' => 'Yalnız RATING_STAR_FILTER ulduzlu rəylər göstərilir',
+ 'latest' => 'Ən son rəylərimiz göstərilir',
+ ),
+ 'bg' => 
+ array (
+ 'star' => 'Показани са само отзиви с RATING_STAR_FILTER звезди',
+ 'latest' => 'Показване на най-новите ни отзиви',
+ ),
+ 'bn' => 
+ array (
+ 'star' => 'শুধুমাত্র RATING_STAR_FILTER স্টার রিভিউ দেখানো হচ্ছে',
+ 'latest' => 'আমাদের সর্বশেষ পর্যালোচনা দেখাচ্ছে',
+ ),
+ 'bs' => 
+ array (
+ 'star' => 'Prikazuju se samo recenzije sa RATING_STAR_FILTER zvjezdicama',
+ 'latest' => 'Prikazujemo naše najnovije recenzije',
+ ),
  'cs' => 
  array (
  'star' => 'Zobrazují se pouze recenze s RATING_STAR_FILTER hvězdičkami',
  'latest' => 'Zobrazujeme naše nejnovější recenze',
+ ),
+ 'cy' => 
+ array (
+ 'star' => 'Yn dangos adolygiadau seren RATING_STAR_FILTER yn unig',
+ 'latest' => 'Yn dangos ein adolygiadau diweddaraf',
  ),
  'da' => 
  array (
  'star' => 'Viser kun RATING_STAR_FILTER stjerneanmeldelser',
  'latest' => 'Viser vores seneste anmeldelser',
  ),
+ 'de' => 
+ array (
+ 'star' => 'Es werden nur RATING_STAR_FILTER Sternebewertungen angezeigt',
+ 'latest' => 'Wir zeigen unsere neuesten Bewertungen',
+ ),
+ 'el' => 
+ array (
+ 'star' => 'Εμφάνιση μόνο RATING_STAR_FILTER κριτικές με αστέρια',
+ 'latest' => 'Εμφάνιση των τελευταίων κριτικές μας',
+ ),
+ 'es' => 
+ array (
+ 'star' => 'Mostrando solo RATING_STAR_FILTER reseñas de estrellas',
+ 'latest' => 'Mostrando nuestras últimas reseñas',
+ ),
  'et' => 
  array (
  'star' => 'Kuvatakse ainult RATING_STAR_FILTER tärniga arvustused',
  'latest' => 'Kuvatakse meie viimased arvustused',
  ),
- 'el' => 
+ 'fa' => 
  array (
- 'star' => 'Εμφάνιση μόνο RATING_STAR_FILTER κριτικών με αστέρια',
- 'latest' => 'Εμφάνιση των τελευταίων κριτικών μας',
+ 'star' => 'نمایش فقط نظرات RATING_STAR_FILTER ستاره',
+ 'latest' => 'نمایش آخرین نظرات ما',
  ),
  'fi' => 
  array (
  'star' => 'Näytetään vain RATING_STAR_FILTER tähden arvostelut',
- 'latest' => 'Näytetään viimeisimmät arvostelumme',
+ 'latest' => 'Näytetään viimeisimmät arvostelut',
+ ),
+ 'fr' => 
+ array (
+ 'star' => 'Affichage de RATING_STAR_FILTER avis étoiles uniquement',
+ 'latest' => 'Affichage de nos derniers avis',
+ ),
+ 'gd' => 
+ array (
+ 'star' => 'A’ sealltainn RATING_STAR_FILTER lèirmheasan rionnagan a-mhàin',
+ 'latest' => 'A’ sealltainn na lèirmheasan as ùire againn',
+ ),
+ 'gl' => 
+ array (
+ 'star' => 'Mostrando só RATING_STAR_FILTER comentarios de estrelas',
+ 'latest' => 'Mostrando os nosos últimos comentarios',
+ ),
+ 'he' => 
+ array (
+ 'star' => 'מציג רק RATING_STAR_FILTER ביקורות כוכבים',
+ 'latest' => 'מציג את הביקורות האחרונות שלנו',
  ),
  'hi' => 
  array (
- 'star' => 'केवल RATING_STAR_FILTER स्टार समीक्षाएँ दिखा रहा है',
- 'latest' => 'हमारी नवीनतम समीक्षाएँ दिखा रहा हूँ',
+ 'star' => 'मैन्युअल रूप से चुनी गई समीक्षाएँ दिखाई जा रही हैं',
+ 'latest' => 'हमारी सबसे पुरानी समीक्षाएँ दिखा रहा हूँ',
+ ),
+ 'hr' => 
+ array (
+ 'star' => 'Prikazuju se samo recenzije s RATING_STAR_FILTER zvjezdica',
+ 'latest' => 'Prikazuju se naše najnovije recenzije',
  ),
  'hu' => 
  array (
  'star' => 'Csak RATING_STAR_FILTER csillagos vélemények láthatók',
  'latest' => 'Legkorábbi véleményeink láthatók',
+ ),
+ 'hy' => 
+ array (
+ 'star' => 'Ցուցադրվում են միայն RATING_STAR_FILTER աստղային կարծիքներ',
+ 'latest' => 'Ցուցադրվում են մեր վերջին ակնարկները',
+ ),
+ 'id' => 
+ array (
+ 'star' => 'Hanya menampilkan ulasan berbintang RATING_STAR_FILTER',
+ 'latest' => 'Menampilkan ulasan terbaru kami',
+ ),
+ 'is' => 
+ array (
+ 'star' => 'Sýnir aðeins RATING_STAR_FILTER stjörnu umsagnir',
+ 'latest' => 'Sýnir nýjustu umsagnirnar okkar',
  ),
  'it' => 
  array (
@@ -4128,10 +4403,40 @@ private static $widget_footer_filter_texts = array (
  'star' => 'RATING_STAR_FILTER の星付きレビューのみを表示しています',
  'latest' => '最新のレビューを表示しています',
  ),
+ 'ka' => 
+ array (
+ 'star' => 'ნაჩვენებია მხოლოდ RATING_STAR_FILTER ვარსკვლავიანი მიმოხილვები',
+ 'latest' => 'ნაჩვენებია ჩვენი უახლესი მიმოხილვები',
+ ),
+ 'kk' => 
+ array (
+ 'star' => 'Тек RATING_STAR_FILTER жұлдызды шолулар көрсетілген',
+ 'latest' => 'Соңғы шолуларымызды көрсету',
+ ),
+ 'ko' => 
+ array (
+ 'star' => '별점 리뷰 RATING_STAR_FILTER 개만 표시',
+ 'latest' => '최신 리뷰 표시',
+ ),
+ 'lt' => 
+ array (
+ 'star' => 'Rodomi tik RATING_STAR_FILTER žvaigždučių atsiliepimais',
+ 'latest' => 'Rodomi mūsų naujausios atsiliepimais',
+ ),
+ 'mk' => 
+ array (
+ 'star' => 'Се прикажуваат само RATING_STAR_FILTER рецензии со ѕвезди',
+ 'latest' => 'Се прикажуваат нашите најнови критики',
+ ),
+ 'ms' => 
+ array (
+ 'star' => 'Menunjukkan ulasan bintang RATING_STAR_FILTER sahaja',
+ 'latest' => 'Menunjukkan ulasan terkini kami',
+ ),
  'nl' => 
  array (
- 'star' => 'Alleen beoordelingen met RATING_STAR_FILTER sterren worden weergegeven',
- 'latest' => 'Toont onze laatste beoordelingen',
+ 'star' => 'Er worden alleen RATING_STAR_FILTER sterrecensies weergegeven',
+ 'latest' => 'Toont onze laatste recensies',
  ),
  'no' => 
  array (
@@ -4140,8 +4445,8 @@ private static $widget_footer_filter_texts = array (
  ),
  'pl' => 
  array (
- 'star' => 'Wyświetlanie tylko RATING_STAR_FILTER recenzji w postaci gwiazdek',
- 'latest' => 'Wyświetlanie naszych najnowszych recenzji',
+ 'star' => 'Wyświetlanie tylko RATING_STAR_FILTER opinii w postaci gwiazdek',
+ 'latest' => 'Wyświetlanie naszych najnowszych opinii',
  ),
  'pt' => 
  array (
@@ -4158,155 +4463,55 @@ private static $widget_footer_filter_texts = array (
  'star' => 'Показаны только отзывы со звездами RATING_STAR_FILTER',
  'latest' => 'Показаны наши последние отзывы',
  ),
- 'sl' => 
- array (
- 'star' => 'Prikazane so le ocene s RATING_STAR_FILTER zvezdicami',
- 'latest' => 'Prikaz naših najnovejših mnenj',
- ),
  'sk' => 
  array (
- 'star' => 'Zobrazujú sa iba recenzie s RATING_STAR_FILTER hviezdičkami',
- 'latest' => 'Zobrazujú sa naše najnovšie recenzie',
+ 'star' => 'Zobrazujú sa iba recenzií s RATING_STAR_FILTER hviezdičkami',
+ 'latest' => 'Zobrazujú sa naše najnovšie recenzií',
  ),
- 'sv' => 
+ 'sl' => 
  array (
- 'star' => 'Visar endast RATING_STAR_FILTER stjärnrecensioner',
- 'latest' => 'Visar våra senaste recensioner',
- ),
- 'tr' => 
- array (
- 'star' => 'Yalnızca RATING_STAR_FILTER yıldızlı incelemeler gösteriliyor',
- 'latest' => 'En son incelemelerimiz gösteriliyor',
- ),
- 'uk' => 
- array (
- 'star' => 'Показано лише відгуки з RATING_STAR_FILTER зірочками',
- 'latest' => 'Показ наших останніх оглядів',
- ),
- 'zh' => 
- array (
- 'star' => '仅显示 RATING_STAR_FILTER 星评价',
- 'latest' => '显示我们的最新评论',
- ),
- 'gd' => 
- array (
- 'star' => 'A’ sealltainn RATING_STAR_FILTER lèirmheasan rionnagan a-mhàin',
- 'latest' => 'A’ sealltainn na lèirmheasan as ùire againn',
- ),
- 'hr' => 
- array (
- 'star' => 'Prikazuju se samo recenzije s RATING_STAR_FILTER zvjezdica',
- 'latest' => 'Prikazuju se naše najnovije recenzije',
- ),
- 'id' => 
- array (
- 'star' => 'Hanya menampilkan ulasan berbintang RATING_STAR_FILTER',
- 'latest' => 'Menampilkan ulasan terbaru kami',
- ),
- 'is' => 
- array (
- 'star' => 'Sýnir aðeins RATING_STAR_FILTER stjörnu umsagnir',
- 'latest' => 'Sýnir nýjustu umsagnirnar okkar',
- ),
- 'he' => 
- array (
- 'star' => 'מציג רק RATING_STAR_FILTER ביקורות כוכבים',
- 'latest' => 'מציג את הביקורות האחרונות שלנו',
- ),
- 'ko' => 
- array (
- 'star' => '별점 리뷰 RATING_STAR_FILTER 개만 표시',
- 'latest' => '최신 리뷰 표시',
- ),
- 'lt' => 
- array (
- 'star' => 'Rodomi tik RATING_STAR_FILTER žvaigždučių atsiliepimai',
- 'latest' => 'Rodomi mūsų naujausios apžvalgos',
- ),
- 'ms' => 
- array (
- 'star' => 'Menunjukkan ulasan bintang RATING_STAR_FILTER sahaja',
- 'latest' => 'Menunjukkan ulasan terkini kami',
- ),
- 'sr' => 
- array (
- 'star' => 'Приказују се само рецензије са RATING_STAR_FILTER звездицама',
- 'latest' => 'Приказујемо наше најновије рецензије',
- ),
- 'th' => 
- array (
- 'star' => 'แสดงเฉพาะบทวิจารณ์ระดับ RATING_STAR_FILTER ดาว',
- 'latest' => 'แสดงความคิดเห็นล่าสุดของเรา',
- ),
- 'vi' => 
- array (
- 'star' => 'Chỉ hiển thị RATING_STAR_FILTER bài đánh giá sao',
- 'latest' => 'Đang hiển thị các đánh giá mới nhất của chúng tôi',
- ),
- 'mk' => 
- array (
- 'star' => 'Се прикажуваат само RATING_STAR_FILTER рецензии со ѕвезди',
- 'latest' => 'Се прикажуваат нашите најнови критики',
- ),
- 'bg' => 
- array (
- 'star' => 'Показани са само отзиви с RATING_STAR_FILTER звезди',
- 'latest' => 'Показване на най-новите ни отзиви',
+ 'star' => 'Prikazane so le ocen s RATING_STAR_FILTER zvezdicami',
+ 'latest' => 'Prikazane so naše najnovejše ocen',
  ),
  'sq' => 
  array (
  'star' => 'Duke shfaqur vetëm komente RATING_STAR_FILTER yje',
  'latest' => 'Duke shfaqur komentet tona më të fundit',
  ),
- 'af' => 
+ 'sr' => 
  array (
- 'star' => 'Wys tans net RATING_STAR_FILTER sterresensies',
- 'latest' => 'Wys ons jongste resensies',
+ 'star' => 'Приказују се само рецензије са RATING_STAR_FILTER звездицама',
+ 'latest' => 'Приказујемо наше најновије рецензије',
  ),
- 'az' => 
+ 'sv' => 
  array (
- 'star' => 'Yalnız RATING_STAR_FILTER ulduzlu rəylər göstərilir',
- 'latest' => 'Ən son rəylərimiz göstərilir',
+ 'star' => 'Visar endast RATING_STAR_FILTER stjärnrecensioner',
+ 'latest' => 'Visar våra senaste recensioner',
  ),
- 'bn' => 
+ 'th' => 
  array (
- 'star' => 'শুধুমাত্র RATING_STAR_FILTER স্টার রিভিউ দেখানো হচ্ছে',
- 'latest' => 'আমাদের সর্বশেষ পর্যালোচনা দেখাচ্ছে',
+ 'star' => 'แสดงเฉพาะบทวิจารณ์ระดับ RATING_STAR_FILTER ดาว',
+ 'latest' => 'แสดงความคิดเห็นล่าสุดของเรา',
  ),
- 'bs' => 
+ 'tr' => 
  array (
- 'star' => 'Prikazuju se samo recenzije sa RATING_STAR_FILTER zvjezdicama',
- 'latest' => 'Prikazujemo naše najnovije recenzije',
+ 'star' => 'Yalnızca RATING_STAR_FILTER yıldızlı değerlendirmeler gösteriliyor',
+ 'latest' => 'En son değerlendirmeler gösteriliyor',
  ),
- 'cy' => 
+ 'uk' => 
  array (
- 'star' => 'Yn dangos adolygiadau seren RATING_STAR_FILTER yn unig',
- 'latest' => 'Yn dangos ein hadolygiadau diweddaraf',
+ 'star' => 'Показано лише RATING_STAR_FILTER старих рецензії',
+ 'latest' => 'Показано наші останні рецензії',
  ),
- 'fa' => 
+ 'vi' => 
  array (
- 'star' => 'نمایش فقط نظرات RATING_STAR_FILTER ستاره',
- 'latest' => 'نمایش آخرین نظرات ما',
+ 'star' => 'Chỉ hiển thị RATING_STAR_FILTER bài đánh giá sao',
+ 'latest' => 'Đang hiển thị các đánh giá mới nhất của chúng tôi',
  ),
- 'gl' => 
+ 'zh' => 
  array (
- 'star' => 'Mostrando só RATING_STAR_FILTER comentarios de estrelas',
- 'latest' => 'Mostrando os nosos últimos comentarios',
- ),
- 'hy' => 
- array (
- 'star' => 'Ցուցադրվում են միայն RATING_STAR_FILTER աստղային կարծիքներ',
- 'latest' => 'Ցուցադրվում են մեր վերջին ակնարկները',
- ),
- 'ka' => 
- array (
- 'star' => 'ნაჩვენებია მხოლოდ RATING_STAR_FILTER ვარსკვლავიანი მიმოხილვები',
- 'latest' => 'ნაჩვენებია ჩვენი უახლესი მიმოხილვები',
- ),
- 'kk' => 
- array (
- 'star' => 'Тек RATING_STAR_FILTER жұлдызды пікірлер көрсетіледі',
- 'latest' => 'Соңғы шолуларымызды көрсету',
+ 'star' => '仅显示 RATING_STAR_FILTER 星评价',
+ 'latest' => '显示我们的最新评论',
  ),
 );
 public static $verified_platforms = array (
@@ -4383,20 +4588,20 @@ private static $widget_month_names = array (
  10 => 'November',
  11 => 'December',
  ),
- 'et' => 
+ 'af' => 
  array (
- 0 => 'jaanuar',
- 1 => 'veebruar',
- 2 => 'märts',
- 3 => 'aprill',
- 4 => 'mai',
- 5 => 'juuni',
- 6 => 'juuli',
- 7 => 'august',
- 8 => 'september',
- 9 => 'oktoober',
- 10 => 'november',
- 11 => 'detsember',
+ 0 => 'Januarie',
+ 1 => 'Februarie',
+ 2 => 'Maart',
+ 3 => 'April',
+ 4 => 'Mei',
+ 5 => 'Junie',
+ 6 => 'Julie',
+ 7 => 'Augustus',
+ 8 => 'September',
+ 9 => 'Oktober',
+ 10 => 'November',
+ 11 => 'Desember',
  ),
  'ar' => 
  array (
@@ -4413,20 +4618,65 @@ private static $widget_month_names = array (
  10 => 'نوفمبر',
  11 => 'ديسمبر',
  ),
- 'zh' => 
+ 'az' => 
  array (
- 0 => '一月',
- 1 => '二月',
- 2 => '三月',
- 3 => '四月',
- 4 => '五月',
- 5 => '六月',
- 6 => '七月',
- 7 => '八月',
- 8 => '九月',
- 9 => '十月',
- 10 => '十一月',
- 11 => '十二月',
+ 0 => 'Yanvar',
+ 1 => 'Fevral',
+ 2 => 'Mart',
+ 3 => 'Aprel',
+ 4 => 'May',
+ 5 => 'İyun',
+ 6 => 'İyul',
+ 7 => 'Avqust',
+ 8 => 'Sentyabr',
+ 9 => 'Oktyabr',
+ 10 => 'Noyabr',
+ 11 => 'Dekabr',
+ ),
+ 'bg' => 
+ array (
+ 0 => 'Януари',
+ 1 => 'февруари',
+ 2 => 'Март',
+ 3 => 'Aприл',
+ 4 => 'май',
+ 5 => 'юни',
+ 6 => 'юли',
+ 7 => 'Август',
+ 8 => 'Септември',
+ 9 => 'Октомври',
+ 10 => 'Ноември',
+ 11 => 'Декември',
+ ),
+ 'bn' => 
+ array (
+ 0 => 'জানুয়ারি',
+ 1 => 'ফেব্রুয়ারি',
+ 2 => 'মার্চ',
+ 3 => 'এপ্রিল',
+ 4 => 'মে',
+ 5 => 'জুন',
+ 6 => 'জুলাই',
+ 7 => 'আগস্ট',
+ 8 => 'সেপ্টেম্বর',
+ 9 => 'অক্টোবর',
+ 10 => 'নভেম্বর',
+ 11 => 'ডিসেম্বর',
+ ),
+ 'bs' => 
+ array (
+ 0 => 'Januar',
+ 1 => 'Februar',
+ 2 => 'Mart',
+ 3 => 'April',
+ 4 => 'Maj',
+ 5 => 'Jun',
+ 6 => 'Jul',
+ 7 => 'Avgust',
+ 8 => 'Septembar',
+ 9 => 'Oktobar',
+ 10 => 'Novembar',
+ 11 => 'Decembar',
  ),
  'cs' => 
  array (
@@ -4443,6 +4693,21 @@ private static $widget_month_names = array (
  10 => 'Listopad',
  11 => 'Prosinec',
  ),
+ 'cy' => 
+ array (
+ 0 => 'Ionawr',
+ 1 => 'Chwefror',
+ 2 => 'Mawrth',
+ 3 => 'Ebrill',
+ 4 => 'Mai',
+ 5 => 'Mehefin',
+ 6 => 'Gorffennaf',
+ 7 => 'Awst',
+ 8 => 'Medi',
+ 9 => 'Hydref',
+ 10 => 'Tachwedd',
+ 11 => 'Rhagfyr',
+ ),
  'da' => 
  array (
  0 => 'Januar',
@@ -4457,51 +4722,6 @@ private static $widget_month_names = array (
  9 => 'Oktober',
  10 => 'November',
  11 => 'December',
- ),
- 'nl' => 
- array (
- 0 => 'Januari',
- 1 => 'Februari',
- 2 => 'Maart',
- 3 => 'April',
- 4 => 'Mei',
- 5 => 'Juni',
- 6 => 'Juli',
- 7 => 'Augustus',
- 8 => 'September',
- 9 => 'Oktober',
- 10 => 'November',
- 11 => 'December',
- ),
- 'fi' => 
- array (
- 0 => 'Tammikuu',
- 1 => 'Helmikuu',
- 2 => 'Maaliskuu',
- 3 => 'Huhtikuu',
- 4 => 'Toukokuu',
- 5 => 'Kesäkuu',
- 6 => 'Heinäkuu',
- 7 => 'Elokuu',
- 8 => 'Syyskuu',
- 9 => 'Lokakuu',
- 10 => 'Marraskuu',
- 11 => 'Joulukuu',
- ),
- 'fr' => 
- array (
- 0 => 'Janvier',
- 1 => 'Février',
- 2 => 'Mars',
- 3 => 'Avril',
- 4 => 'Mai',
- 5 => 'Juin',
- 6 => 'Juillet',
- 7 => 'Août',
- 8 => 'Septembre',
- 9 => 'Octobre',
- 10 => 'Novembre',
- 11 => 'Décembre',
  ),
  'de' => 
  array (
@@ -4533,6 +4753,111 @@ private static $widget_month_names = array (
  10 => 'Νοέμβριος',
  11 => 'Δεκέμβριος',
  ),
+ 'es' => 
+ array (
+ 0 => 'Enero',
+ 1 => 'Febrero',
+ 2 => 'Marzo',
+ 3 => 'Abril',
+ 4 => 'Mayo',
+ 5 => 'Junio',
+ 6 => 'Julio',
+ 7 => 'Agosto',
+ 8 => 'Septiembre',
+ 9 => 'Octubre',
+ 10 => 'Noviembre',
+ 11 => 'Diciembre',
+ ),
+ 'et' => 
+ array (
+ 0 => 'jaanuar',
+ 1 => 'veebruar',
+ 2 => 'märts',
+ 3 => 'aprill',
+ 4 => 'mai',
+ 5 => 'juuni',
+ 6 => 'juuli',
+ 7 => 'august',
+ 8 => 'september',
+ 9 => 'oktoober',
+ 10 => 'november',
+ 11 => 'detsember',
+ ),
+ 'fa' => 
+ array (
+ 0 => 'ژانویه',
+ 1 => 'فوریه',
+ 2 => 'مارس',
+ 3 => 'آوریل',
+ 4 => 'ممکن است',
+ 5 => 'ژوئن',
+ 6 => 'جولای',
+ 7 => 'اوت',
+ 8 => 'سپتامبر',
+ 9 => 'اکتبر',
+ 10 => 'نوامبر',
+ 11 => 'دسامبر',
+ ),
+ 'fi' => 
+ array (
+ 0 => 'Tammikuu',
+ 1 => 'Helmikuu',
+ 2 => 'Maaliskuu',
+ 3 => 'Huhtikuu',
+ 4 => 'Toukokuu',
+ 5 => 'Kesäkuu',
+ 6 => 'Heinäkuu',
+ 7 => 'Elokuu',
+ 8 => 'Syyskuu',
+ 9 => 'Lokakuu',
+ 10 => 'Marraskuu',
+ 11 => 'Joulukuu',
+ ),
+ 'fr' => 
+ array (
+ 0 => 'Janvier',
+ 1 => 'Février',
+ 2 => 'Mars',
+ 3 => 'Avril',
+ 4 => 'Mai',
+ 5 => 'Juin',
+ 6 => 'Juillet',
+ 7 => 'Août',
+ 8 => 'Septembre',
+ 9 => 'Octobre',
+ 10 => 'Novembre',
+ 11 => 'Décembre',
+ ),
+ 'gd' => 
+ array (
+ 0 => 'am Faoilleach',
+ 1 => 'an Gearran',
+ 2 => 'am Màrt',
+ 3 => 'an Giblean',
+ 4 => 'an Cèitean',
+ 5 => 'an t-Ògmhios',
+ 6 => 'an t-luchar',
+ 7 => 'an Lùnastal',
+ 8 => 'an t-Sultain',
+ 9 => 'an Dàmhair',
+ 10 => 'an t-Samhain',
+ 11 => 'an Dùbhlachd',
+ ),
+ 'gl' => 
+ array (
+ 0 => 'Xaneiro',
+ 1 => 'Febreiro',
+ 2 => 'Marzo',
+ 3 => 'Abril',
+ 4 => 'Maio',
+ 5 => 'Xuño',
+ 6 => 'Xullo',
+ 7 => 'Agosto',
+ 8 => 'Setembro',
+ 9 => 'Outubro',
+ 10 => 'Novembro',
+ 11 => 'Decembro',
+ ),
  'he' => 
  array (
  0 => 'ינואר',
@@ -4563,6 +4888,21 @@ private static $widget_month_names = array (
  10 => 'नवंबर',
  11 => 'दिसंबर',
  ),
+ 'hr' => 
+ array (
+ 0 => 'Siječanj',
+ 1 => 'Veljača',
+ 2 => 'Ožujak',
+ 3 => 'Travanj',
+ 4 => 'Svibanj',
+ 5 => 'Lipanj',
+ 6 => 'Srpanj',
+ 7 => 'Kolovoz',
+ 8 => 'Rujan',
+ 9 => 'Listopad',
+ 10 => 'Studeni',
+ 11 => 'Prosinac',
+ ),
  'hu' => 
  array (
  0 => 'Január',
@@ -4577,6 +4917,51 @@ private static $widget_month_names = array (
  9 => 'Október',
  10 => 'November',
  11 => 'December',
+ ),
+ 'hy' => 
+ array (
+ 0 => 'Հունվար',
+ 1 => 'փետրվար',
+ 2 => 'մարտ',
+ 3 => 'ապրիլ',
+ 4 => 'մայիս',
+ 5 => 'հունիս',
+ 6 => 'հուլիս',
+ 7 => 'օգոստոս',
+ 8 => 'սեպտեմբեր',
+ 9 => 'հոկտեմբեր',
+ 10 => 'նոյեմբեր',
+ 11 => 'դեկտեմբեր',
+ ),
+ 'id' => 
+ array (
+ 0 => 'Januari',
+ 1 => 'Februari',
+ 2 => 'Maret',
+ 3 => 'April',
+ 4 => 'Mei',
+ 5 => 'Juni',
+ 6 => 'Juli',
+ 7 => 'Agustus',
+ 8 => 'September',
+ 9 => 'Oktober',
+ 10 => 'November',
+ 11 => 'Desember',
+ ),
+ 'is' => 
+ array (
+ 0 => 'Janúar',
+ 1 => 'Febrúar',
+ 2 => 'Mars',
+ 3 => 'April',
+ 4 => 'Maí',
+ 5 => 'Júní',
+ 6 => 'Júlí',
+ 7 => 'Ágúst',
+ 8 => 'September',
+ 9 => 'Október',
+ 10 => 'Nóvember',
+ 11 => 'Desember',
  ),
  'it' => 
  array (
@@ -4607,6 +4992,111 @@ private static $widget_month_names = array (
  9 => '10月',
  10 => '11月',
  11 => '12月',
+ ),
+ 'ka' => 
+ array (
+ 0 => 'იანვარი',
+ 1 => 'თებერვალი',
+ 2 => 'მარტი',
+ 3 => 'აპრილი',
+ 4 => 'მაისი',
+ 5 => 'ივნისი',
+ 6 => 'ივლისი',
+ 7 => 'აგვისტო',
+ 8 => 'სექტემბერი',
+ 9 => 'ოქტომბერი',
+ 10 => 'ნოემბერი',
+ 11 => 'დეკემბერი',
+ ),
+ 'kk' => 
+ array (
+ 0 => 'қаңтар',
+ 1 => 'ақпан',
+ 2 => 'наурыз',
+ 3 => 'сәуір',
+ 4 => 'мамыр',
+ 5 => 'маусым',
+ 6 => 'шілде',
+ 7 => 'тамыз',
+ 8 => 'қыркүйек',
+ 9 => 'қазан',
+ 10 => 'қараша',
+ 11 => 'желтоқсан',
+ ),
+ 'ko' => 
+ array (
+ 0 => '일월',
+ 1 => '이월',
+ 2 => '삼월',
+ 3 => '사월',
+ 4 => '오월',
+ 5 => '유월',
+ 6 => '칠월',
+ 7 => '팔월',
+ 8 => '구월',
+ 9 => '시월',
+ 10 => '십일월',
+ 11 => '십이월',
+ ),
+ 'lt' => 
+ array (
+ 0 => 'Sausis',
+ 1 => 'Vasaris',
+ 2 => 'Kovas',
+ 3 => 'Balandis',
+ 4 => 'Gegužė',
+ 5 => 'Birželis',
+ 6 => 'Liepa',
+ 7 => 'Rugpjūtis',
+ 8 => 'Rugsėjis',
+ 9 => 'Spalis',
+ 10 => 'Lapkritis',
+ 11 => 'Gruodis',
+ ),
+ 'mk' => 
+ array (
+ 0 => 'Jануари',
+ 1 => 'февруари',
+ 2 => 'март',
+ 3 => 'април',
+ 4 => 'мај',
+ 5 => 'јуни',
+ 6 => 'јули',
+ 7 => 'август',
+ 8 => 'септември',
+ 9 => 'октомври',
+ 10 => 'ноември',
+ 11 => 'декември',
+ ),
+ 'ms' => 
+ array (
+ 0 => 'Januari',
+ 1 => 'Februari',
+ 2 => 'Mac',
+ 3 => 'April',
+ 4 => 'Mei',
+ 5 => 'Jun',
+ 6 => 'Julai',
+ 7 => 'Ogos',
+ 8 => 'September',
+ 9 => 'Oktober',
+ 10 => 'November',
+ 11 => 'Disember',
+ ),
+ 'nl' => 
+ array (
+ 0 => 'Januari',
+ 1 => 'Februari',
+ 2 => 'Maart',
+ 3 => 'April',
+ 4 => 'Mei',
+ 5 => 'Juni',
+ 6 => 'Juli',
+ 7 => 'Augustus',
+ 8 => 'September',
+ 9 => 'Oktober',
+ 10 => 'November',
+ 11 => 'December',
  ),
  'no' => 
  array (
@@ -4713,20 +5203,35 @@ private static $widget_month_names = array (
  10 => 'November',
  11 => 'December',
  ),
- 'es' => 
+ 'sq' => 
  array (
- 0 => 'Enero',
- 1 => 'Febrero',
- 2 => 'Marzo',
- 3 => 'Abril',
- 4 => 'Mayo',
- 5 => 'Junio',
- 6 => 'Julio',
- 7 => 'Agosto',
- 8 => 'Septiembre',
- 9 => 'Octubre',
- 10 => 'Noviembre',
- 11 => 'Diciembre',
+ 0 => 'Janar',
+ 1 => 'Shkurt',
+ 2 => 'Mars',
+ 3 => 'Prill',
+ 4 => 'Maj',
+ 5 => 'Qershor',
+ 6 => 'Korrik',
+ 7 => 'Gusht',
+ 8 => 'Shtator',
+ 9 => 'Tetor',
+ 10 => 'Nëntor',
+ 11 => 'Dhjetor',
+ ),
+ 'sr' => 
+ array (
+ 0 => 'Јануар',
+ 1 => 'Фебруар',
+ 2 => 'Март',
+ 3 => 'Април',
+ 4 => 'Mај',
+ 5 => 'Јуни',
+ 6 => 'Јул',
+ 7 => 'Август',
+ 8 => 'Cептембар',
+ 9 => 'Октобар',
+ 10 => 'Новембар',
+ 11 => 'Децембар',
  ),
  'sv' => 
  array (
@@ -4742,6 +5247,21 @@ private static $widget_month_names = array (
  9 => 'Oktober',
  10 => 'November',
  11 => 'December',
+ ),
+ 'th' => 
+ array (
+ 0 => 'มกราคม',
+ 1 => 'กุมภาพันธ์',
+ 2 => 'มีนาคม',
+ 3 => 'เมษายน',
+ 4 => 'พฤษภาคม',
+ 5 => 'มิถุนายน',
+ 6 => 'กรกฎาคม',
+ 7 => 'สิงหาคม',
+ 8 => 'กันยายน',
+ 9 => 'ตุลาคม',
+ 10 => 'พฤศจิกายน',
+ 11 => 'ธันวาคม',
  ),
  'tr' => 
  array (
@@ -4773,141 +5293,6 @@ private static $widget_month_names = array (
  10 => 'листопад',
  11 => 'грудень',
  ),
- 'gd' => 
- array (
- 0 => 'am Faoilleach',
- 1 => 'an Gearran',
- 2 => 'am Màrt',
- 3 => 'an Giblean',
- 4 => 'an Cèitean',
- 5 => 'an t-Ògmhios',
- 6 => 'an t-luchar',
- 7 => 'an Lùnastal',
- 8 => 'an t-Sultain',
- 9 => 'an Dàmhair',
- 10 => 'an t-Samhain',
- 11 => 'an Dùbhlachd',
- ),
- 'hr' => 
- array (
- 0 => 'Siječanj',
- 1 => 'Veljača',
- 2 => 'Ožujak',
- 3 => 'Travanj',
- 4 => 'Svibanj',
- 5 => 'Lipanj',
- 6 => 'Srpanj',
- 7 => 'Kolovoz',
- 8 => 'Rujan',
- 9 => 'Listopad',
- 10 => 'Studeni',
- 11 => 'Prosinac',
- ),
- 'id' => 
- array (
- 0 => 'Januari',
- 1 => 'Februari',
- 2 => 'Maret',
- 3 => 'April',
- 4 => 'Mei',
- 5 => 'Juni',
- 6 => 'Juli',
- 7 => 'Agustus',
- 8 => 'September',
- 9 => 'Oktober',
- 10 => 'November',
- 11 => 'Desember',
- ),
- 'is' => 
- array (
- 0 => 'Janúar',
- 1 => 'Febrúar',
- 2 => 'Mars',
- 3 => 'April',
- 4 => 'Maí',
- 5 => 'Júní',
- 6 => 'Júlí',
- 7 => 'Ágúst',
- 8 => 'September',
- 9 => 'Október',
- 10 => 'Nóvember',
- 11 => 'Desember',
- ),
- 'ko' => 
- array (
- 0 => '일월',
- 1 => '이월',
- 2 => '삼월',
- 3 => '사월',
- 4 => '오월',
- 5 => '유월',
- 6 => '칠월',
- 7 => '팔월',
- 8 => '구월',
- 9 => '시월',
- 10 => '십일월',
- 11 => '십이월',
- ),
- 'lt' => 
- array (
- 0 => 'Sausis',
- 1 => 'Vasaris',
- 2 => 'Kovas',
- 3 => 'Balandis',
- 4 => 'Gegužė',
- 5 => 'Birželis',
- 6 => 'Liepa',
- 7 => 'Rugpjūtis',
- 8 => 'Rugsėjis',
- 9 => 'Spalis',
- 10 => 'Lapkritis',
- 11 => 'Gruodis',
- ),
- 'ms' => 
- array (
- 0 => 'Januari',
- 1 => 'Februari',
- 2 => 'Mac',
- 3 => 'April',
- 4 => 'Mei',
- 5 => 'Jun',
- 6 => 'Julai',
- 7 => 'Ogos',
- 8 => 'September',
- 9 => 'Oktober',
- 10 => 'November',
- 11 => 'Disember',
- ),
- 'sr' => 
- array (
- 0 => 'Јануар',
- 1 => 'Фебруар',
- 2 => 'Март',
- 3 => 'Април',
- 4 => 'Mај',
- 5 => 'Јуни',
- 6 => 'Јул',
- 7 => 'Август',
- 8 => 'Cептембар',
- 9 => 'Октобар',
- 10 => 'Новембар',
- 11 => 'Децембар',
- ),
- 'th' => 
- array (
- 0 => 'มกราคม',
- 1 => 'กุมภาพันธ์',
- 2 => 'มีนาคม',
- 3 => 'เมษายน',
- 4 => 'พฤษภาคม',
- 5 => 'มิถุนายน',
- 6 => 'กรกฎาคม',
- 7 => 'สิงหาคม',
- 8 => 'กันยายน',
- 9 => 'ตุลาคม',
- 10 => 'พฤศจิกายน',
- 11 => 'ธันวาคม',
- ),
  'vi' => 
  array (
  0 => 'tháng một',
@@ -4923,200 +5308,20 @@ private static $widget_month_names = array (
  10 => 'tháng mười một',
  11 => 'tháng mười hai',
  ),
- 'mk' => 
+ 'zh' => 
  array (
- 0 => 'Jануари',
- 1 => 'февруари',
- 2 => 'март',
- 3 => 'април',
- 4 => 'мај',
- 5 => 'јуни',
- 6 => 'јули',
- 7 => 'август',
- 8 => 'септември',
- 9 => 'октомври',
- 10 => 'ноември',
- 11 => 'декември',
- ),
- 'bg' => 
- array (
- 0 => 'Януари',
- 1 => 'февруари',
- 2 => 'Март',
- 3 => 'Aприл',
- 4 => 'май',
- 5 => 'юни',
- 6 => 'юли',
- 7 => 'Август',
- 8 => 'Септември',
- 9 => 'Октомври',
- 10 => 'Ноември',
- 11 => 'Декември',
- ),
- 'sq' => 
- array (
- 0 => 'Janar',
- 1 => 'Shkurt',
- 2 => 'Mars',
- 3 => 'Prill',
- 4 => 'Maj',
- 5 => 'Qershor',
- 6 => 'Korrik',
- 7 => 'Gusht',
- 8 => 'Shtator',
- 9 => 'Tetor',
- 10 => 'Nëntor',
- 11 => 'Dhjetor',
- ),
- 'af' => 
- array (
- 0 => 'Januarie',
- 1 => 'Februarie',
- 2 => 'Maart',
- 3 => 'April',
- 4 => 'Mei',
- 5 => 'Junie',
- 6 => 'Julie',
- 7 => 'Augustus',
- 8 => 'September',
- 9 => 'Oktober',
- 10 => 'November',
- 11 => 'Desember',
- ),
- 'az' => 
- array (
- 0 => 'Yanvar',
- 1 => 'Fevral',
- 2 => 'Mart',
- 3 => 'Aprel',
- 4 => 'May',
- 5 => 'İyun',
- 6 => 'İyul',
- 7 => 'Avqust',
- 8 => 'Sentyabr',
- 9 => 'Oktyabr',
- 10 => 'Noyabr',
- 11 => 'Dekabr',
- ),
- 'bn' => 
- array (
- 0 => 'জানুয়ারি',
- 1 => 'ফেব্রুয়ারি',
- 2 => 'মার্চ',
- 3 => 'এপ্রিল',
- 4 => 'মে',
- 5 => 'জুন',
- 6 => 'জুলাই',
- 7 => 'আগস্ট',
- 8 => 'সেপ্টেম্বর',
- 9 => 'অক্টোবর',
- 10 => 'নভেম্বর',
- 11 => 'ডিসেম্বর',
- ),
- 'bs' => 
- array (
- 0 => 'Januar',
- 1 => 'Februar',
- 2 => 'Mart',
- 3 => 'April',
- 4 => 'Maj',
- 5 => 'Jun',
- 6 => 'Jul',
- 7 => 'Avgust',
- 8 => 'Septembar',
- 9 => 'Oktobar',
- 10 => 'Novembar',
- 11 => 'Decembar',
- ),
- 'cy' => 
- array (
- 0 => 'Ionawr',
- 1 => 'Chwefror',
- 2 => 'Mawrth',
- 3 => 'Ebrill',
- 4 => 'Mai',
- 5 => 'Mehefin',
- 6 => 'Gorffennaf',
- 7 => 'Awst',
- 8 => 'Medi',
- 9 => 'Hydref',
- 10 => 'Tachwedd',
- 11 => 'Rhagfyr',
- ),
- 'fa' => 
- array (
- 0 => 'ژانویه',
- 1 => 'فوریه',
- 2 => 'مارس',
- 3 => 'آوریل',
- 4 => 'ممکن است',
- 5 => 'ژوئن',
- 6 => 'جولای',
- 7 => 'اوت',
- 8 => 'سپتامبر',
- 9 => 'اکتبر',
- 10 => 'نوامبر',
- 11 => 'دسامبر',
- ),
- 'gl' => 
- array (
- 0 => 'Xaneiro',
- 1 => 'Febreiro',
- 2 => 'Marzo',
- 3 => 'Abril',
- 4 => 'Maio',
- 5 => 'Xuño',
- 6 => 'Xullo',
- 7 => 'Agosto',
- 8 => 'Setembro',
- 9 => 'Outubro',
- 10 => 'Novembro',
- 11 => 'Decembro',
- ),
- 'hy' => 
- array (
- 0 => 'Հունվար',
- 1 => 'փետրվար',
- 2 => 'մարտ',
- 3 => 'ապրիլ',
- 4 => 'մայիս',
- 5 => 'հունիս',
- 6 => 'հուլիս',
- 7 => 'օգոստոս',
- 8 => 'սեպտեմբեր',
- 9 => 'հոկտեմբեր',
- 10 => 'նոյեմբեր',
- 11 => 'դեկտեմբեր',
- ),
- 'ka' => 
- array (
- 0 => 'იანვარი',
- 1 => 'თებერვალი',
- 2 => 'მარტი',
- 3 => 'აპრილი',
- 4 => 'მაისი',
- 5 => 'ივნისი',
- 6 => 'ივლისი',
- 7 => 'აგვისტო',
- 8 => 'სექტემბერი',
- 9 => 'ოქტომბერი',
- 10 => 'ნოემბერი',
- 11 => 'დეკემბერი',
- ),
- 'kk' => 
- array (
- 0 => 'қаңтар',
- 1 => 'ақпан',
- 2 => 'наурыз',
- 3 => 'сәуір',
- 4 => 'мамыр',
- 5 => 'маусым',
- 6 => 'шілде',
- 7 => 'тамыз',
- 8 => 'қыркүйек',
- 9 => 'қазан',
- 10 => 'қараша',
- 11 => 'желтоқсан',
+ 0 => '一月',
+ 1 => '二月',
+ 2 => '三月',
+ 3 => '四月',
+ 4 => '五月',
+ 5 => '六月',
+ 6 => '七月',
+ 7 => '八月',
+ 8 => '九月',
+ 9 => '十月',
+ 10 => '十一月',
+ 11 => '十二月',
  ),
 );
 private static $dot_separated_languages = array (
@@ -5140,55 +5345,55 @@ private static $dot_separated_languages = array (
 );
 public static $widget_date_format_locales = array (
  'en' => '%d %s ago|today|day|days|week|weeks|month|months|year|years',
- 'fr' => 'il y a %d %s|aujourd\'hui|jour|jours|semaine|semaines|mois|mois|année|ans',
- 'de' => 'vor %d %s|heute|tag|tagen|woche|wochen|monat|monaten|jahr|jahren',
- 'es' => 'hace %d %s|hoy|día|días|semana|semanas|mes|meses|año|años',
+ 'af' => '%d %s gelede|vandag|dag|dae|week|weke|maand|maande|jaar|jaar',
  'ar' => '%d %s مضى|اليوم|يوم|أيام|أسبوع|أسابيع|شهر|أشهر|سنة|سنوات',
+ 'az' => '%d %s əvvəl|bu gün|gün|gün|həftə|həftə|ay|ay|il|il',
+ 'bg' => 'преди %d %s|днес|ден|дни|седмица|седмици|месец|месеца|година|години',
+ 'bn' => '%d %s আগে|আজ|দিন|দিন|সপ্তাহ|সপ্তাহ|মাস|মাস|বছর|বছর',
+ 'bs' => 'prije %d %s|danas|dan|dana|sedmicu|sedmica|mjesec|mjeseci|godinu|godina',
  'cs' => 'před %d %s|dnes|dnem|dny|týdnem|týdny|měsícem|měsíci|rokem|roky',
+ 'cy' => '%d %s yn ôl|heddiw|diwrnod|diwrnod|wythnos|wythnosau|mis|mis|flwyddyn|flynyddoedd',
  'da' => '%d %s siden|i dag|dag|dage|uge|uger|måned|måneder|år|år',
- 'et' => '%d %s tagasi|täna|päev|päeva|nädal|nädalat|kuu|kuud|aasta|aastat',
+ 'de' => 'vor %d %s|heute|tag|tagen|woche|wochen|monat|monaten|jahr|jahren',
  'el' => 'πριν από %d ημέρα|σήμερα|ημέρα|ημέρες|εβδομάδα|εβδομάδες|μήνα|μήνες|χρόνο|χρόνια',
+ 'es' => 'hace %d %s|hoy|día|días|semana|semanas|mes|meses|año|años',
+ 'et' => '%d %s tagasi|täna|päev|päeva|nädal|nädalat|kuu|kuud|aasta|aastat',
+ 'fa' => '%d %s قبل|امروز|روز|روز|هفته|هفته|ماه|ماه|سال|سال',
  'fi' => '%d %s sitten|tänään|päivä|päivää|viikko|viikkoa|kuukausi|kuukautta|vuosi|vuotta',
+ 'fr' => 'il y a %d %s|aujourd\'hui|jour|jours|semaine|semaines|mois|mois|année|ans',
+ 'gd' => '%d %s air ais|an diugh|latha|làithean|seachdain|seachdainean|mìos|mìosan|bliadhna|bliadhna',
+ 'gl' => 'hai %d %s|hoxe|día|días|semana|semanas|mes|meses|ano|anos',
+ 'he' => '%d לפני %s|היום|יום|ימים|שבוע|שבועות|חודש|חודשים|שנה|שנים',
  'hi' => '%d %s पहले|आज|दिन|दिन|सप्ताह|सप्ताह|महीने|महीने|वर्ष|वर्ष',
+ 'hr' => 'prije %d %s|danas|dan|dana|tjedan|tjedana|mjesec|mjeseci|godinu|godina',
  'hu' => '%d %s|ma|napja|napja|hete|hete|hónapja|hónapja|éve|éve',
+ 'hy' => '%d %s առաջ|այսօր|օր|օր|շաբաթ|շաբաթ|ամիս|ամիս|տարի|տարի',
+ 'id' => '%d %s lalu|hari ini|hari|hari yang|minggu|minggu yang|bulan|bulan yang|tahun|tahun yang',
+ 'is' => 'fyrir %d %s|í dag|degi|dögum|viku|vikum|mánuði|mánuðum|ári|árum',
  'it' => '%d %s fa|oggi|giorno|giorni|settimana|settimane|mese|mesi|anno|anni',
  'ja' => '%d %s 前|今日|日|日|週間|週間|か月|か月|年|年',
+ 'ka' => '%d %s წინ|დღეს|დღის|დღის|კვირის|კვირის|თვის|თვის|წლის|წლის',
+ 'kk' => '%d %s бұрын|бүгін|күн|күн|апта|апта|ай|ай|жыл|жыл',
+ 'ko' => '%d %s 전|오늘|일|일|주|주|월|월|년|년',
+ 'lt' => 'prieš %d %s|šiandien|dieną|dienų|savaitę|savaites|mėnesį|mėnesių|metų|metų',
+ 'mk' => 'пред %d %s|денес|ден|дена|недела|недели|месец|месеци|година|години',
+ 'ms' => '%d %s lalu|hari ini|hari|hari|minggu|minggu|bulan|bulan|tahun|tahun',
  'nl' => '%d %s geleden|vandaag|dag|dagen|week|weken|maand|maanden|jaar|jaar',
  'no' => '%d %s siden|i dag|dag|dager|uke|uker|måned|måneder|år|år',
  'pl' => '%d %s temu|dziś|dzień|dni|tydzień|tygodni|miesiąc|miesięcy|rok|lat',
  'pt' => '%d %s atrás|hoje|dia|dias|semana|semanas|mês|meses|ano|anos',
  'ro' => 'acum %d %s|astăzi|zi|zile|săptămână|săptămâni|lună|luni|an|ani',
  'ru' => '%d %s назад|сегодня|день|дней|неделю|недель|месяц|месяцев|год|лет',
- 'sl' => 'pred %d %s|danes|dnevom|dnevi|tednom|tedni|mesecem|meseci|letom|leti',
  'sk' => 'pred %d %s|dnes|dňom|dňami|týždňom|týždňami|mesiacom|mesiacmi|rokom|rokmi',
+ 'sl' => 'pred %d %s|danes|dnevom|dnevi|tednom|tedni|mesecem|meseci|letom|leti',
+ 'sq' => '%d %s më parë|sot|ditë|ditë|javë|javë|muaj|muaj|vit|vit',
+ 'sr' => 'пре %d %s|данас|дан|дана|недељу|недеље|месец|месеци|године|година',
  'sv' => '%d %s sedan|i dag|dag|dagar|vecka|veckor|månad|månader|år|år',
+ 'th' => '%d %s ที่แล้ว|วันนี้|วัน|วัน|สัปดาห์|สัปดาห์|เดือน|เดือน|ปี|ปี',
  'tr' => '%d %s önce|bugün|gün|gün|hafta|hafta|ay|ay|yıl|yıl',
  'uk' => '%d %s тому|сьогодні|день|днів|тиждень|тижнів|місяць|місяців|рік|років',
- 'zh' => '%d %s 前|今天|天|天|周|周|个月|个月|年|年',
- 'gd' => '%d %s air ais|an diugh|latha|làithean|seachdain|seachdainean|mìos|mìosan|bliadhna|bliadhna',
- 'hr' => 'prije %d %s|danas|dan|dana|tjedan|tjedana|mjesec|mjeseci|godinu|godina',
- 'id' => '%d %s lalu|hari ini|hari|hari yang|minggu|minggu yang|bulan|bulan yang|tahun|tahun yang',
- 'is' => 'fyrir %d %s|í dag|degi|dögum|viku|vikum|mánuði|mánuðum|ári|árum',
- 'he' => '%d לפני %s|היום|יום|ימים|שבוע|שבועות|חודש|חודשים|שנה|שנים',
- 'ko' => '%d %s 전|오늘|일|일|주|주|월|월|년|년',
- 'lt' => 'prieš %d %s|šiandien|dieną|dienų|savaitę|savaites|mėnesį|mėnesių|metų|metų',
- 'ms' => '%d %s lalu|hari ini|hari|hari|minggu|minggu|bulan|bulan|tahun|tahun',
- 'sr' => 'пре %d %s|данас|дан|дана|недељу|недеље|месец|месеци|године|година',
- 'th' => '%d %s ที่แล้ว|วันนี้|วัน|วัน|สัปดาห์|สัปดาห์|เดือน|เดือน|ปี|ปี',
  'vi' => '%d %s trước|hôm nay|ngày|ngày|tuần|tuần|tháng|tháng|năm|năm',
- 'mk' => 'пред %d %s|денес|ден|дена|недела|недели|месец|месеци|година|години',
- 'bg' => 'преди %d %s|днес|ден|дни|седмица|седмици|месец|месеца|година|години',
- 'sq' => '%d %s më parë|sot|ditë|ditë|javë|javë|muaj|muaj|vit|vit',
- 'af' => '%d %s gelede|vandag|dag|dae|week|weke|maand|maande|jaar|jaar',
- 'az' => '%d %s əvvəl|bu gün|gün|gün|həftə|həftə|ay|ay|il|il',
- 'bn' => '%d %s আগে|আজ|দিন|দিন|সপ্তাহ|সপ্তাহ|মাস|মাস|বছর|বছর',
- 'bs' => 'prije %d %s|danas|dan|dana|sedmicu|sedmica|mjesec|mjeseci|godinu|godina',
- 'cy' => '%d %s yn ôl|heddiw|diwrnod|diwrnod|wythnos|wythnosau|mis|mis|flwyddyn|flynyddoedd',
- 'fa' => '%d %s قبل|امروز|روز|روز|هفته|هفته|ماه|ماه|سال|سال',
- 'gl' => 'hai %d %s|hoxe|día|días|semana|semanas|mes|meses|ano|anos',
- 'hy' => '%d %s առաջ|այսօր|օր|օր|շաբաթ|շաբաթ|ամիս|ամիս|տարի|տարի',
- 'ka' => '%d %s წინ|დღეს|დღის|დღის|კვირის|კვირის|თვის|თვის|წლის|წლის',
- 'kk' => '%d %s бұрын|бүгін|күн|күн|апта|апта|ай|ай|жыл|жыл',
+ 'zh' => '%d %s 前|今天|天|天|周|周|个月|个月|年|年',
 );
 private static $page_urls = array (
  'facebook' => 'https://www.facebook.com/pg/%page_id%',
@@ -5218,7 +5423,7 @@ public function getPageUrl()
 if (!isset(self::$page_urls[ $this->shortname ])) {
 return "";
 }
-$pageDetails = get_option($this->get_option_name('page-details'));
+$pageDetails = $this->getPageDetails();
 if (!$pageDetails) {
 return "";
 }
@@ -5252,7 +5457,7 @@ return preg_match('/&c=\w+&v=\d+/', $pageId) ? 'shop' : 'map';
 }
 public function getReviewPageUrl()
 {
-$pageDetails = get_option($this->get_option_name('page-details'));
+$pageDetails = $this->getPageDetails();
 if (!$pageDetails) {
 return "";
 }
@@ -5266,7 +5471,7 @@ return 'http://search.google.com/local/reviews?placeid=' . $pageId;
 }
 public function getReviewWriteUrl()
 {
-$pageDetails = get_option($this->get_option_name('page-details'));
+$pageDetails = $this->getPageDetails();
 if (!$pageDetails) {
 return "";
 }
@@ -5280,7 +5485,10 @@ return 'http://search.google.com/local/writereview?placeid=' . $pageId;
 }
 public function getReviewHtml($review)
 {
+$html = $review->text;
+if ($review->text) {
 $html = preg_replace('/\r\n|\r|\n/', "\n", html_entity_decode($review->text, ENT_HTML5 | ENT_QUOTES));
+}
 if (isset($review->highlight) && $review->highlight) {
 $tmp = explode(',', $review->highlight);
 $start = (int)$tmp[0];
@@ -5313,7 +5521,7 @@ private $templateCache = null;
 public function get_noreg_list_reviews($forcePlatform = null, $listAll = false, $defaultStyleId = 4, $defaultSetId = 'light-background', $onlyPreview = false, $defaultReviews = false, $forceDefaultReviews = false)
 {
 global $wpdb;
-$pageDetails = get_option($this->get_option_name('page-details'));
+$pageDetails = $this->getPageDetails();
 $styleId = (int)get_option($this->get_option_name('style-id'), 4);
 $setId = get_option($this->get_option_name('scss-set'), 'light-background');
 $content = get_option($this->get_option_name('review-content'));
@@ -5369,6 +5577,9 @@ $lang = substr(get_locale(), 0, 2);
 if (!isset(self::$widget_languages[ $lang ])) {
 $lang = 'en';
 }
+if (!$pageDetails) {
+$pageDetails = [];
+}
 if (!isset($pageDetails['avatar_url'])) {
 $pageDetails['avatar_url'] = 'https://cdn.trustindex.io/companies/default_avatar.jpg';
 }
@@ -5420,9 +5631,9 @@ add_action('http_api_curl', function($handle) {
 curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
 }, 10);
-$response = wp_remote_get("https://cdn.trustindex.io/widget-assets/template/$lang.json");
+$response = wp_remote_get("https://cdn.trustindex.io/widget-assets/template/$lang.json", [ 'timeout' => 30 ]);
 if (is_wp_error($response)) {
-echo $this->get_alertbox('error', '<br />' .$this->___('Could not download the template for the widget.<br />Please reload the page.<br />If the problem persists, please write an email to support@trustindex.io.'));
+echo $this->get_alertbox('error', '<br />' .$this->___('Could not download the template for the widget.<br />Please reload the page.<br />If the problem persists, please write an email to support@trustindex.io.') .'<br /><br />'. print_r($response, true));
 die;
 }
 $this->templateCache = json_decode($response['body'], true);
@@ -5457,13 +5668,13 @@ $content = preg_replace('/data-set[_-]id=[\'"][^\'"]*[\'"]/m', 'data-set-id="'. 
 $classAppends = [];
 $widgetType = self::$widget_templates[ 'templates' ][ $styleId ]['type'];
 if (!in_array($widgetType, [ 'button', 'badge' ]) && !$showLogos) {
-array_push($classAppends, 'ti-no-logo');
+$classAppends []= 'ti-no-logo';
 }
 if (!in_array($widgetType, [ 'button', 'badge' ]) && !$showStars) {
-array_push($classAppends, 'ti-no-stars');
+$classAppends []= 'ti-no-stars';
 }
 if (!$showReviewersPhoto) {
-array_push($classAppends, 'ti-no-profile-img');
+$classAppends []= 'ti-no-profile-img';
 }
 $freeCssClass = 'ti-' . substr($this->shortname, 0, 4);
 if ($onlyPreview) {
@@ -5475,7 +5686,7 @@ if (!$widgetCss) {
 wp_enqueue_style("trustindex-widget-css-" . $this->shortname, "https://cdn.trustindex.io/widget-assets/css/". $styleId ."-blue.css");
 }
 else {
-array_push($classAppends, $freeCssClass);
+$classAppends []= $freeCssClass;
 }
 }
 if ($classAppends) {
@@ -5646,7 +5857,7 @@ $array['content'] = str_replace(
 ucfirst($this->getShortName()),
 $array['page-details']['name'],
 $ratingCount,
-$ratingScore,
+number_format((float)$ratingScore, 1),
 $this->is_ten_scale_rating_platform() ? 10 : 5,
 $ratingText,
 $ratingTextUcfirst,
@@ -5727,6 +5938,7 @@ if (!in_array($array['style-id'], [ 53, 54 ])) {
 preg_match('/src="([^"]+logo[^\.]*\.svg)"/m', $array['content'], $matches);
 if (isset($matches[1]) && !empty($matches[1])) {
 $array['content'] = str_replace($matches[0], $matches[0] . ' width="150" height="25"', $array['content']);
+$array['content'] = preg_replace('/width="([\d%]+)" height="([\d%]+)"( alt="[^"]+")? width="([\d%]+)" height="([\d%]+)"/', 'width="$1" height="$2"$3', $array['content']);
 }
 }
 return $array['content'];
@@ -5819,7 +6031,7 @@ public function get_widget_default_filter()
 global $wpdb;
 $onlyRatingsDefault = false;
 if ($this->is_noreg_linked()) {
-$onlyRatingsDefault = intval($wpdb->get_var('SELECT COUNT(`id`) FROM `'. $this->get_tablename('reviews') .'` WHERE `text` != ""')) >= 3;
+$onlyRatingsDefault = (float)$wpdb->get_var('SELECT COUNT(`id`) FROM `'. $this->get_tablename('reviews') .'` WHERE `text` != ""') >= 3;
 }
 return [
 'stars' => [1, 2, 3, 4, 5],
@@ -5893,7 +6105,7 @@ curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
 }, 10);
 $response = wp_remote_get('https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]='. $this->get_plugin_slug());
 $json = json_decode($response['body'], true);
-if (!$json && !isset($json['version'])) {
+if (!$json || !isset($json['version'])) {
 return false;
 }
 return $json['version'];
@@ -5979,7 +6191,7 @@ public function register_tinymce_buttons($buttons)
 {
 $buttonName = 'trustindex';
 if (!in_array($buttonName, $buttons)) {
-array_push($buttons, $buttonName);
+$buttons []= $buttonName;
 }
 return $buttons;
 }
@@ -6045,11 +6257,9 @@ wp_enqueue_script('trustindex_settings_script_'. $this->shortname, $this->get_pl
 }
 }
 }
-wp_register_script('trustindex_admin_popup', $this->get_plugin_file_url('static/js/admin-popup.js') );
-wp_enqueue_script('trustindex_admin_popup');
-wp_enqueue_style('trustindex_admin_popup', $this->get_plugin_file_url('static/css/admin-popup.css'));
 wp_register_script('trustindex_admin_notification', $this->get_plugin_file_url('static/js/admin-notification.js') );
 wp_enqueue_script('trustindex_admin_notification');
+wp_enqueue_style('trustindex_admin_notification', $this->get_plugin_file_url('static/css/admin-notification.css'));
 }
 
 
@@ -6196,6 +6406,10 @@ if ($method !== 'direct' && !defined('FS_METHOD')) {
 return 'direct';
 }
 return $method;
+}
+public function isJson($str) {
+$json = json_decode($str);
+return $json && $str !== $json;
 }
 public function register_block_editor()
 {
